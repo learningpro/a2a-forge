@@ -1,8 +1,23 @@
+import { useState, useEffect } from "react";
 import { useUiStore } from "../../stores/uiStore";
+import { useAgentStore } from "../../stores/agentStore";
+import { AgentListItem } from "../agent/AgentListItem";
+import { AddAgentDialog } from "../agent/AddAgentDialog";
 
 export function Sidebar() {
   const sidebarCollapsed = useUiStore((s) => s.sidebarCollapsed);
   const setSidebarCollapsed = useUiStore((s) => s.setSidebarCollapsed);
+
+  const agents = useAgentStore((s) => s.agents);
+  const selectedAgentId = useAgentStore((s) => s.selectedAgentId);
+  const setSelectedAgentId = useAgentStore((s) => s.setSelectedAgentId);
+
+  const [showAddDialog, setShowAddDialog] = useState(false);
+
+  // Load agents from SQLite on mount
+  useEffect(() => {
+    useAgentStore.getState().loadAgents("default");
+  }, []);
 
   return (
     <aside
@@ -39,6 +54,7 @@ export function Sidebar() {
               Agents
             </div>
             <button
+              onClick={() => setShowAddDialog(true)}
               style={{
                 width: "100%",
                 padding: "6px 10px",
@@ -73,7 +89,7 @@ export function Sidebar() {
         )}
       </div>
 
-      {/* Agent list placeholder */}
+      {/* Agent list */}
       <div
         style={{
           flex: 1,
@@ -83,7 +99,16 @@ export function Sidebar() {
           flexDirection: "column",
           gap: 2,
         }}
-      />
+      >
+        {agents.map((agent) => (
+          <AgentListItem
+            key={agent.id}
+            agent={agent}
+            isActive={agent.id === selectedAgentId}
+            onClick={() => setSelectedAgentId(agent.id)}
+          />
+        ))}
+      </div>
 
       {/* Footer */}
       <div
@@ -132,6 +157,12 @@ export function Sidebar() {
           {sidebarCollapsed ? "\u25B6" : "\u25C0"}
         </button>
       </div>
+
+      {/* Add Agent Dialog */}
+      <AddAgentDialog
+        open={showAddDialog}
+        onClose={() => setShowAddDialog(false)}
+      />
     </aside>
   );
 }
