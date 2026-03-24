@@ -9,6 +9,8 @@ describe("bundle safety", () => {
     const monacoImports = sourceFiles.filter((file) => {
       // Skip test files themselves
       if (file.includes("__tests__") || file.includes(".test.")) return false;
+      // MonacoWrapper is the designated wrapper — it's the ONLY file allowed to import Monaco directly
+      if (file.endsWith("MonacoWrapper.tsx")) return false;
       const content = fs.readFileSync(file, "utf-8");
       return (
         content.includes('from "monaco-editor"') ||
