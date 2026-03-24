@@ -31,8 +31,8 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans:** 2/2 plans complete
 
 Plans:
-- [ ] 01-01-PLAN.md — Scaffold Tauri project, Rust backend modules (error, state, db, commands), capabilities ACL, tauri.conf.json
-- [ ] 01-02-PLAN.md — Frontend theme system, Zustand stores, three-panel layout components, visual verification
+- [x] 01-01-PLAN.md — Scaffold Tauri project, Rust backend modules (error, state, db, commands), capabilities ACL, tauri.conf.json
+- [x] 01-02-PLAN.md — Frontend theme system, Zustand stores, three-panel layout components, visual verification
 
 ### Phase 2: Agent and Skill Discovery
 **Goal**: Users can register any A2A agent by URL, browse all its skills with search and filtering, and manage their card library across sessions
@@ -44,7 +44,13 @@ Plans:
   3. Cards survive app restart — all registered agents reappear on relaunch
   4. User can import and export cards as a JSON bundle
   5. All skills in a selected card are listed with name, description, input modes, and output modes; skills are searchable by name/description and filterable by mode; clicking a skill opens the test panel
-**Plans**: TBD
+**Plans:** 4 plans
+
+Plans:
+- [ ] 02-01-PLAN.md — Rust A2A types, 7 agent CRUD commands, lib.rs wiring, dialog plugin
+- [ ] 02-02-PLAN.md — agentStore CRUD, AddAgentDialog with debounced preview, Sidebar agent list
+- [ ] 02-03-PLAN.md — SkillPanel with search, filter chips, mode tags, skill selection
+- [ ] 02-04-PLAN.md — Card management UI (rename/refresh/delete hover menu, import/export)
 
 ### Phase 3: Task Execution and Testing
 **Goal**: Users can compose and send test messages to any skill, see real-time results including streaming responses, and access full history of past executions
@@ -67,5 +73,5 @@ Phases execute in numeric order: 1 → 2 → 3
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 2/2 | Complete    | 2026-03-24 |
-| 2. Agent and Skill Discovery | 0/? | Not started | - |
+| 2. Agent and Skill Discovery | 0/4 | In progress | - |
 | 3. Task Execution and Testing | 0/? | Not started | - |
