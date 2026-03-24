@@ -1,9 +1,9 @@
+import { useTheme } from "./hooks/useTheme";
+import { AppShell } from "./components/layout/AppShell";
+
 function App() {
-  return (
-    <div>
-      <h1>A2A Workbench</h1>
-    </div>
-  );
+  useTheme();
+  return <AppShell />;
 }
 
 export default App;
