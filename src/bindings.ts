@@ -96,8 +96,8 @@ export const commands = {
   async getSettings(): Promise<Record<string, unknown>> {
     return await TAURI_INVOKE("get_settings");
   },
-  async saveSettings(key: string, value: string): Promise<void> {
-    await TAURI_INVOKE("save_settings", { key, value });
+  async saveSetting(key: string, value: string): Promise<void> {
+    await TAURI_INVOKE("save_setting", { key, value });
   },
   async fetchAgentCard(baseUrl: string): Promise<AgentCard> {
     return await TAURI_INVOKE("fetch_agent_card", { baseUrl });

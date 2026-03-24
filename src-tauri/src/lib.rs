@@ -12,7 +12,7 @@ pub fn run() {
     let builder = Builder::<tauri::Wry>::new()
         .commands(collect_commands![
             commands::settings::get_settings,
-            commands::settings::save_settings,
+            commands::settings::save_setting,
             commands::agents::fetch_agent_card,
             commands::agents::add_agent,
             commands::agents::list_agents,
@@ -20,6 +20,19 @@ pub fn run() {
             commands::agents::refresh_agent,
             commands::agents::import_agents,
             commands::agents::export_agents,
+            commands::tasks::send_task,
+            commands::tasks::stream_task,
+            commands::tasks::cancel_task,
+            commands::history::save_history,
+            commands::history::list_history,
+            commands::history::clear_history,
+            commands::saved_tests::save_test,
+            commands::saved_tests::list_saved_tests,
+            commands::saved_tests::delete_saved_test,
+            commands::workspaces::list_workspaces,
+            commands::workspaces::create_workspace,
+            commands::workspaces::delete_workspace,
+            commands::workspaces::set_active_workspace,
         ]);
 
     #[cfg(debug_assertions)]
