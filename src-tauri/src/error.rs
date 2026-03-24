@@ -1,7 +1,8 @@
 use serde::Serialize;
+use specta::Type;
 use thiserror::Error;
 
-#[derive(Error, Debug, Serialize)]
+#[derive(Error, Debug, Serialize, Type)]
 #[serde(tag = "kind", content = "message")]
 pub enum AppError {
     #[error("Database error: {0}")]

@@ -10,12 +10,22 @@
       {
         "title": "A2A Workbench",
         "width": 1280,
-        "height": 800
+        "height": 800,
+        "minWidth": 1024,
+        "minHeight": 640,
+        "decorations": true,
+        "resizable": true
       }
-    ]
+    ],
+    "security": {
+      "csp": "default-src 'self'; script-src 'self' 'unsafe-eval'; worker-src blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: asset: https://asset.localhost"
+    }
   },
   "bundle": {
     "active": true,
-    "targets": "all"
+    "targets": "all",
+    "icon": [
+      "icons/icon.png"
+    ]
   }
 }
