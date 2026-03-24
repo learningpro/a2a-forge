@@ -13,6 +13,13 @@ pub fn run() {
         .commands(collect_commands![
             commands::settings::get_settings,
             commands::settings::save_settings,
+            commands::agents::fetch_agent_card,
+            commands::agents::add_agent,
+            commands::agents::list_agents,
+            commands::agents::delete_agent,
+            commands::agents::refresh_agent,
+            commands::agents::import_agents,
+            commands::agents::export_agents,
         ]);
 
     #[cfg(debug_assertions)]
@@ -29,6 +36,7 @@ pub fn run() {
         .plugin(tauri_plugin_window_state::Builder::default().build())
         .plugin(tauri_plugin_store::Builder::default().build())
         .plugin(tauri_plugin_keyring::init())
+        .plugin(tauri_plugin_dialog::init())
         .manage(state::AppState::new())
         .invoke_handler(builder.invoke_handler())
         .setup(move |app| {

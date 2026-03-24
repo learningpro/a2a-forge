@@ -14,6 +14,8 @@
     "store:allow-get",
     "store:allow-set",
     "store:allow-save",
-    "keyring:default"
+    "keyring:default",
+    "dialog:allow-open",
+    "dialog:allow-save"
   ]
 }
