@@ -3,7 +3,7 @@
 
 /** user-defined commands **/
 
-import { invoke as TAURI_INVOKE } from "@tauri-apps/api/core";
+import { invoke as TAURI_INVOKE, Channel } from "@tauri-apps/api/core";
 
 // Type definitions matching Rust types (camelCase via serde rename_all)
 
@@ -59,6 +59,39 @@ export type AppError =
   | { kind: "NotFound"; message: string }
   | { kind: "Credential"; message: string };
 
+export type TaskEvent = {
+  id: string | null;
+  status: { state: string; message: string | null } | null;
+  artifact: unknown | null;
+  raw: unknown;
+};
+
+export type HistoryEntry = {
+  id: string;
+  agentId: string;
+  taskId: string;
+  request: unknown;
+  response: unknown;
+  status: string;
+  latencyMs: number | null;
+  createdAt: number;
+};
+
+export type SavedTest = {
+  id: string;
+  name: string;
+  agentId: string;
+  skillId: string;
+  payload: unknown;
+  createdAt: number;
+};
+
+export type Workspace = {
+  id: string;
+  name: string;
+  createdAt: number;
+};
+
 export const commands = {
   async getSettings(): Promise<Record<string, unknown>> {
     return await TAURI_INVOKE("get_settings");
@@ -93,5 +126,80 @@ export const commands = {
   },
   async exportAgents(workspaceId: string): Promise<string> {
     return await TAURI_INVOKE("export_agents", { workspaceId });
+  },
+  async sendTask(
+    agentUrl: string,
+    payload: unknown,
+    authHeader: string | null,
+    extraHeaders: Record<string, string> | null,
+  ): Promise<unknown> {
+    return await TAURI_INVOKE("send_task", { agentUrl, payload, authHeader, extraHeaders });
+  },
+  async streamTask(
+    agentUrl: string,
+    payload: unknown,
+    authHeader: string | null,
+    extraHeaders: Record<string, string> | null,
+    onEvent: Channel<TaskEvent>,
+  ): Promise<string> {
+    return await TAURI_INVOKE("stream_task", {
+      agentUrl,
+      payload,
+      authHeader,
+      extraHeaders,
+      onEvent,
+    });
+  },
+  async cancelTask(taskId: string): Promise<void> {
+    await TAURI_INVOKE("cancel_task", { taskId });
+  },
+  async saveHistory(
+    agentId: string,
+    taskId: string,
+    request: unknown,
+    response: unknown,
+    status: string,
+    latencyMs: number | null,
+  ): Promise<void> {
+    await TAURI_INVOKE("save_history", {
+      agentId,
+      taskId,
+      request,
+      response,
+      status,
+      latencyMs,
+    });
+  },
+  async listHistory(agentId: string): Promise<HistoryEntry[]> {
+    return await TAURI_INVOKE("list_history", { agentId });
+  },
+  async clearHistory(agentId: string): Promise<void> {
+    await TAURI_INVOKE("clear_history", { agentId });
+  },
+  async saveTest(
+    name: string,
+    agentId: string,
+    skillId: string,
+    payload: unknown,
+  ): Promise<void> {
+    await TAURI_INVOKE("save_test", { name, agentId, skillId, payload });
+  },
+  async listSavedTests(agentId: string): Promise<SavedTest[]> {
+    return await TAURI_INVOKE("list_saved_tests", { agentId });
+  },
+  async deleteSavedTest(testId: string): Promise<void> {
+    await TAURI_INVOKE("delete_saved_test", { testId });
+  },
+  async listWorkspaces(): Promise<Workspace[]> {
+    return await TAURI_INVOKE("list_workspaces");
+  },
+  async createWorkspace(name: string): Promise<Workspace> {
+    return await TAURI_INVOKE("create_workspace", { name });
+  },
+  async deleteWorkspace(workspaceId: string): Promise<void> {
+    await TAURI_INVOKE("delete_workspace", { workspaceId });
+  },
+  async setActiveWorkspace(workspaceId: string): Promise<void> {
+    await TAURI_INVOKE("set_active_workspace", { workspaceId });
   },
 };
