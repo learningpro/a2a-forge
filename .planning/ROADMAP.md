@@ -44,7 +44,7 @@ Plans:
   3. Cards survive app restart — all registered agents reappear on relaunch
   4. User can import and export cards as a JSON bundle
   5. All skills in a selected card are listed with name, description, input modes, and output modes; skills are searchable by name/description and filterable by mode; clicking a skill opens the test panel
-**Plans:** 4 plans
+**Plans:** 1/4 plans executed
 
 Plans:
 - [ ] 02-01-PLAN.md — Rust A2A types, 7 agent CRUD commands, lib.rs wiring, dialog plugin
@@ -73,5 +73,5 @@ Phases execute in numeric order: 1 → 2 → 3
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 2/2 | Complete    | 2026-03-24 |
-| 2. Agent and Skill Discovery | 0/4 | In progress | - |
+| 2. Agent and Skill Discovery | 1/4 | In Progress|  |
 | 3. Task Execution and Testing | 0/? | Not started | - |
