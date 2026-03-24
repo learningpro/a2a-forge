@@ -28,7 +28,11 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. All HTTP requests are routed through the Rust backend — the webview makes no outbound network calls
   4. Credentials are stored in the OS keychain, not in SQLite plaintext
   5. SQLite is initialized with WAL mode and the full schema; the app can read and write records without errors
-**Plans**: TBD
+**Plans:** 2 plans
+
+Plans:
+- [ ] 01-01-PLAN.md — Scaffold Tauri project, Rust backend modules (error, state, db, commands), capabilities ACL, tauri.conf.json
+- [ ] 01-02-PLAN.md — Frontend theme system, Zustand stores, three-panel layout components, visual verification
 
 ### Phase 2: Agent and Skill Discovery
 **Goal**: Users can register any A2A agent by URL, browse all its skills with search and filtering, and manage their card library across sessions
@@ -62,6 +66,6 @@ Phases execute in numeric order: 1 → 2 → 3
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/? | Not started | - |
+| 1. Foundation | 0/2 | Planning complete | - |
 | 2. Agent and Skill Discovery | 0/? | Not started | - |
 | 3. Task Execution and Testing | 0/? | Not started | - |
