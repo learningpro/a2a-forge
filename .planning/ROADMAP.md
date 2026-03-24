@@ -12,7 +12,7 @@ Build a Tauri 2.x desktop app that lets engineers add any A2A agent by URL, brow
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Foundation** - Tauri 2 scaffold with SQLite, permissions ACL, typed Rust/React bridge, and three-panel shell UI
+- [x] **Phase 1: Foundation** - Tauri 2 scaffold with SQLite, permissions ACL, typed Rust/React bridge, and three-panel shell UI (completed 2026-03-24)
 - [ ] **Phase 2: Agent and Skill Discovery** - Add agents by URL, browse and filter skills, manage cards across sessions
 - [ ] **Phase 3: Task Execution and Testing** - Full test workflow — adaptive input, sync and streaming send, response viewer, history, saved tests, curl export, settings
 
@@ -28,7 +28,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. All HTTP requests are routed through the Rust backend — the webview makes no outbound network calls
   4. Credentials are stored in the OS keychain, not in SQLite plaintext
   5. SQLite is initialized with WAL mode and the full schema; the app can read and write records without errors
-**Plans:** 2 plans
+**Plans:** 2/2 plans complete
 
 Plans:
 - [ ] 01-01-PLAN.md — Scaffold Tauri project, Rust backend modules (error, state, db, commands), capabilities ACL, tauri.conf.json
@@ -66,6 +66,6 @@ Phases execute in numeric order: 1 → 2 → 3
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/2 | Planning complete | - |
+| 1. Foundation | 2/2 | Complete   | 2026-03-24 |
 | 2. Agent and Skill Discovery | 0/? | Not started | - |
 | 3. Task Execution and Testing | 0/? | Not started | - |
