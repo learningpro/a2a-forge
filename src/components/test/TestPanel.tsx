@@ -8,7 +8,8 @@ import {
   generateTaskId,
 } from "../../lib/a2a";
 import { generateCurlCommand } from "../../lib/curl";
-import { commands, unwrap, type AgentSkill, type HistoryEntry, type JsonValue } from "../../bindings";
+import { commands, type AgentSkill, type JsonValue } from "../../bindings";
+import { unwrap, type HistoryEntry } from "../../lib/tauri-helpers";
 import { SkillMetadata } from "./SkillMetadata";
 import { InputForm } from "./InputForm";
 import { ResponseViewer } from "./ResponseViewer";

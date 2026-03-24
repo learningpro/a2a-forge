@@ -1,5 +1,6 @@
 import { Channel } from "@tauri-apps/api/core";
-import { commands, unwrap, type TaskEvent, type JsonValue } from "../bindings";
+import { commands, type TaskEvent, type JsonValue } from "../bindings";
+import { unwrap } from "../lib/tauri-helpers";
 import { useTestStore, type TaskChunk } from "../stores/testStore";
 
 /**

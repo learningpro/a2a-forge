@@ -1,5 +1,6 @@
 import { create } from "zustand";
-import { commands, unwrap, type AgentRow } from "../bindings";
+import { commands, type AgentRow } from "../bindings";
+import { unwrap } from "../lib/tauri-helpers";
 import Database from "@tauri-apps/plugin-sql";
 
 interface AgentState {

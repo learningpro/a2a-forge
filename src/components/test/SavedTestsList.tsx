@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
-import { commands, unwrap } from "../../bindings";
+import { commands } from "../../bindings";
+import { unwrap } from "../../lib/tauri-helpers";
 
 interface SavedTestsListProps {
   agentId: string;

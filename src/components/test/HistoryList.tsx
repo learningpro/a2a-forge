@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { commands, unwrap, type HistoryEntry } from "../../bindings";
+import { commands } from "../../bindings";
+import { unwrap, type HistoryEntry } from "../../lib/tauri-helpers";
 
 interface HistoryListProps {
   agentId: string | null;

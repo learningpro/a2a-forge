@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { commands, unwrap } from "../bindings";
+import { commands } from "../bindings";
+import { unwrap } from "../lib/tauri-helpers";
 
 export interface Workspace {
   id: string;

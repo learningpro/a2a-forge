@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
-import { commands, unwrap, type AgentCard } from "../../bindings";
+import { commands, type AgentCard } from "../../bindings";
+import { unwrap } from "../../lib/tauri-helpers";
 import { useAgentStore } from "../../stores/agentStore";
 
 type PreviewState =
