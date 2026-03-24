@@ -35,10 +35,10 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **TEST-06**: App supports streaming via tasks/sendSubscribe (SSE) when agent advertises streaming
 - [ ] **TEST-07**: Response viewer shows full JSON-RPC response in collapsible tree
 - [ ] **TEST-08**: Response viewer renders message.parts natively (text as markdown, file as download, data as JSON)
-- [ ] **TEST-09**: Response viewer shows task status badge and latency in ms
+- [x] **TEST-09**: Response viewer shows task status badge and latency in ms
 - [x] **TEST-10**: User can save request/response pair as named Test Case
 - [x] **TEST-11**: User can re-run saved Test Case with one click
-- [ ] **TEST-12**: User can copy equivalent curl command for any request
+- [x] **TEST-12**: User can copy equivalent curl command for any request
 
 ### Test History
 
@@ -56,7 +56,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [x] **UIUX-01**: Three-panel resizable layout (agents sidebar | skill list | test panel)
 - [x] **UIUX-02**: System dark/light mode with settings override
-- [ ] **UIUX-03**: Keyboard shortcuts for common actions (add card, run test, copy curl)
+- [x] **UIUX-03**: Keyboard shortcuts for common actions (add card, run test, copy curl)
 - [ ] **UIUX-04**: Empty states guide new users with example public A2A agents
 - [x] **UIUX-05**: App launches in < 2s on target hardware
 
@@ -121,17 +121,17 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TEST-06 | Phase 3 | Complete |
 | TEST-07 | Phase 3 | Pending |
 | TEST-08 | Phase 3 | Pending |
-| TEST-09 | Phase 3 | Pending |
+| TEST-09 | Phase 3 | Complete |
 | TEST-10 | Phase 3 | Complete |
 | TEST-11 | Phase 3 | Complete |
-| TEST-12 | Phase 3 | Pending |
+| TEST-12 | Phase 3 | Complete |
 | HIST-01 | Phase 3 | Complete |
 | HIST-02 | Phase 3 | Pending |
 | HIST-03 | Phase 3 | Complete |
 | WORK-01 | Phase 3 | Complete |
 | SETT-01 | Phase 3 | Complete |
 | SETT-02 | Phase 3 | Complete |
-| UIUX-03 | Phase 3 | Pending |
+| UIUX-03 | Phase 3 | Complete |
 | UIUX-04 | Phase 3 | Pending |
 
 **Coverage:**
