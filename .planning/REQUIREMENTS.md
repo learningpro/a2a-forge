@@ -10,8 +10,8 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Agent Card Management
 
 - [x] **CARD-01**: User can add an agent card by entering a base URL (app fetches `{url}/.well-known/agent.json`)
-- [ ] **CARD-02**: App displays loading state during fetch and descriptive error on failure
-- [ ] **CARD-03**: User can give a card a local nickname overriding the name field
+- [x] **CARD-02**: App displays loading state during fetch and descriptive error on failure
+- [x] **CARD-03**: User can give a card a local nickname overriding the name field
 - [x] **CARD-04**: Cards are persisted across sessions in SQLite
 - [x] **CARD-05**: User can delete a card with confirmation (removes associated test history)
 - [x] **CARD-06**: User can manually refresh a card to re-fetch latest version
@@ -102,8 +102,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SECR-01 | Phase 1 | Complete |
 | SECR-02 | Phase 1 | Complete |
 | CARD-01 | Phase 2 | Complete |
-| CARD-02 | Phase 2 | Pending |
-| CARD-03 | Phase 2 | Pending |
+| CARD-02 | Phase 2 | Complete |
+| CARD-03 | Phase 2 | Complete |
 | CARD-04 | Phase 2 | Complete |
 | CARD-05 | Phase 2 | Complete |
 | CARD-06 | Phase 2 | Complete |
