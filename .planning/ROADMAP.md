@@ -13,7 +13,7 @@ Build a Tauri 2.x desktop app that lets engineers add any A2A agent by URL, brow
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Foundation** - Tauri 2 scaffold with SQLite, permissions ACL, typed Rust/React bridge, and three-panel shell UI (completed 2026-03-24)
-- [ ] **Phase 2: Agent and Skill Discovery** - Add agents by URL, browse and filter skills, manage cards across sessions
+- [x] **Phase 2: Agent and Skill Discovery** - Add agents by URL, browse and filter skills, manage cards across sessions (completed 2026-03-24)
 - [ ] **Phase 3: Task Execution and Testing** - Full test workflow — adaptive input, sync and streaming send, response viewer, history, saved tests, curl export, settings
 
 ## Phase Details
@@ -44,7 +44,7 @@ Plans:
   3. Cards survive app restart — all registered agents reappear on relaunch
   4. User can import and export cards as a JSON bundle
   5. All skills in a selected card are listed with name, description, input modes, and output modes; skills are searchable by name/description and filterable by mode; clicking a skill opens the test panel
-**Plans:** 3/4 plans executed
+**Plans:** 4/4 plans complete
 
 Plans:
 - [ ] 02-01-PLAN.md — Rust A2A types, 7 agent CRUD commands, lib.rs wiring, dialog plugin
@@ -73,5 +73,5 @@ Phases execute in numeric order: 1 → 2 → 3
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 2/2 | Complete    | 2026-03-24 |
-| 2. Agent and Skill Discovery | 3/4 | In Progress|  |
+| 2. Agent and Skill Discovery | 3/4 | Complete    | 2026-03-24 |
 | 3. Task Execution and Testing | 0/? | Not started | - |
