@@ -57,7 +57,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **UIUX-01**: Three-panel resizable layout (agents sidebar | skill list | test panel)
 - [x] **UIUX-02**: System dark/light mode with settings override
 - [x] **UIUX-03**: Keyboard shortcuts for common actions (add card, run test, copy curl)
-- [ ] **UIUX-04**: Empty states guide new users with example public A2A agents
+- [x] **UIUX-04**: Empty states guide new users with example public A2A agents
 - [x] **UIUX-05**: App launches in < 2s on target hardware
 
 ### Security
@@ -132,7 +132,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SETT-01 | Phase 3 | Complete |
 | SETT-02 | Phase 3 | Complete |
 | UIUX-03 | Phase 3 | Complete |
-| UIUX-04 | Phase 3 | Pending |
+| UIUX-04 | Phase 3 | Complete |
 
 **Coverage:**
 - v1 requirements: 37 total (note: original count of 30 was incorrect)
