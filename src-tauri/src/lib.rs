@@ -1,3 +1,4 @@
+mod a2a;
 mod commands;
 mod credentials;
 mod db;
