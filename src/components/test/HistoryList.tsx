@@ -30,11 +30,11 @@ export function HistoryList({ agentId, onSelectHistory }: HistoryListProps) {
   const loadHistory = useCallback(async (searchQuery?: string) => {
     setLoading(true);
     try {
-      const all = await commands.listHistory(agentId ?? "");
-      let filtered = all;
+      const all = await commands.listHistory(agentId, null, null) as unknown as HistoryEntry[];
+      let filtered: HistoryEntry[] = all;
       if (searchQuery) {
         const q = searchQuery.toLowerCase();
-        filtered = all.filter((e) => {
+        filtered = all.filter((e: HistoryEntry) => {
           const reqStr = typeof e.request === "string" ? e.request : JSON.stringify(e.request);
           return reqStr.toLowerCase().includes(q) || e.taskId.toLowerCase().includes(q);
         });
@@ -66,7 +66,7 @@ export function HistoryList({ agentId, onSelectHistory }: HistoryListProps) {
     const label = agentId ? "this agent" : "all agents";
     if (!window.confirm(`Clear history for ${label}?`)) return;
     try {
-      await commands.clearHistory(agentId ?? "");
+      await commands.clearHistory(agentId ?? null);
       setEntries([]);
     } catch {
       // ignore

@@ -20,7 +20,7 @@ export function SavedTestsList({
   const loadTests = useCallback(async () => {
     setLoading(true);
     try {
-      const all = await commands.listSavedTests(agentId);
+      const all = await commands.listSavedTests(agentId, skillName) as unknown as Array<{ id: string; name: string; agentId: string; skillId: string; payload: unknown; createdAt: number }>;
       // Filter by skillName client-side if needed
       const filtered = skillName
         ? all.filter((t) => t.skillId === skillName)
@@ -42,7 +42,7 @@ export function SavedTestsList({
     const name = window.prompt("Name this test case:");
     if (!name?.trim()) return;
     try {
-      await commands.saveTest(name.trim(), agentId, skillName, currentPayload);
+      await commands.saveTest(name.trim(), agentId, skillName, JSON.stringify(currentPayload));
       await loadTests();
     } catch {
       // ignore save failures

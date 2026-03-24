@@ -1,5 +1,5 @@
 import { Channel } from "@tauri-apps/api/core";
-import { commands, type TaskEvent } from "../bindings";
+import { commands, type TaskEvent, type JsonValue } from "../bindings";
 import { useTestStore, type TaskChunk } from "../stores/testStore";
 
 /**
@@ -15,7 +15,7 @@ export function useStreamingTask() {
 
   const run = async (
     agentUrl: string,
-    payload: unknown,
+    payload: JsonValue,
     authHeader?: string,
     extraHeaders?: Record<string, string>,
   ) => {

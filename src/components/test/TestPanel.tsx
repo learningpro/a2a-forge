@@ -8,7 +8,7 @@ import {
   generateTaskId,
 } from "../../lib/a2a";
 import { generateCurlCommand } from "../../lib/curl";
-import { commands, type AgentSkill, type HistoryEntry } from "../../bindings";
+import { commands, type AgentSkill, type HistoryEntry, type JsonValue } from "../../bindings";
 import { SkillMetadata } from "./SkillMetadata";
 import { InputForm } from "./InputForm";
 import { ResponseViewer } from "./ResponseViewer";
@@ -70,7 +70,7 @@ export function TestPanel() {
       try {
         await runStreaming(
           selectedAgent.url,
-          payload,
+          payload as unknown as JsonValue,
           authHeader,
           extraHeaders,
         );
@@ -86,9 +86,10 @@ export function TestPanel() {
       try {
         const result = await commands.sendTask(
           selectedAgent.url,
-          payload,
+          payload as unknown as JsonValue,
           authHeader ?? null,
           extraHeaders ?? null,
+          null,
         );
         finishTask(result, "completed");
       } catch (err) {
@@ -106,8 +107,8 @@ export function TestPanel() {
       .saveHistory(
         selectedAgent.id,
         taskId,
-        { skill: skill.id, text: inputText },
-        result,
+        JSON.stringify({ skill: skill.id, text: inputText }),
+        result != null ? JSON.stringify(result) : null,
         finalStatus,
         finalLatency,
       )

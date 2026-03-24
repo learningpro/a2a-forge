@@ -25,19 +25,19 @@ export const useWorkspaceStore = create<WorkspaceState>()(
       activeWorkspaceId: "default",
 
       loadWorkspaces: async () => {
-        const workspaces = await commands.listWorkspaces();
+        const workspaces = await commands.listWorkspaces() as unknown as Workspace[];
         set({ workspaces });
       },
 
       createWorkspace: async (name: string) => {
         await commands.createWorkspace(name);
-        const workspaces = await commands.listWorkspaces();
+        const workspaces = await commands.listWorkspaces() as unknown as Workspace[];
         set({ workspaces });
       },
 
       deleteWorkspace: async (id: string) => {
         await commands.deleteWorkspace(id);
-        const workspaces = await commands.listWorkspaces();
+        const workspaces = await commands.listWorkspaces() as unknown as Workspace[];
         set((state) => ({
           workspaces,
           activeWorkspaceId:

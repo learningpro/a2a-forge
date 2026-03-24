@@ -24,7 +24,8 @@ export function SettingsModal({ isOpen, onClose, cardId }: SettingsModalProps) {
   // Load settings on mount
   useEffect(() => {
     if (!isOpen) return;
-    commands.getSettings().then((settings) => {
+    commands.getSettings().then((raw) => {
+      const settings = raw as Record<string, unknown>;
       if (!cardId) {
         // Global settings
         if (settings["timeout_seconds"] != null) {

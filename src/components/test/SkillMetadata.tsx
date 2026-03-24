@@ -69,8 +69,8 @@ export function SkillMetadata({ skill, onExampleClick }: SkillMetadataProps) {
 
       {/* Modes */}
       <div style={{ display: "flex", gap: 12, marginTop: 2 }}>
-        {renderModePills(skill.inputModes, "in")}
-        {renderModePills(skill.outputModes, "out")}
+        {renderModePills(skill.inputModes ?? null, "in")}
+        {renderModePills(skill.outputModes ?? null, "out")}
       </div>
 
       {/* Examples */}

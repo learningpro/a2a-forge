@@ -11,7 +11,7 @@ interface AgentListItemProps {
 
 function getStatusDotColor(agent: AgentRow): string {
   const nowSeconds = Date.now() / 1000;
-  if (nowSeconds - agent.lastFetchedAt > 3600) {
+  if (nowSeconds - Number(agent.lastFetchedAt) > 3600) {
     return "#EF9F27"; // amber -- stale > 1 hour
   }
   return "#1D9E75"; // green -- recently fetched
