@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useAgentStore } from "../../stores/agentStore";
 import { useTestStore } from "../../stores/testStore";
 import { useStreamingTask } from "../../hooks/useStreamingTask";
@@ -8,20 +8,24 @@ import {
   generateTaskId,
 } from "../../lib/a2a";
 import { generateCurlCommand } from "../../lib/curl";
-import { commands, type AgentSkill } from "../../bindings";
+import { commands, type AgentSkill, type HistoryEntry } from "../../bindings";
 import { SkillMetadata } from "./SkillMetadata";
 import { InputForm } from "./InputForm";
+import { ResponseViewer } from "./ResponseViewer";
+import { HistoryList } from "./HistoryList";
+import { SavedTestsList } from "./SavedTestsList";
 
 export function TestPanel() {
   const selectedAgent = useAgentStore((s) => s.selectedAgent());
   const selectedSkillId = useAgentStore((s) => s.selectedSkillId);
 
-  const { status, latencyMs, startTask, finishTask, inputText, customHeaders } =
+  const { status, inputText, customHeaders } =
     useTestStore();
   const { run: runStreaming } = useStreamingTask();
 
   const [authValue, setAuthValue] = useState("");
   const [curlCopied, setCurlCopied] = useState(false);
+  const [historyRefreshKey, setHistoryRefreshKey] = useState(0);
 
   // Find selected skill
   const skill: AgentSkill | null =
@@ -59,9 +63,9 @@ export function TestPanel() {
     const authHeader = authValue || undefined;
     const extraHeaders =
       Object.keys(customHeaders).length > 0 ? customHeaders : undefined;
+    const { startTask, finishTask } = useTestStore.getState();
 
     if (hasStreaming) {
-      // Streaming mode: tasks/sendSubscribe via SSE
       const payload = buildTaskSubscribePayload(skill.id, inputText, taskId);
       try {
         await runStreaming(
@@ -77,7 +81,6 @@ export function TestPanel() {
         );
       }
     } else {
-      // Sync mode: tasks/send
       const payload = buildTaskSendPayload(skill.id, inputText, taskId);
       startTask(taskId);
       try {
@@ -108,6 +111,10 @@ export function TestPanel() {
         finalStatus,
         finalLatency,
       )
+      .then(() => {
+        // Refresh history list after saving
+        setHistoryRefreshKey((k) => k + 1);
+      })
       .catch(() => {
         /* fire-and-forget */
       });
@@ -118,8 +125,6 @@ export function TestPanel() {
     inputText,
     authValue,
     customHeaders,
-    startTask,
-    finishTask,
     runStreaming,
   ]);
 
@@ -132,7 +137,54 @@ export function TestPanel() {
     [],
   );
 
-  // No skill selected — empty state
+  // Listen for global keyboard shortcut event
+  useEffect(() => {
+    const handler = () => {
+      handleRun();
+    };
+    document.addEventListener("a2a:run-test", handler);
+    return () => document.removeEventListener("a2a:run-test", handler);
+  }, [handleRun]);
+
+  const handleHistorySelect = useCallback((entry: HistoryEntry) => {
+    // Load the request into the input form
+    const req = entry.request as Record<string, unknown> | null;
+    if (req && typeof req === "object" && "text" in req) {
+      useTestStore.getState().setInputText(String(req.text));
+    }
+    // Show the response in the viewer
+    if (entry.response != null) {
+      useTestStore.getState().finishTask(
+        entry.response,
+        entry.status as "completed" | "failed",
+      );
+    }
+  }, []);
+
+  const handleRerun = useCallback(
+    (payload: unknown) => {
+      // Populate input from saved test payload and trigger run
+      const p = payload as Record<string, unknown> | null;
+      if (p && typeof p === "object") {
+        const text = typeof p.text === "string" ? p.text : JSON.stringify(p, null, 2);
+        useTestStore.getState().setInputText(text);
+        useTestStore.getState().setInputTab("message");
+      }
+      // Auto-run after a tick so state is updated
+      setTimeout(() => {
+        handleRun();
+      }, 50);
+    },
+    [handleRun],
+  );
+
+  // Build the current payload for the saved tests "save current" button
+  const currentPayload =
+    selectedAgent && skill && inputText
+      ? { skill: skill.id, text: inputText }
+      : undefined;
+
+  // No skill selected -- empty state
   if (!skill || !selectedAgent) {
     return (
       <div
@@ -204,7 +256,7 @@ export function TestPanel() {
                 textAlign: "center",
               }}
             >
-              Results will appear here
+              Select a skill and run a test to see results here
             </div>
           </div>
         </div>
@@ -237,6 +289,7 @@ export function TestPanel() {
         <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
           <button
             onClick={handleCopyCurl}
+            title="Copy as curl (Cmd+Shift+C)"
             style={{
               padding: "4px 8px",
               fontSize: 10,
@@ -274,6 +327,33 @@ export function TestPanel() {
             onRun={handleRun}
             isRunning={isRunning}
           />
+
+          {/* Saved tests */}
+          <div
+            style={{
+              padding: "8px 14px 10px",
+              borderTop: "0.5px solid var(--border-subtle)",
+            }}
+          >
+            <div
+              style={{
+                fontSize: 10,
+                fontWeight: 500,
+                color: "var(--text-muted)",
+                textTransform: "uppercase",
+                letterSpacing: "0.07em",
+                marginBottom: 6,
+              }}
+            >
+              Saved Tests
+            </div>
+            <SavedTestsList
+              agentId={selectedAgent.id}
+              skillName={skill.id}
+              onRerun={handleRerun}
+              currentPayload={currentPayload}
+            />
+          </div>
         </div>
 
         {/* Output column */}
@@ -286,24 +366,35 @@ export function TestPanel() {
             overflow: "hidden",
           }}
         >
+          <ResponseViewer />
+
+          {/* History */}
           <div
             style={{
-              flex: 1,
+              borderTop: "0.5px solid var(--border-subtle)",
+              height: 200,
+              minHeight: 120,
               display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              padding: 20,
+              flexDirection: "column",
             }}
           >
             <div
               style={{
-                fontSize: 12,
+                fontSize: 10,
+                fontWeight: 500,
                 color: "var(--text-muted)",
-                textAlign: "center",
+                textTransform: "uppercase",
+                letterSpacing: "0.07em",
+                padding: "8px 12px 0",
               }}
             >
-              Run a test to see results
+              History
             </div>
+            <HistoryList
+              key={historyRefreshKey}
+              agentId={selectedAgent.id}
+              onSelectHistory={handleHistorySelect}
+            />
           </div>
         </div>
       </div>

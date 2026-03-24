@@ -1,11 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useUiStore } from "../../stores/uiStore";
 import { useAgentStore } from "../../stores/agentStore";
+import { useWorkspaceStore } from "../../stores/workspaceStore";
 import { commands } from "../../bindings";
 import { AgentListItem } from "../agent/AgentListItem";
 import { AddAgentDialog } from "../agent/AddAgentDialog";
+import { SettingsModal } from "../settings/SettingsModal";
 
-async function handleExport() {
+async function handleExport(workspaceId: string) {
   try {
     const { save } = await import("@tauri-apps/plugin-dialog");
     const filePath = await save({
@@ -13,7 +15,7 @@ async function handleExport() {
       filters: [{ name: "JSON", extensions: ["json"] }],
     });
     if (!filePath) return;
-    const jsonData = await commands.exportAgents("default");
+    const jsonData = await commands.exportAgents(workspaceId);
     const { writeTextFile } = await import("@tauri-apps/plugin-fs");
     await writeTextFile(filePath, jsonData);
   } catch (e) {
@@ -21,7 +23,7 @@ async function handleExport() {
   }
 }
 
-async function handleImport() {
+async function handleImport(workspaceId: string) {
   try {
     const { open } = await import("@tauri-apps/plugin-dialog");
     const filePath = await open({
@@ -31,8 +33,8 @@ async function handleImport() {
     if (!filePath || Array.isArray(filePath)) return;
     const { readTextFile } = await import("@tauri-apps/plugin-fs");
     const jsonData = await readTextFile(filePath as string);
-    await commands.importAgents(jsonData, "default");
-    await useAgentStore.getState().loadAgents("default");
+    await commands.importAgents(jsonData, workspaceId);
+    await useAgentStore.getState().loadAgents(workspaceId);
   } catch (e) {
     console.error("Import failed:", e);
   }
@@ -46,12 +48,45 @@ export function Sidebar() {
   const selectedAgentId = useAgentStore((s) => s.selectedAgentId);
   const setSelectedAgentId = useAgentStore((s) => s.setSelectedAgentId);
 
-  const [showAddDialog, setShowAddDialog] = useState(false);
+  const workspaces = useWorkspaceStore((s) => s.workspaces);
+  const activeWorkspaceId = useWorkspaceStore((s) => s.activeWorkspaceId);
+  const setActiveWorkspace = useWorkspaceStore((s) => s.setActiveWorkspace);
+  const loadWorkspaces = useWorkspaceStore((s) => s.loadWorkspaces);
+  const createWorkspace = useWorkspaceStore((s) => s.createWorkspace);
 
-  // Load agents from SQLite on mount
+  const [showAddDialog, setShowAddDialog] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+
+  // Listen for global keyboard shortcut event
   useEffect(() => {
-    useAgentStore.getState().loadAgents("default");
+    const handler = () => setShowAddDialog(true);
+    document.addEventListener("a2a:add-agent", handler);
+    return () => document.removeEventListener("a2a:add-agent", handler);
   }, []);
+
+  // Load workspaces and agents on mount
+  useEffect(() => {
+    loadWorkspaces();
+  }, [loadWorkspaces]);
+
+  useEffect(() => {
+    useAgentStore.getState().loadAgents(activeWorkspaceId);
+  }, [activeWorkspaceId]);
+
+  const handleWorkspaceChange = (id: string) => {
+    setActiveWorkspace(id);
+    useAgentStore.getState().loadAgents(id);
+  };
+
+  const handleAddWorkspace = () => {
+    const name = window.prompt("New workspace name:");
+    if (!name?.trim()) return;
+    createWorkspace(name.trim());
+  };
+
+  const handleAddFromExample = () => {
+    setShowAddDialog(true);
+  };
 
   const importExportButtonStyle: React.CSSProperties = {
     fontSize: 10,
@@ -100,6 +135,7 @@ export function Sidebar() {
             </div>
             <button
               onClick={() => setShowAddDialog(true)}
+              title="Add agent (Cmd+N)"
               style={{
                 width: "100%",
                 padding: "6px 10px",
@@ -145,6 +181,39 @@ export function Sidebar() {
           gap: 2,
         }}
       >
+        {agents.length === 0 && !sidebarCollapsed && (
+          <div
+            style={{
+              padding: "20px 12px",
+              textAlign: "center",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 8,
+            }}
+          >
+            <div style={{ fontSize: 11, color: "var(--text-muted)", lineHeight: 1.5 }}>
+              Get started by adding your first A2A agent
+            </div>
+            <button
+              onClick={handleAddFromExample}
+              style={{
+                fontSize: 10,
+                padding: "4px 8px",
+                background: "var(--bg-info)",
+                border: "0.5px solid var(--border-info)",
+                borderRadius: "var(--radius-md)",
+                color: "var(--text-info)",
+                cursor: "pointer",
+                fontFamily: "var(--font-mono, 'JetBrains Mono', monospace)",
+                lineHeight: 1.4,
+              }}
+              title="Add the AIGC example agent"
+            >
+              https://aigc-service.echonlab.com
+            </button>
+          </div>
+        )}
         {agents.map((agent) => (
           <AgentListItem
             key={agent.id}
@@ -167,8 +236,52 @@ export function Sidebar() {
       >
         {!sidebarCollapsed && (
           <>
-            <div style={{ fontSize: 10, color: "var(--text-muted)" }}>Workspace</div>
+            <div
+              style={{
+                fontSize: 10,
+                color: "var(--text-muted)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              <span>Workspace</span>
+              <div style={{ display: "flex", gap: 4 }}>
+                <button
+                  onClick={handleAddWorkspace}
+                  title="Create workspace"
+                  style={{
+                    background: "transparent",
+                    border: "none",
+                    cursor: "pointer",
+                    color: "var(--text-muted)",
+                    fontSize: 13,
+                    padding: 0,
+                    lineHeight: 1,
+                  }}
+                >
+                  +
+                </button>
+                <button
+                  onClick={() => setSettingsOpen(true)}
+                  title="Settings"
+                  style={{
+                    background: "transparent",
+                    border: "none",
+                    cursor: "pointer",
+                    color: "var(--text-muted)",
+                    fontSize: 12,
+                    padding: 0,
+                    lineHeight: 1,
+                  }}
+                >
+                  {"\u2699"}
+                </button>
+              </div>
+            </div>
             <select
+              value={activeWorkspaceId}
+              onChange={(e) => handleWorkspaceChange(e.target.value)}
               style={{
                 width: "100%",
                 padding: "4px 8px",
@@ -181,12 +294,19 @@ export function Sidebar() {
                 fontFamily: "inherit",
               }}
             >
-              <option>Default</option>
+              <option value="default">Default</option>
+              {workspaces
+                .filter((w) => w.id !== "default")
+                .map((w) => (
+                  <option key={w.id} value={w.id}>
+                    {w.name}
+                  </option>
+                ))}
             </select>
             {/* Import/Export buttons */}
             <div style={{ display: "flex", gap: 4, marginTop: 4 }}>
               <button
-                onClick={handleImport}
+                onClick={() => handleImport(activeWorkspaceId)}
                 style={importExportButtonStyle}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.borderColor = "var(--border-default)";
@@ -200,7 +320,7 @@ export function Sidebar() {
                 Import
               </button>
               <button
-                onClick={handleExport}
+                onClick={() => handleExport(activeWorkspaceId)}
                 style={importExportButtonStyle}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.borderColor = "var(--border-default)";
@@ -238,6 +358,12 @@ export function Sidebar() {
       <AddAgentDialog
         open={showAddDialog}
         onClose={() => setShowAddDialog(false)}
+      />
+
+      {/* Settings Modal */}
+      <SettingsModal
+        isOpen={settingsOpen}
+        onClose={() => setSettingsOpen(false)}
       />
     </aside>
   );
