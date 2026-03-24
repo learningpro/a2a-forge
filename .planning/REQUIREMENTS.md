@@ -31,26 +31,26 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **TEST-02**: User can compose test message with adaptive input area (text → multi-line editor, file → drag-and-drop picker, data → JSON editor with syntax highlighting)
 - [ ] **TEST-03**: User can select authentication method if card declares multiple schemes
 - [ ] **TEST-04**: User can override request headers via key-value editor
-- [ ] **TEST-05**: App sends tasks/send JSON-RPC and shows real-time status indicator
-- [ ] **TEST-06**: App supports streaming via tasks/sendSubscribe (SSE) when agent advertises streaming
+- [x] **TEST-05**: App sends tasks/send JSON-RPC and shows real-time status indicator
+- [x] **TEST-06**: App supports streaming via tasks/sendSubscribe (SSE) when agent advertises streaming
 - [ ] **TEST-07**: Response viewer shows full JSON-RPC response in collapsible tree
 - [ ] **TEST-08**: Response viewer renders message.parts natively (text as markdown, file as download, data as JSON)
 - [ ] **TEST-09**: Response viewer shows task status badge and latency in ms
-- [ ] **TEST-10**: User can save request/response pair as named Test Case
-- [ ] **TEST-11**: User can re-run saved Test Case with one click
+- [x] **TEST-10**: User can save request/response pair as named Test Case
+- [x] **TEST-11**: User can re-run saved Test Case with one click
 - [ ] **TEST-12**: User can copy equivalent curl command for any request
 
 ### Test History
 
-- [ ] **HIST-01**: All executions saved to SQLite with timestamp, skill id, agent id, request/response payload, latency, status
+- [x] **HIST-01**: All executions saved to SQLite with timestamp, skill id, agent id, request/response payload, latency, status
 - [ ] **HIST-02**: History is browsable and searchable
-- [ ] **HIST-03**: User can clear history per agent or globally
+- [x] **HIST-03**: User can clear history per agent or globally
 
 ### Workspace & Settings
 
-- [ ] **WORK-01**: App supports multiple named workspaces
-- [ ] **SETT-01**: Global settings: default timeout, proxy URL, theme (system/light/dark), telemetry opt-in
-- [ ] **SETT-02**: Per-card settings: default auth headers, base URL override
+- [x] **WORK-01**: App supports multiple named workspaces
+- [x] **SETT-01**: Global settings: default timeout, proxy URL, theme (system/light/dark), telemetry opt-in
+- [x] **SETT-02**: Per-card settings: default auth headers, base URL override
 
 ### UI/UX
 
@@ -117,20 +117,20 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TEST-02 | Phase 3 | Pending |
 | TEST-03 | Phase 3 | Pending |
 | TEST-04 | Phase 3 | Pending |
-| TEST-05 | Phase 3 | Pending |
-| TEST-06 | Phase 3 | Pending |
+| TEST-05 | Phase 3 | Complete |
+| TEST-06 | Phase 3 | Complete |
 | TEST-07 | Phase 3 | Pending |
 | TEST-08 | Phase 3 | Pending |
 | TEST-09 | Phase 3 | Pending |
-| TEST-10 | Phase 3 | Pending |
-| TEST-11 | Phase 3 | Pending |
+| TEST-10 | Phase 3 | Complete |
+| TEST-11 | Phase 3 | Complete |
 | TEST-12 | Phase 3 | Pending |
-| HIST-01 | Phase 3 | Pending |
+| HIST-01 | Phase 3 | Complete |
 | HIST-02 | Phase 3 | Pending |
-| HIST-03 | Phase 3 | Pending |
-| WORK-01 | Phase 3 | Pending |
-| SETT-01 | Phase 3 | Pending |
-| SETT-02 | Phase 3 | Pending |
+| HIST-03 | Phase 3 | Complete |
+| WORK-01 | Phase 3 | Complete |
+| SETT-01 | Phase 3 | Complete |
+| SETT-02 | Phase 3 | Complete |
 | UIUX-03 | Phase 3 | Pending |
 | UIUX-04 | Phase 3 | Pending |
 
