@@ -20,13 +20,13 @@ interface HeaderEntry {
 
 export function InputForm({
   skill,
-  card,
+  card: _card,
   authValue,
   onAuthChange,
   onRun,
   isRunning,
 }: InputFormProps) {
-  const { inputText, setInputText, inputTab, setInputTab, customHeaders, setCustomHeaders } =
+  const { inputText, setInputText, inputTab, setInputTab, customHeaders: _customHeaders, setCustomHeaders } =
     useTestStore();
 
   const [contextData, setContextData] = useState("{\n  \n}");
