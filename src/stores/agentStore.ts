@@ -9,6 +9,8 @@ interface AgentState {
   selectedSkillId: string | null;
   isLoading: boolean;
   error: string | null;
+  /** agentId -> Record<headerName, headerValue> */
+  defaultHeaders: Record<string, Record<string, string>>;
 
   loadAgents: (workspaceId: string) => Promise<void>;
   addAgent: (
@@ -22,6 +24,8 @@ interface AgentState {
   setSelectedAgentId: (id: string | null) => void;
   setSelectedSkillId: (id: string | null) => void;
   selectedAgent: () => AgentRow | undefined;
+  setDefaultHeaders: (agentId: string, headers: Record<string, string>) => Promise<void>;
+  loadDefaultHeaders: (agentId: string) => Promise<void>;
 }
 
 export const useAgentStore = create<AgentState>()((set, get) => ({
@@ -30,6 +34,7 @@ export const useAgentStore = create<AgentState>()((set, get) => ({
   selectedSkillId: null,
   isLoading: false,
   error: null,
+  defaultHeaders: {},
 
   loadAgents: async (workspaceId: string) => {
     set({ isLoading: true, error: null });
@@ -94,5 +99,35 @@ export const useAgentStore = create<AgentState>()((set, get) => ({
   selectedAgent: () => {
     const { agents, selectedAgentId } = get();
     return agents.find((a) => a.id === selectedAgentId);
+  },
+
+  setDefaultHeaders: async (agentId: string, headers: Record<string, string>) => {
+    set((state) => ({
+      defaultHeaders: { ...state.defaultHeaders, [agentId]: headers },
+    }));
+    // Persist to SQLite
+    try {
+      await commands.saveSetting(
+        `card:${agentId}:headers`,
+        JSON.stringify(headers),
+      );
+    } catch {
+      /* best-effort persistence */
+    }
+  },
+
+  loadDefaultHeaders: async (agentId: string) => {
+    try {
+      const settings = unwrap(await commands.getSettings());
+      const raw = (settings as Record<string, string>)[`card:${agentId}:headers`];
+      if (raw) {
+        const headers = JSON.parse(raw) as Record<string, string>;
+        set((state) => ({
+          defaultHeaders: { ...state.defaultHeaders, [agentId]: headers },
+        }));
+      }
+    } catch {
+      /* ignore */
+    }
   },
 }));

@@ -371,7 +371,13 @@ function MediaPreview({ item }: { item: MediaItem }) {
         <video
           src={item.url}
           controls
-          style={{ maxWidth: "100%", maxHeight: 400, display: "block", padding: "0 10px 10px" }}
+          style={{
+            width: "100%",
+            maxHeight: 400,
+            display: "block",
+            borderRadius: "0 0 var(--radius-md) var(--radius-md)",
+            background: "#000",
+          }}
         />
         {!item.url.startsWith("data:") && (
           <a href={item.url} target="_blank" rel="noreferrer" style={linkStyle}>{item.url}</a>

@@ -7,8 +7,6 @@ const MonacoWrapper = React.lazy(() => import("./MonacoWrapper").then((m) => ({ 
 interface InputFormProps {
   skill: AgentSkill;
   card: AgentCard;
-  authValue: string;
-  onAuthChange: (v: string) => void;
   onRun: () => void;
   isRunning: boolean;
 }
@@ -21,8 +19,6 @@ interface HeaderEntry {
 export function InputForm({
   skill,
   card: _card,
-  authValue,
-  onAuthChange,
   onRun,
   isRunning,
 }: InputFormProps) {
@@ -326,31 +322,14 @@ export function InputForm({
         </>
       )}
 
-      {/* Auth row */}
+      {/* Run button */}
       <div
         style={{
           padding: "6px 14px 10px",
           display: "flex",
-          gap: 6,
-          alignItems: "center",
+          justifyContent: "flex-end",
         }}
       >
-        <span style={{ fontSize: 10, color: "var(--text-muted)", flexShrink: 0 }}>Auth</span>
-        <input
-          value={authValue}
-          onChange={(e) => onAuthChange(e.target.value)}
-          placeholder="Bearer token or API key..."
-          style={{
-            flex: 1,
-            padding: "4px 7px",
-            fontSize: 10,
-            background: "var(--bg-secondary)",
-            border: "0.5px solid var(--border-subtle)",
-            borderRadius: "var(--radius-md, 6px)",
-            color: "var(--text-primary)",
-            fontFamily: "var(--font-mono, 'JetBrains Mono', monospace)",
-          }}
-        />
         <button
           onClick={onRun}
           disabled={isRunning}

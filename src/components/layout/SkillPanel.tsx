@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { useAgentStore } from "../../stores/agentStore";
 import type { AgentSkill } from "../../bindings";
+import { AgentHeadersDialog } from "../agent/AgentHeadersDialog";
 
 interface SkillPanelProps {
   width: number;
@@ -128,6 +129,7 @@ const FILTER_LABELS: { label: string; value: ModeFilter }[] = [
 export function SkillPanel({ width }: SkillPanelProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState<ModeFilter>("all");
+  const [headersOpen, setHeadersOpen] = useState(false);
 
   const agents = useAgentStore((s) => s.agents);
   const selectedAgentId = useAgentStore((s) => s.selectedAgentId);
@@ -212,6 +214,22 @@ export function SkillPanel({ width }: SkillPanelProps) {
               >
                 online
               </span>
+              <button
+                onClick={() => setHeadersOpen(true)}
+                title="Default headers for this agent"
+                style={{
+                  background: "transparent",
+                  border: "none",
+                  cursor: "pointer",
+                  color: "var(--text-muted)",
+                  fontSize: 12,
+                  padding: "0 2px",
+                  lineHeight: 1,
+                  marginLeft: "auto",
+                }}
+              >
+                {"\u2699"}
+              </button>
             </div>
             <div
               style={{
@@ -330,6 +348,15 @@ export function SkillPanel({ width }: SkillPanelProps) {
           ))
         )}
       </div>
+
+      {selectedAgent && (
+        <AgentHeadersDialog
+          open={headersOpen}
+          onClose={() => setHeadersOpen(false)}
+          agentId={selectedAgent.id}
+          agentName={selectedAgent.nickname ?? selectedAgent.card.name}
+        />
+      )}
     </div>
   );
 }

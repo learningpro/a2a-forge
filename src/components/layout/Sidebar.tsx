@@ -44,6 +44,7 @@ async function handleImport(workspaceId: string) {
 export function Sidebar() {
   const sidebarCollapsed = useUiStore((s) => s.sidebarCollapsed);
   const setSidebarCollapsed = useUiStore((s) => s.setSidebarCollapsed);
+  const sidebarWidth = useUiStore((s) => s.sidebarWidth);
 
   const agents = useAgentStore((s) => s.agents);
   const selectedAgentId = useAgentStore((s) => s.selectedAgentId);
@@ -103,8 +104,8 @@ export function Sidebar() {
   return (
     <aside
       style={{
-        width: sidebarCollapsed ? 48 : 220,
-        minWidth: sidebarCollapsed ? 48 : 220,
+        width: sidebarCollapsed ? 48 : sidebarWidth,
+        minWidth: sidebarCollapsed ? 48 : sidebarWidth,
         background: "var(--bg-secondary)",
         borderRight: "0.5px solid var(--border-subtle)",
         display: "flex",

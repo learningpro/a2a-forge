@@ -19,12 +19,14 @@ import { SavedTestsList } from "./SavedTestsList";
 export function TestPanel() {
   const selectedAgent = useAgentStore((s) => s.selectedAgent());
   const selectedSkillId = useAgentStore((s) => s.selectedSkillId);
+  const agentDefaultHeaders = useAgentStore(
+    (s) => (s.selectedAgentId ? s.defaultHeaders[s.selectedAgentId] : undefined) ?? {},
+  );
 
   const { status, inputText, customHeaders } =
     useTestStore();
   const { run: runStreaming } = useStreamingTask();
 
-  const [authValue, setAuthValue] = useState("");
   const [curlCopied, setCurlCopied] = useState(false);
   const [historyRefreshKey, setHistoryRefreshKey] = useState(0);
 
@@ -41,29 +43,37 @@ export function TestPanel() {
 
     const taskId = generateTaskId();
     const payload = buildTaskSendPayload(skill.id, inputText, taskId);
-    const authHeader = authValue ? `Authorization: ${authValue}` : undefined;
+    const merged = { ...agentDefaultHeaders, ...customHeaders };
+    const authHeader = merged["Authorization"]
+      ? `Authorization: ${merged["Authorization"]}`
+      : undefined;
+    const { Authorization: _, ...rest } = merged;
 
     const curl = generateCurlCommand(
       selectedAgent.url,
       payload,
       authHeader,
-      Object.keys(customHeaders).length > 0 ? customHeaders : undefined,
+      Object.keys(rest).length > 0 ? rest : undefined,
     );
 
     navigator.clipboard.writeText(curl).then(() => {
       setCurlCopied(true);
       setTimeout(() => setCurlCopied(false), 1500);
     });
-  }, [selectedAgent, skill, inputText, authValue, customHeaders]);
+  }, [selectedAgent, skill, inputText, agentDefaultHeaders, customHeaders]);
 
   const handleRun = useCallback(async () => {
     if (!selectedAgent || !skill || isRunning) return;
 
     const taskId = generateTaskId();
     const hasStreaming = selectedAgent.card.capabilities.streaming === true;
-    const authHeader = authValue || undefined;
+    // Merge agent-level default headers with per-request custom headers (per-request wins)
+    const merged = { ...agentDefaultHeaders, ...customHeaders };
+    const authHeader = merged["Authorization"] || undefined;
+    // Remove Authorization from extra headers since it's passed separately
+    const { Authorization: _, ...rest } = merged;
     const extraHeaders =
-      Object.keys(customHeaders).length > 0 ? customHeaders : undefined;
+      Object.keys(rest).length > 0 ? rest : undefined;
     const { startTask, finishTask } = useTestStore.getState();
 
     if (hasStreaming) {
@@ -125,7 +135,7 @@ export function TestPanel() {
     skill,
     isRunning,
     inputText,
-    authValue,
+    agentDefaultHeaders,
     customHeaders,
     runStreaming,
   ]);
@@ -329,8 +339,6 @@ export function TestPanel() {
           <InputForm
             skill={skill}
             card={selectedAgent.card}
-            authValue={authValue}
-            onAuthChange={setAuthValue}
             onRun={handleRun}
             isRunning={isRunning}
           />

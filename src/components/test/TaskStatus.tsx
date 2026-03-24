@@ -13,6 +13,13 @@ const statusColors: Record<TaskStatusType, string> = {
   canceled: "#9a9992",
 };
 
+function formatLatency(ms: number): string {
+  if (ms >= 1000) {
+    return `${(ms / 1000).toFixed(3)}s`;
+  }
+  return `${ms}ms`;
+}
+
 export function TaskStatus({ status, latencyMs }: TaskStatusProps) {
   const dotColor = statusColors[status];
 
@@ -32,7 +39,7 @@ export function TaskStatus({ status, latencyMs }: TaskStatusProps) {
       </span>
       {latencyMs != null && (
         <span style={{ fontSize: 10, color: "var(--text-muted)" }}>
-          {latencyMs}ms
+          {formatLatency(latencyMs)}
         </span>
       )}
     </span>
