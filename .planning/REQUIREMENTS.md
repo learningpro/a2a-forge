@@ -33,8 +33,8 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **TEST-04**: User can override request headers via key-value editor
 - [x] **TEST-05**: App sends tasks/send JSON-RPC and shows real-time status indicator
 - [x] **TEST-06**: App supports streaming via tasks/sendSubscribe (SSE) when agent advertises streaming
-- [ ] **TEST-07**: Response viewer shows full JSON-RPC response in collapsible tree
-- [ ] **TEST-08**: Response viewer renders message.parts natively (text as markdown, file as download, data as JSON)
+- [x] **TEST-07**: Response viewer shows full JSON-RPC response in collapsible tree
+- [x] **TEST-08**: Response viewer renders message.parts natively (text as markdown, file as download, data as JSON)
 - [x] **TEST-09**: Response viewer shows task status badge and latency in ms
 - [x] **TEST-10**: User can save request/response pair as named Test Case
 - [x] **TEST-11**: User can re-run saved Test Case with one click
@@ -43,7 +43,7 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Test History
 
 - [x] **HIST-01**: All executions saved to SQLite with timestamp, skill id, agent id, request/response payload, latency, status
-- [ ] **HIST-02**: History is browsable and searchable
+- [x] **HIST-02**: History is browsable and searchable
 - [x] **HIST-03**: User can clear history per agent or globally
 
 ### Workspace & Settings
@@ -119,14 +119,14 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TEST-04 | Phase 3 | Complete |
 | TEST-05 | Phase 3 | Complete |
 | TEST-06 | Phase 3 | Complete |
-| TEST-07 | Phase 3 | Pending |
-| TEST-08 | Phase 3 | Pending |
+| TEST-07 | Phase 3 | Complete |
+| TEST-08 | Phase 3 | Complete |
 | TEST-09 | Phase 3 | Complete |
 | TEST-10 | Phase 3 | Complete |
 | TEST-11 | Phase 3 | Complete |
 | TEST-12 | Phase 3 | Complete |
 | HIST-01 | Phase 3 | Complete |
-| HIST-02 | Phase 3 | Pending |
+| HIST-02 | Phase 3 | Complete |
 | HIST-03 | Phase 3 | Complete |
 | WORK-01 | Phase 3 | Complete |
 | SETT-01 | Phase 3 | Complete |
