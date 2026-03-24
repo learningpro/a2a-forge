@@ -96,3 +96,22 @@ body {
   min-height: 100vh;
   overflow: hidden;
 }
+
+/* JSON Tree syntax colors — matches mockup exactly */
+.json-key  { color: #185fa5; }
+.json-str  { color: #1d9e75; }
+.json-num  { color: #854f0b; }
+.json-bool { color: #993556; }
+.json-null { color: var(--text-muted); }
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .json-key  { color: #85b7eb; }
+  :root:not([data-theme="light"]) .json-str  { color: #5dcaa5; }
+  :root:not([data-theme="light"]) .json-num  { color: #ef9f27; }
+  :root:not([data-theme="light"]) .json-bool { color: #ed93b1; }
+}
+
+[data-theme="dark"] .json-key  { color: #85b7eb; }
+[data-theme="dark"] .json-str  { color: #5dcaa5; }
+[data-theme="dark"] .json-num  { color: #ef9f27; }
+[data-theme="dark"] .json-bool { color: #ed93b1; }
