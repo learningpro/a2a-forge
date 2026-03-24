@@ -2,7 +2,9 @@
   "productName": "A2A Workbench",
   "identifier": "com.a2aworkbench.app",
   "build": {
-    "devUrl": "http://localhost:1420",
+    "beforeDevCommand": "npm run dev -- --port 1421",
+    "beforeBuildCommand": "npm run build",
+    "devUrl": "http://localhost:1421",
     "frontendDist": "../dist"
   },
   "app": {

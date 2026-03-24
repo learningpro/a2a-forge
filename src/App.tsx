@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTheme } from "./hooks/useTheme";
 import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
 import { AppShell } from "./components/layout/AppShell";
@@ -8,6 +8,18 @@ import { generateCurlCommand } from "./lib/curl";
 import { buildTaskSendPayload, generateTaskId } from "./lib/a2a";
 
 function App() {
+  const [dbReady, setDbReady] = useState(false);
+
+  useEffect(() => {
+    // Initialize SQLite database connection before any commands can use it
+    import("@tauri-apps/plugin-sql").then((mod) =>
+      mod.default.load("sqlite:workbench.db").then(() => setDbReady(true))
+    ).catch((err) => {
+      console.error("Failed to initialize database:", err);
+      setDbReady(true); // Continue anyway, commands will show errors
+    });
+  }, []);
+
   useTheme();
 
   const handleAddAgent = useCallback(() => {
@@ -52,6 +64,18 @@ function App() {
   );
 
   useKeyboardShortcuts(handlers);
+
+  if (!dbReady) {
+    return (
+      <div style={{
+        display: "flex", alignItems: "center", justifyContent: "center",
+        height: "100vh", background: "var(--bg-tertiary)", color: "var(--text-muted)",
+        fontFamily: "Inter, system-ui, sans-serif", fontSize: "13px",
+      }}>
+        Initializing...
+      </div>
+    );
+  }
 
   return <AppShell />;
 }
