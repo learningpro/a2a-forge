@@ -69,7 +69,7 @@ pub struct AgentRow {
     pub url: String,
     pub nickname: Option<String>,
     pub card: AgentCard,
-    pub last_fetched_at: i64,
+    pub last_fetched_at: String,
     pub workspace_id: String,
 }
 

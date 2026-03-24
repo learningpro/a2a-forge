@@ -16,10 +16,10 @@ pub async fn send_task(
     payload: serde_json::Value,
     auth_header: Option<String>,
     extra_headers: Option<HashMap<String, String>>,
-    timeout_secs: Option<u64>,
+    timeout_secs: Option<u32>,
     state: tauri::State<'_, AppState>,
 ) -> Result<serde_json::Value, AppError> {
-    let timeout = timeout_secs.unwrap_or(30);
+    let timeout = timeout_secs.unwrap_or(30) as u64;
     let resp = client::send_task_rpc(
         &state.http_client,
         &agent_url,

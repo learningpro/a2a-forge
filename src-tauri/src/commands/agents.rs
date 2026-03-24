@@ -82,7 +82,7 @@ pub async fn add_agent(
         url: base_url,
         nickname,
         card,
-        last_fetched_at: now,
+        last_fetched_at: now.to_string(),
         workspace_id,
     })
 }
@@ -114,8 +114,9 @@ pub async fn list_agents(
             nickname: row.try_get("nickname").map_err(|e| AppError::Database(e.to_string()))?,
             card,
             last_fetched_at: row
-                .try_get("last_fetched_at")
-                .map_err(|e| AppError::Database(e.to_string()))?,
+                .try_get::<i64, _>("last_fetched_at")
+                .map_err(|e| AppError::Database(e.to_string()))?
+                .to_string(),
             workspace_id: row
                 .try_get("workspace_id")
                 .map_err(|e| AppError::Database(e.to_string()))?,
@@ -184,7 +185,7 @@ pub async fn refresh_agent(
         url,
         nickname,
         card,
-        last_fetched_at: now,
+        last_fetched_at: now.to_string(),
         workspace_id,
     })
 }
@@ -296,7 +297,7 @@ async fn add_agent_inner(
         url: base_url.to_string(),
         nickname: nickname.map(|s| s.to_string()),
         card,
-        last_fetched_at: now,
+        last_fetched_at: now.to_string(),
         workspace_id: workspace_id.to_string(),
     })
 }

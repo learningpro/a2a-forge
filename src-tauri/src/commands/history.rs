@@ -11,7 +11,7 @@ pub async fn save_history(
     request_json: String,
     response_json: Option<String>,
     status: String,
-    duration_ms: Option<i64>,
+    duration_ms: Option<i32>,
     app: tauri::AppHandle,
 ) -> Result<String, AppError> {
     let pool = get_pool(&app).await?;
@@ -44,11 +44,11 @@ pub async fn save_history(
 pub async fn list_history(
     agent_id: Option<String>,
     search: Option<String>,
-    limit: Option<i64>,
+    limit: Option<i32>,
     app: tauri::AppHandle,
 ) -> Result<serde_json::Value, AppError> {
     let pool = get_pool(&app).await?;
-    let limit_val = limit.unwrap_or(100);
+    let limit_val = limit.unwrap_or(100) as i64;
 
     let mut sql = String::from(
         "SELECT id, agent_id, skill_name, request_json, response_json, status, duration_ms, created_at FROM history WHERE 1=1",
