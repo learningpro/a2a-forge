@@ -149,16 +149,21 @@ export function TestPanel() {
 
   const handleHistorySelect = useCallback((entry: HistoryEntry) => {
     // Load the request into the input form
-    const req = entry.request as Record<string, unknown> | null;
-    if (req && typeof req === "object" && "text" in req) {
-      useTestStore.getState().setInputText(String(req.text));
-    }
+    try {
+      const req = JSON.parse(entry.requestJson);
+      if (req && typeof req === "object" && "text" in req) {
+        useTestStore.getState().setInputText(String(req.text));
+      }
+    } catch { /* ignore parse error */ }
     // Show the response in the viewer
-    if (entry.response != null) {
-      useTestStore.getState().finishTask(
-        entry.response,
-        entry.status as "completed" | "failed",
-      );
+    if (entry.responseJson != null) {
+      try {
+        const resp = JSON.parse(entry.responseJson);
+        useTestStore.getState().finishTask(
+          resp,
+          entry.status as "completed" | "failed",
+        );
+      } catch { /* ignore */ }
     }
   }, []);
 

@@ -35,8 +35,8 @@ export function HistoryList({ agentId, onSelectHistory }: HistoryListProps) {
       if (searchQuery) {
         const q = searchQuery.toLowerCase();
         filtered = all.filter((e: HistoryEntry) => {
-          const reqStr = typeof e.request === "string" ? e.request : JSON.stringify(e.request);
-          return reqStr.toLowerCase().includes(q) || e.taskId.toLowerCase().includes(q);
+          const reqStr = e.requestJson;
+          return reqStr.toLowerCase().includes(q) || e.id.toLowerCase().includes(q);
         });
       }
       setEntries(filtered);
@@ -148,7 +148,7 @@ export function HistoryList({ agentId, onSelectHistory }: HistoryListProps) {
                   fontFamily: "var(--font-mono)",
                 }}
               >
-                {entry.taskId}
+                {entry.skillName}
               </div>
               <div
                 style={{
@@ -160,7 +160,7 @@ export function HistoryList({ agentId, onSelectHistory }: HistoryListProps) {
                 }}
               >
                 <span>{formatTime(entry.createdAt)}</span>
-                {entry.latencyMs != null && <span>{entry.latencyMs}ms</span>}
+                {entry.durationMs != null && <span>{entry.durationMs}ms</span>}
               </div>
             </div>
           </div>
