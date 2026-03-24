@@ -3,7 +3,8 @@ use std::time::Duration;
 
 use crate::error::AppError;
 
-pub async fn send_task_rpc(
+/// Low-level helper: POST a JSON-RPC payload to `{agent_url}/a2a` and return the parsed response.
+async fn post_rpc(
     client: &reqwest::Client,
     agent_url: &str,
     payload: &serde_json::Value,
@@ -11,7 +12,7 @@ pub async fn send_task_rpc(
     extra_headers: Option<&HashMap<String, String>>,
     timeout_secs: u64,
 ) -> Result<serde_json::Value, AppError> {
-    let url = format!("{}", agent_url.trim_end_matches('/'));
+    let url = format!("{}/a2a", agent_url.trim_end_matches('/'));
 
     let mut req = client
         .post(&url)
@@ -41,6 +42,82 @@ pub async fn send_task_rpc(
     Ok(json)
 }
 
+/// Returns the task state string from a JSON-RPC response, if present.
+fn extract_task_state(resp: &serde_json::Value) -> Option<&str> {
+    resp.get("result")
+        .and_then(|r| r.get("status"))
+        .and_then(|s| s.get("state"))
+        .and_then(|v| v.as_str())
+}
+
+/// Send a task via JSON-RPC. If the response indicates the task is still in progress
+/// (state = "submitted" or "working"), poll with tasks/get until it reaches a terminal state.
+pub async fn send_task_rpc(
+    client: &reqwest::Client,
+    agent_url: &str,
+    payload: &serde_json::Value,
+    auth_header: Option<&str>,
+    extra_headers: Option<&HashMap<String, String>>,
+    timeout_secs: u64,
+) -> Result<serde_json::Value, AppError> {
+    let resp = post_rpc(client, agent_url, payload, auth_header, extra_headers, timeout_secs).await?;
+
+    // Check if the task is async (state = submitted/working)
+    let state = extract_task_state(&resp);
+    match state {
+        Some("submitted") | Some("working") => {
+            // Extract task ID for polling
+            let task_id = resp
+                .get("result")
+                .and_then(|r| r.get("id"))
+                .and_then(|v| v.as_str())
+                .ok_or_else(|| {
+                    AppError::Http("Async task response missing result.id for polling".into())
+                })?
+                .to_string();
+
+            // Poll with tasks/get
+            poll_task(client, agent_url, &task_id, auth_header, extra_headers, timeout_secs).await
+        }
+        _ => Ok(resp),
+    }
+}
+
+/// Poll a task by ID using JSON-RPC tasks/get until it reaches a terminal state.
+async fn poll_task(
+    client: &reqwest::Client,
+    agent_url: &str,
+    task_id: &str,
+    auth_header: Option<&str>,
+    extra_headers: Option<&HashMap<String, String>>,
+    timeout_secs: u64,
+) -> Result<serde_json::Value, AppError> {
+    let max_polls = 120; // max ~2 minutes with 1s interval
+    let poll_interval = Duration::from_secs(1);
+
+    for _ in 0..max_polls {
+        tokio::time::sleep(poll_interval).await;
+
+        let get_payload = serde_json::json!({
+            "jsonrpc": "2.0",
+            "method": "tasks/get",
+            "params": { "id": task_id },
+            "id": 1
+        });
+
+        let resp = post_rpc(client, agent_url, &get_payload, auth_header, extra_headers, timeout_secs).await?;
+
+        match extract_task_state(&resp) {
+            Some("submitted") | Some("working") => continue,
+            _ => return Ok(resp),
+        }
+    }
+
+    Err(AppError::Http(format!(
+        "Task {task_id} did not complete within polling timeout"
+    )))
+}
+
 pub fn build_sse_request(
     client: &reqwest::Client,
     agent_url: &str,
@@ -48,7 +125,7 @@ pub fn build_sse_request(
     auth_header: Option<&str>,
     extra_headers: Option<&HashMap<String, String>>,
 ) -> reqwest::RequestBuilder {
-    let url = format!("{}", agent_url.trim_end_matches('/'));
+    let url = format!("{}/a2a", agent_url.trim_end_matches('/'));
 
     let mut req = client
         .post(&url)
