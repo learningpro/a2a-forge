@@ -8,7 +8,7 @@ import {
   generateTaskId,
 } from "../../lib/a2a";
 import { generateCurlCommand } from "../../lib/curl";
-import { commands, type AgentSkill, type HistoryEntry, type JsonValue } from "../../bindings";
+import { commands, unwrap, type AgentSkill, type HistoryEntry, type JsonValue } from "../../bindings";
 import { SkillMetadata } from "./SkillMetadata";
 import { InputForm } from "./InputForm";
 import { ResponseViewer } from "./ResponseViewer";
@@ -84,13 +84,13 @@ export function TestPanel() {
       const payload = buildTaskSendPayload(skill.id, inputText, taskId);
       startTask(taskId);
       try {
-        const result = await commands.sendTask(
+        const result = unwrap(await commands.sendTask(
           selectedAgent.url,
           payload as unknown as JsonValue,
           authHeader ?? null,
           extraHeaders ?? null,
           null,
-        );
+        ));
         finishTask(result, "completed");
       } catch (err) {
         finishTask(

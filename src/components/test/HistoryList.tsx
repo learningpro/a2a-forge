@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { commands, type HistoryEntry } from "../../bindings";
+import { commands, unwrap, type HistoryEntry } from "../../bindings";
 
 interface HistoryListProps {
   agentId: string | null;
@@ -30,7 +30,7 @@ export function HistoryList({ agentId, onSelectHistory }: HistoryListProps) {
   const loadHistory = useCallback(async (searchQuery?: string) => {
     setLoading(true);
     try {
-      const all = await commands.listHistory(agentId, null, null) as unknown as HistoryEntry[];
+      const all = unwrap(await commands.listHistory(agentId, null, null)) as unknown as HistoryEntry[];
       let filtered: HistoryEntry[] = all;
       if (searchQuery) {
         const q = searchQuery.toLowerCase();
@@ -66,7 +66,7 @@ export function HistoryList({ agentId, onSelectHistory }: HistoryListProps) {
     const label = agentId ? "this agent" : "all agents";
     if (!window.confirm(`Clear history for ${label}?`)) return;
     try {
-      await commands.clearHistory(agentId ?? null);
+      unwrap(await commands.clearHistory(agentId ?? null));
       setEntries([]);
     } catch {
       // ignore

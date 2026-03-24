@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { commands } from "../bindings";
+import { commands, unwrap } from "../bindings";
 
 export interface Workspace {
   id: string;
@@ -25,19 +25,19 @@ export const useWorkspaceStore = create<WorkspaceState>()(
       activeWorkspaceId: "default",
 
       loadWorkspaces: async () => {
-        const workspaces = await commands.listWorkspaces() as unknown as Workspace[];
+        const workspaces = unwrap(await commands.listWorkspaces()) as unknown as Workspace[];
         set({ workspaces });
       },
 
       createWorkspace: async (name: string) => {
-        await commands.createWorkspace(name);
-        const workspaces = await commands.listWorkspaces() as unknown as Workspace[];
+        unwrap(await commands.createWorkspace(name));
+        const workspaces = unwrap(await commands.listWorkspaces()) as unknown as Workspace[];
         set({ workspaces });
       },
 
       deleteWorkspace: async (id: string) => {
-        await commands.deleteWorkspace(id);
-        const workspaces = await commands.listWorkspaces() as unknown as Workspace[];
+        unwrap(await commands.deleteWorkspace(id));
+        const workspaces = unwrap(await commands.listWorkspaces()) as unknown as Workspace[];
         set((state) => ({
           workspaces,
           activeWorkspaceId:

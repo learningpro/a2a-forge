@@ -1,5 +1,5 @@
 import { Channel } from "@tauri-apps/api/core";
-import { commands, type TaskEvent, type JsonValue } from "../bindings";
+import { commands, unwrap, type TaskEvent, type JsonValue } from "../bindings";
 import { useTestStore, type TaskChunk } from "../stores/testStore";
 
 /**
@@ -35,13 +35,13 @@ export function useStreamingTask() {
       appendChunk(chunk);
     };
 
-    const taskId = await commands.streamTask(
+    const taskId = unwrap(await commands.streamTask(
       agentUrl,
       payload,
       authHeader ?? null,
       extraHeaders ?? null,
       channel,
-    );
+    ));
 
     startTask(taskId);
 

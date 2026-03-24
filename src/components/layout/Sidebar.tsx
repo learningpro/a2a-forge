@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useUiStore } from "../../stores/uiStore";
 import { useAgentStore } from "../../stores/agentStore";
 import { useWorkspaceStore } from "../../stores/workspaceStore";
-import { commands } from "../../bindings";
+import { commands, unwrap } from "../../bindings";
 import { AgentListItem } from "../agent/AgentListItem";
 import { AddAgentDialog } from "../agent/AddAgentDialog";
 import { SettingsModal } from "../settings/SettingsModal";
@@ -15,7 +15,7 @@ async function handleExport(workspaceId: string) {
       filters: [{ name: "JSON", extensions: ["json"] }],
     });
     if (!filePath) return;
-    const jsonData = await commands.exportAgents(workspaceId);
+    const jsonData = unwrap(await commands.exportAgents(workspaceId));
     const { writeTextFile } = await import("@tauri-apps/plugin-fs");
     await writeTextFile(filePath, jsonData);
   } catch (e) {
@@ -33,7 +33,7 @@ async function handleImport(workspaceId: string) {
     if (!filePath || Array.isArray(filePath)) return;
     const { readTextFile } = await import("@tauri-apps/plugin-fs");
     const jsonData = await readTextFile(filePath as string);
-    await commands.importAgents(jsonData, workspaceId);
+    unwrap(await commands.importAgents(jsonData, workspaceId));
     await useAgentStore.getState().loadAgents(workspaceId);
   } catch (e) {
     console.error("Import failed:", e);

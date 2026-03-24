@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { commands } from "../../bindings";
+import { commands, unwrap } from "../../bindings";
 import { useUiStore, type ThemeOverride } from "../../stores/uiStore";
 
 interface SettingsModalProps {
@@ -24,8 +24,8 @@ export function SettingsModal({ isOpen, onClose, cardId }: SettingsModalProps) {
   // Load settings on mount
   useEffect(() => {
     if (!isOpen) return;
-    commands.getSettings().then((raw) => {
-      const settings = raw as Record<string, unknown>;
+    commands.getSettings().then((res) => {
+      const settings = unwrap(res) as Record<string, unknown>;
       if (!cardId) {
         // Global settings
         if (settings["timeout_seconds"] != null) {
@@ -54,7 +54,7 @@ export function SettingsModal({ isOpen, onClose, cardId }: SettingsModalProps) {
 
   const saveSetting = useCallback(async (key: string, value: unknown) => {
     try {
-      await commands.saveSetting(key, JSON.stringify(value));
+      unwrap(await commands.saveSetting(key, JSON.stringify(value)));
     } catch {
       // ignore save failures
     }

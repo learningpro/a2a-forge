@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { commands } from "../../bindings";
+import { commands, unwrap } from "../../bindings";
 
 interface SavedTestsListProps {
   agentId: string;
@@ -20,7 +20,7 @@ export function SavedTestsList({
   const loadTests = useCallback(async () => {
     setLoading(true);
     try {
-      const all = await commands.listSavedTests(agentId, skillName) as unknown as Array<{ id: string; name: string; agentId: string; skillId: string; payload: unknown; createdAt: number }>;
+      const all = unwrap(await commands.listSavedTests(agentId, skillName)) as unknown as Array<{ id: string; name: string; agentId: string; skillId: string; payload: unknown; createdAt: number }>;
       // Filter by skillName client-side if needed
       const filtered = skillName
         ? all.filter((t) => t.skillId === skillName)
@@ -42,7 +42,7 @@ export function SavedTestsList({
     const name = window.prompt("Name this test case:");
     if (!name?.trim()) return;
     try {
-      await commands.saveTest(name.trim(), agentId, skillName, JSON.stringify(currentPayload));
+      unwrap(await commands.saveTest(name.trim(), agentId, skillName, JSON.stringify(currentPayload)));
       await loadTests();
     } catch {
       // ignore save failures
@@ -52,7 +52,7 @@ export function SavedTestsList({
   const handleDelete = useCallback(
     async (testId: string) => {
       try {
-        await commands.deleteSavedTest(testId);
+        unwrap(await commands.deleteSavedTest(testId));
         setTests((prev) => prev.filter((t) => t.id !== testId));
       } catch {
         // ignore

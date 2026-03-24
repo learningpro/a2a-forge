@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { commands, type AgentRow } from "../bindings";
+import { commands, unwrap, type AgentRow } from "../bindings";
 import Database from "@tauri-apps/plugin-sql";
 
 interface AgentState {
@@ -33,7 +33,7 @@ export const useAgentStore = create<AgentState>()((set, get) => ({
   loadAgents: async (workspaceId: string) => {
     set({ isLoading: true, error: null });
     try {
-      const agents = await commands.listAgents(workspaceId);
+      const agents = unwrap(await commands.listAgents(workspaceId));
       set({ agents, isLoading: false });
     } catch (err: unknown) {
       const message =
@@ -49,13 +49,13 @@ export const useAgentStore = create<AgentState>()((set, get) => ({
     nickname: string | null,
     workspaceId: string
   ) => {
-    const row = await commands.addAgent(baseUrl, nickname, workspaceId);
+    const row = unwrap(await commands.addAgent(baseUrl, nickname, workspaceId));
     set((state) => ({ agents: [...state.agents, row] }));
     return row;
   },
 
   deleteAgent: async (agentId: string) => {
-    await commands.deleteAgent(agentId);
+    unwrap(await commands.deleteAgent(agentId));
     set((state) => ({
       agents: state.agents.filter((a) => a.id !== agentId),
       selectedAgentId:
@@ -66,7 +66,7 @@ export const useAgentStore = create<AgentState>()((set, get) => ({
   },
 
   refreshAgent: async (agentId: string) => {
-    const updated = await commands.refreshAgent(agentId);
+    const updated = unwrap(await commands.refreshAgent(agentId));
     set((state) => ({
       agents: state.agents.map((a) => (a.id === agentId ? updated : a)),
     }));

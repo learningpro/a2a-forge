@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { commands, type AgentCard } from "../../bindings";
+import { commands, unwrap, type AgentCard } from "../../bindings";
 import { useAgentStore } from "../../stores/agentStore";
 
 type PreviewState =
@@ -30,7 +30,7 @@ export function AddAgentDialog({ open, onClose }: AddAgentDialogProps) {
 
     const timer = setTimeout(async () => {
       try {
-        const card = await commands.fetchAgentCard(url.trim());
+        const card = unwrap(await commands.fetchAgentCard(url.trim()));
         setPreview({ status: "success", card });
       } catch (err: unknown) {
         let message = "Failed to fetch agent card";
