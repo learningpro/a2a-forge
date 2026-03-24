@@ -47,10 +47,10 @@ Plans:
 **Plans:** 4/4 plans complete
 
 Plans:
-- [ ] 02-01-PLAN.md — Rust A2A types, 7 agent CRUD commands, lib.rs wiring, dialog plugin
-- [ ] 02-02-PLAN.md — agentStore CRUD, AddAgentDialog with debounced preview, Sidebar agent list
-- [ ] 02-03-PLAN.md — SkillPanel with search, filter chips, mode tags, skill selection
-- [ ] 02-04-PLAN.md — Card management UI (rename/refresh/delete hover menu, import/export)
+- [x] 02-01-PLAN.md — Rust A2A types, 7 agent CRUD commands, lib.rs wiring, dialog plugin
+- [x] 02-02-PLAN.md — agentStore CRUD, AddAgentDialog with debounced preview, Sidebar agent list
+- [x] 02-03-PLAN.md — SkillPanel with search, filter chips, mode tags, skill selection
+- [x] 02-04-PLAN.md — Card management UI (rename/refresh/delete hover menu, import/export)
 
 ### Phase 3: Task Execution and Testing
 **Goal**: Users can compose and send test messages to any skill, see real-time results including streaming responses, and access full history of past executions
@@ -63,7 +63,14 @@ Plans:
   4. Every execution is saved to SQLite with timestamp, agent, skill, request/response payload, latency, and status; history is browsable, searchable, and clearable per agent or globally
   5. User can save any request/response as a named test case and re-run it with one click; user can copy the equivalent curl command for any request
   6. App supports multiple named workspaces, global settings (timeout, proxy, theme, telemetry), and per-card settings (default auth headers, base URL override); keyboard shortcuts work for add card, run test, and copy curl; empty states guide new users with example public A2A agents
-**Plans**: TBD
+**Plans:** 5 plans
+
+Plans:
+- [ ] 03-01-PLAN.md — Rust backend: all command modules (tasks, history, saved_tests, workspaces, settings), A2A client, Cargo deps
+- [ ] 03-02-PLAN.md — Frontend infrastructure: testStore, workspaceStore, a2a/curl utilities, hooks, bindings, unit tests
+- [ ] 03-03-PLAN.md — Test panel input: SkillMetadata, InputForm with Monaco, auth selection, Run button with send/stream
+- [ ] 03-04-PLAN.md — Response viewer: JsonTree with mockup colors, ResponseViewer, HistoryList, SavedTestsList
+- [ ] 03-05-PLAN.md — Settings modal, workspace selector, keyboard shortcuts, empty states, visual checkpoint
 
 ## Progress
 
@@ -73,5 +80,5 @@ Phases execute in numeric order: 1 → 2 → 3
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 2/2 | Complete    | 2026-03-24 |
-| 2. Agent and Skill Discovery | 3/4 | Complete    | 2026-03-24 |
-| 3. Task Execution and Testing | 0/? | Not started | - |
+| 2. Agent and Skill Discovery | 4/4 | Complete    | 2026-03-24 |
+| 3. Task Execution and Testing | 0/5 | Not started | - |
