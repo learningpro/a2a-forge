@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { commands, type AgentRow } from "../bindings";
+import Database from "@tauri-apps/plugin-sql";
 
 interface AgentState {
   agents: AgentRow[];
@@ -16,6 +17,7 @@ interface AgentState {
   ) => Promise<AgentRow>;
   deleteAgent: (agentId: string) => Promise<void>;
   refreshAgent: (agentId: string) => Promise<void>;
+  renameAgent: (agentId: string, nickname: string) => Promise<void>;
   setSelectedAgentId: (id: string | null) => void;
   setSelectedSkillId: (id: string | null) => void;
   selectedAgent: () => AgentRow | undefined;
@@ -67,6 +69,19 @@ export const useAgentStore = create<AgentState>()((set, get) => ({
     const updated = await commands.refreshAgent(agentId);
     set((state) => ({
       agents: state.agents.map((a) => (a.id === agentId ? updated : a)),
+    }));
+  },
+
+  renameAgent: async (agentId: string, nickname: string) => {
+    const db = await Database.load("sqlite:workbench.db");
+    await db.execute("UPDATE agents SET nickname = ? WHERE id = ?", [
+      nickname,
+      agentId,
+    ]);
+    set((state) => ({
+      agents: state.agents.map((a) =>
+        a.id === agentId ? { ...a, nickname } : a
+      ),
     }));
   },
 

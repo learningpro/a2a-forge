@@ -16,6 +16,8 @@
     "store:allow-save",
     "keyring:default",
     "dialog:allow-open",
-    "dialog:allow-save"
+    "dialog:allow-save",
+    "fs:allow-read-text-file",
+    "fs:allow-write-text-file"
   ]
 }

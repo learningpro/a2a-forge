@@ -37,6 +37,7 @@ pub fn run() {
         .plugin(tauri_plugin_store::Builder::default().build())
         .plugin(tauri_plugin_keyring::init())
         .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_fs::init())
         .manage(state::AppState::new())
         .invoke_handler(builder.invoke_handler())
         .setup(move |app| {
