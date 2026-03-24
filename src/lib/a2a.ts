@@ -1,9 +1,13 @@
 /**
  * A2A JSON-RPC request builders.
  *
- * Produces payloads matching the A2A protocol spec:
+ * Produces payloads matching the A2A protocol:
  *   - tasks/send (one-shot)
  *   - tasks/sendSubscribe (streaming via SSE)
+ *
+ * The AIGC service expects skill_id at params level and
+ * input object with skill-specific parameters (e.g. {prompt: "..."}).
+ * The message field carries the A2A-standard user message.
  */
 
 export interface TaskSendPayload {
@@ -11,13 +15,12 @@ export interface TaskSendPayload {
   method: "tasks/send" | "tasks/sendSubscribe";
   params: {
     id: string;
+    skill_id: string;
     message: {
       role: "user";
       parts: Array<{ type: "text"; text: string }>;
     };
-    metadata: {
-      skill_id: string;
-    };
+    input: Record<string, unknown>;
   };
   id: number;
 }
@@ -32,13 +35,12 @@ export function buildTaskSendPayload(
     method: "tasks/send",
     params: {
       id: taskId,
+      skill_id: skillId,
       message: {
         role: "user",
         parts: [{ type: "text", text }],
       },
-      metadata: {
-        skill_id: skillId,
-      },
+      input: { prompt: text },
     },
     id: 1,
   };
@@ -54,13 +56,12 @@ export function buildTaskSubscribePayload(
     method: "tasks/sendSubscribe",
     params: {
       id: taskId,
+      skill_id: skillId,
       message: {
         role: "user",
         parts: [{ type: "text", text }],
       },
-      metadata: {
-        skill_id: skillId,
-      },
+      input: { prompt: text },
     },
     id: 1,
   };

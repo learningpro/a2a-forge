@@ -17,7 +17,8 @@ describe("a2a", () => {
       expect(result.params.message.parts).toHaveLength(1);
       expect(result.params.message.parts[0].type).toBe("text");
       expect(result.params.message.parts[0].text).toBe("hello");
-      expect(result.params.metadata.skill_id).toBe("skill-1");
+      expect(result.params.skill_id).toBe("skill-1");
+      expect(result.params.input).toEqual({ prompt: "hello" });
       expect(result.id).toBe(1);
     });
   });
@@ -29,7 +30,7 @@ describe("a2a", () => {
       expect(result.method).toBe("tasks/sendSubscribe");
       expect(result.params.id).toBe("task-456");
       expect(result.params.message.parts[0].text).toBe("world");
-      expect(result.params.metadata.skill_id).toBe("skill-2");
+      expect(result.params.skill_id).toBe("skill-2");
     });
   });
 
