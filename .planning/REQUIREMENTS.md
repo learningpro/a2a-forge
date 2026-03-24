@@ -58,12 +58,12 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **UIUX-02**: System dark/light mode with settings override
 - [ ] **UIUX-03**: Keyboard shortcuts for common actions (add card, run test, copy curl)
 - [ ] **UIUX-04**: Empty states guide new users with example public A2A agents
-- [ ] **UIUX-05**: App launches in < 2s on target hardware
+- [x] **UIUX-05**: App launches in < 2s on target hardware
 
 ### Security
 
-- [ ] **SECR-01**: All HTTP requests made from Rust backend, not webview
-- [ ] **SECR-02**: Credentials stored securely (OS keychain or encrypted storage), never in SQLite plaintext
+- [x] **SECR-01**: All HTTP requests made from Rust backend, not webview
+- [x] **SECR-02**: Credentials stored securely (OS keychain or encrypted storage), never in SQLite plaintext
 
 ## v2 Requirements
 
@@ -98,9 +98,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 |-------------|-------|--------|
 | UIUX-01 | Phase 1 | Pending |
 | UIUX-02 | Phase 1 | Pending |
-| UIUX-05 | Phase 1 | Pending |
-| SECR-01 | Phase 1 | Pending |
-| SECR-02 | Phase 1 | Pending |
+| UIUX-05 | Phase 1 | Complete |
+| SECR-01 | Phase 1 | Complete |
+| SECR-02 | Phase 1 | Complete |
 | CARD-01 | Phase 2 | Pending |
 | CARD-02 | Phase 2 | Pending |
 | CARD-03 | Phase 2 | Pending |
