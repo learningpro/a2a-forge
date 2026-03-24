@@ -19,11 +19,11 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Skill Browser
 
-- [ ] **SKIL-01**: All skills in a card are listed showing name, description, input modes, output modes
-- [ ] **SKIL-02**: Skills are searchable by name or description
-- [ ] **SKIL-03**: Skills can be filtered by input mode (text, file, data) and output mode
-- [ ] **SKIL-04**: Skills show a "No examples" badge when card provides no examples
-- [ ] **SKIL-05**: Clicking a skill opens the Skill Test Panel
+- [x] **SKIL-01**: All skills in a card are listed showing name, description, input modes, output modes
+- [x] **SKIL-02**: Skills are searchable by name or description
+- [x] **SKIL-03**: Skills can be filtered by input mode (text, file, data) and output mode
+- [x] **SKIL-04**: Skills show a "No examples" badge when card provides no examples
+- [x] **SKIL-05**: Clicking a skill opens the Skill Test Panel
 
 ### Skill Test Panel
 
@@ -108,11 +108,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CARD-05 | Phase 2 | Complete |
 | CARD-06 | Phase 2 | Complete |
 | CARD-07 | Phase 2 | Complete |
-| SKIL-01 | Phase 2 | Pending |
-| SKIL-02 | Phase 2 | Pending |
-| SKIL-03 | Phase 2 | Pending |
-| SKIL-04 | Phase 2 | Pending |
-| SKIL-05 | Phase 2 | Pending |
+| SKIL-01 | Phase 2 | Complete |
+| SKIL-02 | Phase 2 | Complete |
+| SKIL-03 | Phase 2 | Complete |
+| SKIL-04 | Phase 2 | Complete |
+| SKIL-05 | Phase 2 | Complete |
 | TEST-01 | Phase 3 | Pending |
 | TEST-02 | Phase 3 | Pending |
 | TEST-03 | Phase 3 | Pending |
