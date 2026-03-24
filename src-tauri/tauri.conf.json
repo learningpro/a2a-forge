@@ -2,7 +2,7 @@
   "productName": "A2A Workbench",
   "identifier": "com.a2aworkbench.app",
   "build": {
-    "beforeDevCommand": "npm run dev -- --port 1421",
+    "beforeDevCommand": "lsof -ti :1421 | xargs kill -9 2>/dev/null; npm run dev -- --port 1421",
     "beforeBuildCommand": "npm run build",
     "devUrl": "http://localhost:1421",
     "frontendDist": "../dist"
@@ -20,7 +20,7 @@
       }
     ],
     "security": {
-      "csp": "default-src 'self'; script-src 'self' 'unsafe-eval'; worker-src blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: asset: https://asset.localhost"
+      "csp": "default-src 'self'; script-src 'self' 'unsafe-eval'; worker-src blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: asset: https://asset.localhost https: http:; media-src 'self' data: blob: https: http:"
     }
   },
   "bundle": {

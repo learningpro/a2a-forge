@@ -139,9 +139,28 @@ function EmptyState() {
 function RenderedView({ result }: { result: unknown }) {
   const { message } = extractParts(result);
 
-  if (!message?.parts || message.parts.length === 0) {
-    // Fallback: show raw as JSON tree
+  if (message?.parts && message.parts.length > 0) {
     return (
+      <>
+        {message.parts.map((part, i) => (
+          <PartBubble key={i} part={part} index={i} role={message.role} />
+        ))}
+      </>
+    );
+  }
+
+  // No A2A message parts — scan the entire result for media URLs/data
+  const media = extractMediaFromResult(result);
+
+  return (
+    <>
+      {media.length > 0 && (
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          {media.map((m, i) => (
+            <MediaPreview key={i} item={m} />
+          ))}
+        </div>
+      )}
       <div
         style={{
           background: "var(--bg-secondary)",
@@ -152,14 +171,6 @@ function RenderedView({ result }: { result: unknown }) {
       >
         <JsonTree value={result} />
       </div>
-    );
-  }
-
-  return (
-    <>
-      {message.parts.map((part, i) => (
-        <PartBubble key={i} part={part} index={i} role={message.role} />
-      ))}
     </>
   );
 }
@@ -249,6 +260,143 @@ function FileDownload({ file }: { file: { name?: string; mimeType?: string; byte
       {file.name ?? "file"} \u2193
     </button>
   );
+}
+
+// --- Media detection and preview ---
+
+type MediaItem = {
+  type: "image" | "video" | "audio";
+  url: string;
+  label: string;
+};
+
+const IMAGE_EXTS = /\.(jpg|jpeg|png|gif|webp|svg|bmp|avif)(\?.*)?$/i;
+const VIDEO_EXTS = /\.(mp4|webm|mov|avi|mkv)(\?.*)?$/i;
+const AUDIO_EXTS = /\.(mp3|wav|ogg|aac|flac|m4a)(\?.*)?$/i;
+
+function detectMediaType(url: string): "image" | "video" | "audio" | null {
+  if (url.startsWith("data:image/")) return "image";
+  if (url.startsWith("data:video/")) return "video";
+  if (url.startsWith("data:audio/")) return "audio";
+  if (IMAGE_EXTS.test(url)) return "image";
+  if (VIDEO_EXTS.test(url)) return "video";
+  if (AUDIO_EXTS.test(url)) return "audio";
+  return null;
+}
+
+function extractMediaFromResult(obj: unknown): MediaItem[] {
+  const items: MediaItem[] = [];
+  const seen = new Set<string>();
+
+  function walk(val: unknown, path: string) {
+    if (typeof val === "string" && val.length > 10) {
+      // Check data URLs
+      if (val.startsWith("data:")) {
+        const mediaType = detectMediaType(val);
+        if (mediaType && !seen.has(val.slice(0, 100))) {
+          seen.add(val.slice(0, 100));
+          items.push({ type: mediaType, url: val, label: path });
+        }
+        return;
+      }
+      // Check HTTP URLs
+      if (val.startsWith("http://") || val.startsWith("https://")) {
+        const mediaType = detectMediaType(val);
+        if (mediaType && !seen.has(val)) {
+          seen.add(val);
+          items.push({ type: mediaType, url: val, label: path });
+        }
+        return;
+      }
+    }
+    if (Array.isArray(val)) {
+      val.forEach((v, i) => walk(v, `${path}[${i}]`));
+    } else if (val && typeof val === "object") {
+      for (const [k, v] of Object.entries(val as Record<string, unknown>)) {
+        walk(v, path ? `${path}.${k}` : k);
+      }
+    }
+  }
+
+  walk(obj, "");
+  return items;
+}
+
+function MediaPreview({ item }: { item: MediaItem }) {
+  const containerStyle: React.CSSProperties = {
+    borderRadius: "var(--radius-md)",
+    border: "0.5px solid var(--border-subtle)",
+    overflow: "hidden",
+    background: "var(--bg-secondary)",
+  };
+
+  const labelStyle: React.CSSProperties = {
+    fontSize: 9,
+    textTransform: "uppercase",
+    letterSpacing: "0.08em",
+    color: "var(--text-muted)",
+    padding: "6px 10px 4px",
+  };
+
+  const linkStyle: React.CSSProperties = {
+    fontSize: 10,
+    color: "var(--text-info)",
+    padding: "0 10px 6px",
+    fontFamily: "var(--font-mono)",
+    wordBreak: "break-all",
+    display: "block",
+  };
+
+  if (item.type === "image") {
+    return (
+      <div style={containerStyle}>
+        <div style={labelStyle}>{item.label}</div>
+        <img
+          src={item.url}
+          alt={item.label}
+          style={{ maxWidth: "100%", maxHeight: 400, display: "block", padding: "0 10px 10px" }}
+          loading="lazy"
+        />
+        {!item.url.startsWith("data:") && (
+          <a href={item.url} target="_blank" rel="noreferrer" style={linkStyle}>{item.url}</a>
+        )}
+      </div>
+    );
+  }
+
+  if (item.type === "video") {
+    return (
+      <div style={containerStyle}>
+        <div style={labelStyle}>{item.label}</div>
+        <video
+          src={item.url}
+          controls
+          style={{ maxWidth: "100%", maxHeight: 400, display: "block", padding: "0 10px 10px" }}
+        />
+        {!item.url.startsWith("data:") && (
+          <a href={item.url} target="_blank" rel="noreferrer" style={linkStyle}>{item.url}</a>
+        )}
+      </div>
+    );
+  }
+
+  if (item.type === "audio") {
+    return (
+      <div style={containerStyle}>
+        <div style={labelStyle}>{item.label}</div>
+        <audio
+          src={item.url}
+          controls
+          style={{ width: "100%", padding: "0 10px 10px" }}
+        />
+        {!item.url.startsWith("data:") && (
+          <a href={item.url} target="_blank" rel="noreferrer" style={linkStyle}>{item.url}</a>
+        )}
+      </div>
+    );
+  }
+
+  return null;
 }
 
 function StreamingView({ chunks }: { chunks: { raw: unknown; status?: { state: string; message?: string } }[] }) {
