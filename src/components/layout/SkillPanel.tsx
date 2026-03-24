@@ -1,8 +1,172 @@
+import { useState, useMemo } from "react";
+import { useAgentStore } from "../../stores/agentStore";
+import type { AgentSkill } from "../../bindings";
+
 interface SkillPanelProps {
   width: number;
 }
 
+type ModeFilter = "all" | "text" | "file" | "data";
+
+function getModeStyle(mode: string): React.CSSProperties {
+  const m = mode.toLowerCase();
+  if (m.includes("text"))
+    return { background: "var(--bg-success)", color: "var(--text-success)" };
+  if (m.includes("file"))
+    return { background: "var(--bg-info)", color: "var(--text-info)" };
+  if (m.includes("data"))
+    return { background: "var(--bg-warning)", color: "var(--text-warning)" };
+  return { background: "var(--bg-secondary)", color: "var(--text-secondary)" };
+}
+
+function getHostFromUrl(url: string): string {
+  try {
+    return new URL(url).host;
+  } catch {
+    return url;
+  }
+}
+
+function ModeTag({ mode }: { mode: string }) {
+  return (
+    <span
+      style={{
+        fontSize: 9,
+        padding: "1px 5px",
+        borderRadius: 4,
+        fontWeight: 500,
+        fontFamily: "'JetBrains Mono', monospace",
+        ...getModeStyle(mode),
+      }}
+    >
+      {mode}
+    </span>
+  );
+}
+
+function NoExamplesBadge() {
+  return (
+    <span
+      style={{
+        fontSize: 9,
+        padding: "1px 5px",
+        borderRadius: 4,
+        background: "var(--bg-secondary)",
+        color: "var(--text-muted)",
+        border: "0.5px solid var(--border-subtle)",
+      }}
+    >
+      No examples
+    </span>
+  );
+}
+
+function SkillItem({
+  skill,
+  isSelected,
+  onSelect,
+}: {
+  skill: AgentSkill;
+  isSelected: boolean;
+  onSelect: () => void;
+}) {
+  return (
+    <div
+      onClick={onSelect}
+      style={{
+        padding: "8px 10px",
+        borderRadius: "var(--radius-md)",
+        cursor: "pointer",
+        border: `0.5px solid ${isSelected ? "var(--border-default)" : "transparent"}`,
+        background: isSelected ? "var(--bg-secondary)" : "transparent",
+        transition: "all 0.1s",
+      }}
+    >
+      <div
+        style={{
+          fontSize: 11,
+          fontWeight: 500,
+          color: "var(--text-primary)",
+          fontFamily: "'JetBrains Mono', monospace",
+          marginBottom: 2,
+        }}
+      >
+        {skill.name}
+      </div>
+      <div
+        style={{
+          fontSize: 10,
+          color: "var(--text-muted)",
+          lineHeight: 1.4,
+          WebkitLineClamp: 2,
+          WebkitBoxOrient: "vertical" as const,
+          overflow: "hidden",
+          display: "-webkit-box",
+        }}
+      >
+        {skill.description ?? "No description"}
+      </div>
+      <div style={{ marginTop: 5, display: "flex", gap: 3, flexWrap: "wrap" }}>
+        {(skill.inputModes ?? []).map((mode) => (
+          <ModeTag key={`in-${mode}`} mode={mode} />
+        ))}
+        {(!skill.examples || skill.examples.length === 0) && (
+          <NoExamplesBadge />
+        )}
+      </div>
+    </div>
+  );
+}
+
+const FILTER_LABELS: { label: string; value: ModeFilter }[] = [
+  { label: "All", value: "all" },
+  { label: "text", value: "text" },
+  { label: "file", value: "file" },
+  { label: "data", value: "data" },
+];
+
 export function SkillPanel({ width }: SkillPanelProps) {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [activeFilter, setActiveFilter] = useState<ModeFilter>("all");
+
+  const agents = useAgentStore((s) => s.agents);
+  const selectedAgentId = useAgentStore((s) => s.selectedAgentId);
+  const selectedSkillId = useAgentStore((s) => s.selectedSkillId);
+  const setSelectedSkillId = useAgentStore((s) => s.setSelectedSkillId);
+
+  const selectedAgent = useMemo(
+    () => agents.find((a) => a.id === selectedAgentId),
+    [agents, selectedAgentId],
+  );
+
+  const filteredSkills = useMemo(() => {
+    const skills = selectedAgent?.card.skills ?? [];
+    let result = skills;
+
+    if (activeFilter !== "all") {
+      result = result.filter(
+        (skill) =>
+          (skill.inputModes ?? []).some((m) =>
+            m.toLowerCase().includes(activeFilter),
+          ) ||
+          (skill.outputModes ?? []).some((m) =>
+            m.toLowerCase().includes(activeFilter),
+          ),
+      );
+    }
+
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      result = result.filter(
+        (skill) =>
+          skill.name.toLowerCase().includes(q) ||
+          (skill.description ?? "").toLowerCase().includes(q),
+      );
+    }
+
+    return result;
+  }, [selectedAgent, activeFilter, searchQuery]);
+
   return (
     <div
       style={{
@@ -23,21 +187,58 @@ export function SkillPanel({ width }: SkillPanelProps) {
           borderBottom: "0.5px solid var(--border-subtle)",
         }}
       >
-        <div
-          style={{
-            fontSize: 13,
-            fontWeight: 500,
-            color: "var(--text-primary)",
-            marginBottom: 2,
-            display: "flex",
-            alignItems: "center",
-            gap: 6,
-          }}
-        >
-          <span style={{ color: "var(--text-muted)", fontSize: 11 }}>No agent selected</span>
-        </div>
+        {selectedAgent ? (
+          <>
+            <div
+              style={{
+                fontSize: 13,
+                fontWeight: 500,
+                color: "var(--text-primary)",
+                display: "flex",
+                alignItems: "center",
+                gap: 6,
+              }}
+            >
+              {selectedAgent.nickname ?? selectedAgent.card.name}
+              <span
+                style={{
+                  fontSize: 9,
+                  padding: "2px 6px",
+                  borderRadius: 10,
+                  fontWeight: 500,
+                  background: "var(--bg-success)",
+                  color: "var(--text-success)",
+                }}
+              >
+                online
+              </span>
+            </div>
+            <div
+              style={{
+                fontSize: 10,
+                color: "var(--text-muted)",
+                fontFamily: "'JetBrains Mono', monospace",
+                marginTop: 2,
+              }}
+            >
+              {getHostFromUrl(selectedAgent.url)}
+            </div>
+          </>
+        ) : (
+          <div
+            style={{
+              fontSize: 11,
+              color: "var(--text-muted)",
+            }}
+          >
+            No agent selected
+          </div>
+        )}
         <input
           placeholder="Search skills..."
+          disabled={!selectedAgent}
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
           style={{
             display: "block",
             marginTop: 8,
@@ -50,22 +251,28 @@ export function SkillPanel({ width }: SkillPanelProps) {
             width: "100%",
             fontFamily: "inherit",
             outline: "none",
+            boxSizing: "border-box",
           }}
         />
       </div>
 
       {/* Filter chips */}
       <div style={{ padding: "6px 14px 8px", display: "flex", gap: 4 }}>
-        {["All", "text", "file", "data"].map((label) => (
+        {FILTER_LABELS.map(({ label, value }) => (
           <button
-            key={label}
+            key={value}
+            onClick={() => setActiveFilter(value)}
             style={{
               fontSize: 10,
               padding: "2px 7px",
               borderRadius: 10,
-              border: "0.5px solid var(--border-subtle)",
-              background: label === "All" ? "var(--bg-info)" : "transparent",
-              color: label === "All" ? "var(--text-info)" : "var(--text-secondary)",
+              border: `0.5px solid ${activeFilter === value ? "var(--border-info)" : "var(--border-subtle)"}`,
+              background:
+                activeFilter === value ? "var(--bg-info)" : "transparent",
+              color:
+                activeFilter === value
+                  ? "var(--text-info)"
+                  : "var(--text-secondary)",
               cursor: "pointer",
               fontFamily: "inherit",
             }}
@@ -75,7 +282,7 @@ export function SkillPanel({ width }: SkillPanelProps) {
         ))}
       </div>
 
-      {/* Skill list placeholder */}
+      {/* Skill list */}
       <div
         style={{
           flex: 1,
@@ -83,20 +290,45 @@ export function SkillPanel({ width }: SkillPanelProps) {
           padding: "6px 8px",
           display: "flex",
           flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
+          ...((!selectedAgent || filteredSkills.length === 0) && {
+            alignItems: "center",
+            justifyContent: "center",
+          }),
+          gap: 2,
         }}
       >
-        <div
-          style={{
-            fontSize: 11,
-            color: "var(--text-muted)",
-            textAlign: "center",
-            padding: "20px 10px",
-          }}
-        >
-          Select an agent to browse skills
-        </div>
+        {!selectedAgent ? (
+          <div
+            style={{
+              fontSize: 11,
+              color: "var(--text-muted)",
+              textAlign: "center",
+              padding: "20px 10px",
+            }}
+          >
+            Select an agent to browse skills
+          </div>
+        ) : filteredSkills.length === 0 ? (
+          <div
+            style={{
+              fontSize: 11,
+              color: "var(--text-muted)",
+              textAlign: "center",
+              padding: "20px 10px",
+            }}
+          >
+            No skills match your search
+          </div>
+        ) : (
+          filteredSkills.map((skill) => (
+            <SkillItem
+              key={skill.id}
+              skill={skill}
+              isSelected={skill.id === selectedSkillId}
+              onSelect={() => setSelectedSkillId(skill.id)}
+            />
+          ))
+        )}
       </div>
     </div>
   );
