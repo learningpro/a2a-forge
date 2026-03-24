@@ -27,10 +27,10 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Skill Test Panel
 
-- [ ] **TEST-01**: Panel shows full skill metadata (id, name, description, input/output modes, examples)
-- [ ] **TEST-02**: User can compose test message with adaptive input area (text → multi-line editor, file → drag-and-drop picker, data → JSON editor with syntax highlighting)
-- [ ] **TEST-03**: User can select authentication method if card declares multiple schemes
-- [ ] **TEST-04**: User can override request headers via key-value editor
+- [x] **TEST-01**: Panel shows full skill metadata (id, name, description, input/output modes, examples)
+- [x] **TEST-02**: User can compose test message with adaptive input area (text → multi-line editor, file → drag-and-drop picker, data → JSON editor with syntax highlighting)
+- [x] **TEST-03**: User can select authentication method if card declares multiple schemes
+- [x] **TEST-04**: User can override request headers via key-value editor
 - [x] **TEST-05**: App sends tasks/send JSON-RPC and shows real-time status indicator
 - [x] **TEST-06**: App supports streaming via tasks/sendSubscribe (SSE) when agent advertises streaming
 - [ ] **TEST-07**: Response viewer shows full JSON-RPC response in collapsible tree
@@ -113,10 +113,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SKIL-03 | Phase 2 | Complete |
 | SKIL-04 | Phase 2 | Complete |
 | SKIL-05 | Phase 2 | Complete |
-| TEST-01 | Phase 3 | Pending |
-| TEST-02 | Phase 3 | Pending |
-| TEST-03 | Phase 3 | Pending |
-| TEST-04 | Phase 3 | Pending |
+| TEST-01 | Phase 3 | Complete |
+| TEST-02 | Phase 3 | Complete |
+| TEST-03 | Phase 3 | Complete |
+| TEST-04 | Phase 3 | Complete |
 | TEST-05 | Phase 3 | Complete |
 | TEST-06 | Phase 3 | Complete |
 | TEST-07 | Phase 3 | Pending |
