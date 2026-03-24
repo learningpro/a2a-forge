@@ -21,6 +21,8 @@ pub struct AgentCard {
     pub provider: Option<AgentProvider>,
     #[serde(default)]
     pub documentation_url: Option<String>,
+    #[serde(default)]
+    pub authentication: Option<serde_json::Value>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Type)]
@@ -69,4 +71,20 @@ pub struct AgentRow {
     pub card: AgentCard,
     pub last_fetched_at: i64,
     pub workspace_id: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct TaskEvent {
+    pub id: Option<String>,
+    pub status: Option<TaskStatus>,
+    pub artifact: Option<serde_json::Value>,
+    pub raw: serde_json::Value,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct TaskStatus {
+    pub state: String,
+    pub message: Option<String>,
 }

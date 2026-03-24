@@ -1,29 +1,12 @@
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use serde::Deserialize;
-use sqlx::{Row, Sqlite};
-use tauri::Manager;
-use tauri_plugin_sql::{DbInstances, DbPool};
+use sqlx::Row;
 
 use crate::a2a::types::{AgentCard, AgentRow};
+use crate::db::get_pool;
 use crate::error::AppError;
 use crate::state::AppState;
-
-/// Helper: extract the sqlx Pool<Sqlite> from tauri-plugin-sql's managed DbInstances.
-async fn get_pool(
-    app: &tauri::AppHandle,
-) -> Result<sqlx::Pool<Sqlite>, AppError> {
-    let instances = app.state::<DbInstances>();
-    let guard = instances.0.read().await;
-    let db = guard
-        .get("sqlite:workbench.db")
-        .ok_or_else(|| AppError::Database("Database not initialized".into()))?;
-    match db {
-        DbPool::Sqlite(pool) => Ok(pool.clone()),
-        #[allow(unreachable_patterns)]
-        _ => Err(AppError::Database("Expected SQLite pool".into())),
-    }
-}
 
 /// Helper: fetch an agent card from a base URL.
 async fn fetch_card(

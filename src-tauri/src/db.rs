@@ -1,4 +1,21 @@
-use tauri_plugin_sql::{Migration, MigrationKind};
+use sqlx::Sqlite;
+use tauri::Manager;
+use tauri_plugin_sql::{DbInstances, DbPool, Migration, MigrationKind};
+
+use crate::error::AppError;
+
+pub async fn get_pool(app: &tauri::AppHandle) -> Result<sqlx::Pool<Sqlite>, AppError> {
+    let instances = app.state::<DbInstances>();
+    let guard = instances.0.read().await;
+    let db = guard
+        .get("sqlite:workbench.db")
+        .ok_or_else(|| AppError::Database("Database not initialized".into()))?;
+    match db {
+        DbPool::Sqlite(pool) => Ok(pool.clone()),
+        #[allow(unreachable_patterns)]
+        _ => Err(AppError::Database("Expected SQLite pool".into())),
+    }
+}
 
 pub fn migrations() -> Vec<Migration> {
     vec![
