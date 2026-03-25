@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import { useAgentStore } from "../../stores/agentStore";
 import { useTestStore } from "../../stores/testStore";
 import { useStreamingTask } from "../../hooks/useStreamingTask";
@@ -17,7 +17,12 @@ import { HistoryList } from "./HistoryList";
 import { SavedTestsList } from "./SavedTestsList";
 
 export function TestPanel() {
-  const selectedAgent = useAgentStore((s) => s.selectedAgent());
+  const agents = useAgentStore((s) => s.agents);
+  const selectedAgentId = useAgentStore((s) => s.selectedAgentId);
+  const selectedAgent = useMemo(
+    () => agents.find((a) => a.id === selectedAgentId),
+    [agents, selectedAgentId],
+  );
   const selectedSkillId = useAgentStore((s) => s.selectedSkillId);
   const agentDefaultHeaders = useAgentStore(
     (s) => (s.selectedAgentId ? s.defaultHeaders[s.selectedAgentId] : undefined) ?? {},
