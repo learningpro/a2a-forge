@@ -91,8 +91,13 @@ export const useAgentStore = create<AgentState>()((set, get) => ({
     }));
   },
 
-  setSelectedAgentId: (id: string | null) =>
-    set({ selectedAgentId: id, selectedSkillId: null }),
+  setSelectedAgentId: (id: string | null) => {
+    set({ selectedAgentId: id, selectedSkillId: null });
+    // Auto-load default headers from SQLite when selecting an agent
+    if (id) {
+      get().loadDefaultHeaders(id);
+    }
+  },
 
   setSelectedSkillId: (id: string | null) => set({ selectedSkillId: id }),
 
