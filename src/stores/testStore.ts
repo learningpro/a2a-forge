@@ -8,64 +8,110 @@ export type TaskChunk = {
   artifact?: unknown;
 };
 
-interface TestState {
+/** Per-skill execution state */
+export interface SkillExecution {
   taskId: string | null;
   status: TaskStatus;
   chunks: TaskChunk[];
   result: unknown | null;
   latencyMs: number | null;
   startedAt: number | null;
+}
+
+const emptyExecution: SkillExecution = {
+  taskId: null,
+  status: "idle",
+  chunks: [],
+  result: null,
+  latencyMs: null,
+  startedAt: null,
+};
+
+interface TestState {
+  /** Map of "agentId:skillId" -> execution state */
+  executions: Record<string, SkillExecution>;
+
+  /** Global input state (shared across skills) */
   inputText: string;
   inputTab: "message" | "context" | "headers";
   responseTab: "rendered" | "raw";
   customHeaders: Record<string, string>;
 
-  startTask: (taskId: string) => void;
-  appendChunk: (chunk: TaskChunk) => void;
-  finishTask: (result: unknown, status?: TaskStatus) => void;
-  reset: () => void;
+  /** Get execution state for a skill (returns idle defaults if none) */
+  getExecution: (agentId: string, skillId: string) => SkillExecution;
+
+  startTask: (agentId: string, skillId: string, taskId: string) => void;
+  appendChunk: (agentId: string, skillId: string, chunk: TaskChunk) => void;
+  finishTask: (agentId: string, skillId: string, result: unknown, status?: TaskStatus) => void;
+  reset: (agentId: string, skillId: string) => void;
   setInputText: (text: string) => void;
   setInputTab: (tab: "message" | "context" | "headers") => void;
   setResponseTab: (tab: "rendered" | "raw") => void;
   setCustomHeaders: (headers: Record<string, string>) => void;
 }
 
-const initialState = {
-  taskId: null,
-  status: "idle" as TaskStatus,
-  chunks: [] as TaskChunk[],
-  result: null,
-  latencyMs: null,
-  startedAt: null,
+function key(agentId: string, skillId: string) {
+  return `${agentId}:${skillId}`;
+}
+
+export const useTestStore = create<TestState>()((set, get) => ({
+  executions: {},
   inputText: "",
   inputTab: "message" as const,
   responseTab: "rendered" as const,
   customHeaders: {} as Record<string, string>,
-};
 
-export const useTestStore = create<TestState>()((set, get) => ({
-  ...initialState,
-
-  startTask: (taskId: string) =>
-    set({
-      taskId,
-      status: "running",
-      startedAt: Date.now(),
-      chunks: [],
-      result: null,
-      latencyMs: null,
-    }),
-
-  appendChunk: (chunk: TaskChunk) =>
-    set((state) => ({ chunks: [...state.chunks, chunk] })),
-
-  finishTask: (result: unknown, status: TaskStatus = "completed") => {
-    const { startedAt } = get();
-    const latencyMs = startedAt != null ? Date.now() - startedAt : null;
-    set({ result, status, latencyMs });
+  getExecution: (agentId: string, skillId: string): SkillExecution => {
+    return get().executions[key(agentId, skillId)] ?? emptyExecution;
   },
 
-  reset: () => set(initialState),
+  startTask: (agentId: string, skillId: string, taskId: string) =>
+    set((state) => ({
+      executions: {
+        ...state.executions,
+        [key(agentId, skillId)]: {
+          taskId,
+          status: "running" as TaskStatus,
+          startedAt: Date.now(),
+          chunks: [],
+          result: null,
+          latencyMs: null,
+        },
+      },
+    })),
+
+  appendChunk: (agentId: string, skillId: string, chunk: TaskChunk) =>
+    set((state) => {
+      const k = key(agentId, skillId);
+      const prev = state.executions[k] ?? emptyExecution;
+      return {
+        executions: {
+          ...state.executions,
+          [k]: { ...prev, chunks: [...prev.chunks, chunk] },
+        },
+      };
+    }),
+
+  finishTask: (agentId: string, skillId: string, result: unknown, status: TaskStatus = "completed") =>
+    set((state) => {
+      const k = key(agentId, skillId);
+      const prev = state.executions[k] ?? emptyExecution;
+      const latencyMs = prev.startedAt != null ? Date.now() - prev.startedAt : null;
+      return {
+        executions: {
+          ...state.executions,
+          [k]: { ...prev, result, status, latencyMs },
+        },
+      };
+    }),
+
+  reset: (agentId: string, skillId: string) =>
+    set((state) => {
+      const k = key(agentId, skillId);
+      const next = { ...state.executions };
+      delete next[k];
+      return { executions: next };
+    }),
 
   setInputText: (text: string) => set({ inputText: text }),
   setInputTab: (tab) => set({ inputTab: tab }),

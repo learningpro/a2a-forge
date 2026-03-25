@@ -1,4 +1,5 @@
-import { useTestStore } from "../../stores/testStore";
+import { useMemo } from "react";
+import { useTestStore, type TaskChunk } from "../../stores/testStore";
 import { TaskStatus } from "./TaskStatus";
 import { JsonTree } from "./JsonTree";
 import ReactMarkdown from "react-markdown";
@@ -39,7 +40,11 @@ interface ResponseViewerProps {
 }
 
 export function ResponseViewer({ agentId, skillId }: ResponseViewerProps) {
-  const exec = useTestStore((s) => s.getExecution(agentId, skillId));
+  const executions = useTestStore((s) => s.executions);
+  const exec = useMemo(
+    () => executions[`${agentId}:${skillId}`] ?? { taskId: null, status: "idle" as const, chunks: [] as TaskChunk[], result: null, latencyMs: null, startedAt: null },
+    [executions, agentId, skillId],
+  );
   const { result, status, latencyMs, chunks, taskId } = exec;
   const responseTab = useTestStore((s) => s.responseTab);
   const setResponseTab = useTestStore((s) => s.setResponseTab);
