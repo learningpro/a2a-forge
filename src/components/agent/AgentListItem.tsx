@@ -139,7 +139,7 @@ export function AgentListItem({ agent, isActive, onClick }: AgentListItemProps) 
           style={{
             fontSize: 10,
             color: "var(--text-muted)",
-            fontFamily: "'JetBrains Mono', monospace",
+            fontFamily: "var(--font-mono, 'JetBrains Mono', monospace)",
             whiteSpace: "nowrap",
             overflow: "hidden",
             textOverflow: "ellipsis",

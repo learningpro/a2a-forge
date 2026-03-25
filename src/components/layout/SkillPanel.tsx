@@ -36,7 +36,7 @@ function ModeTag({ mode }: { mode: string }) {
         padding: "1px 5px",
         borderRadius: 4,
         fontWeight: 500,
-        fontFamily: "'JetBrains Mono', monospace",
+        fontFamily: "var(--font-mono, 'JetBrains Mono', monospace)",
         ...getModeStyle(mode),
       }}
     >
@@ -74,6 +74,12 @@ function SkillItem({
   return (
     <div
       onClick={onSelect}
+      onMouseEnter={(e) => {
+        if (!isSelected) e.currentTarget.style.background = "var(--bg-secondary)";
+      }}
+      onMouseLeave={(e) => {
+        if (!isSelected) e.currentTarget.style.background = "transparent";
+      }}
       style={{
         padding: "8px 10px",
         borderRadius: "var(--radius-md)",
@@ -88,7 +94,7 @@ function SkillItem({
           fontSize: 11,
           fontWeight: 500,
           color: "var(--text-primary)",
-          fontFamily: "'JetBrains Mono', monospace",
+          fontFamily: "var(--font-mono, 'JetBrains Mono', monospace)",
           marginBottom: 2,
         }}
       >
@@ -235,7 +241,7 @@ export function SkillPanel({ width }: SkillPanelProps) {
               style={{
                 fontSize: 10,
                 color: "var(--text-muted)",
-                fontFamily: "'JetBrains Mono', monospace",
+                fontFamily: "var(--font-mono, 'JetBrains Mono', monospace)",
                 marginTop: 2,
               }}
             >
