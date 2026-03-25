@@ -145,7 +145,7 @@ npm run tauri build
 
 ## License
 
-[MIT](LICENSE) — Copyright 2026 EchonLab
+[MIT](LICENSE) — Copyright 2026 Orange Dong
 READMEEOF
 
 echo "==> Creating LICENSE..."
@@ -153,7 +153,7 @@ echo "==> Creating LICENSE..."
 cat > "$DEST_DIR/LICENSE" << 'LICENSEEOF'
 MIT License
 
-Copyright (c) 2026 EchonLab
+Copyright (c) 2026 Orange Dong (learningpro.dong@gmail.com)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
