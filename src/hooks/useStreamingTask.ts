@@ -11,6 +11,8 @@ export function useStreamingTask() {
   const run = useCallback(async (
     agentUrl: string,
     payload: JsonValue,
+    agentId: string,
+    skillId: string,
     authHeader?: string,
     extraHeaders?: Record<string, string>,
   ) => {
@@ -28,7 +30,7 @@ export function useStreamingTask() {
         artifact: event.artifact ?? undefined,
       };
       lastChunk = chunk;
-      appendChunk(chunk);
+      appendChunk(agentId, skillId, chunk);
     };
 
     const taskId = unwrap(await commands.streamTask(
@@ -39,12 +41,12 @@ export function useStreamingTask() {
       channel,
     ));
 
-    startTask(taskId);
+    startTask(agentId, skillId, taskId);
 
     const finalStatus = (lastChunk as TaskChunk | null)?.status?.state;
     const taskStatus =
       finalStatus === "failed" ? ("failed" as const) : ("completed" as const);
-    finishTask(lastChunk, taskStatus);
+    finishTask(agentId, skillId, lastChunk, taskStatus);
   }, []);
 
   return { run };

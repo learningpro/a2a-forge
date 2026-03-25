@@ -30,7 +30,7 @@ export function TestPanel() {
     [defaultHeaders, selectedAgentId],
   );
 
-  const status = useTestStore((s) => s.status);
+  const executions = useTestStore((s) => s.executions);
   const inputText = useTestStore((s) => s.inputText);
   const customHeaders = useTestStore((s) => s.customHeaders);
   const { run: runStreaming } = useStreamingTask();
@@ -44,7 +44,15 @@ export function TestPanel() {
       ? selectedAgent.card.skills.find((s) => s.id === selectedSkillId) ?? null
       : null;
 
-  const isRunning = status === "running";
+  const agentId = selectedAgent?.id ?? "";
+  const skillId = skill?.id ?? "";
+
+  const exec = useMemo(
+    () => useTestStore.getState().getExecution(agentId, skillId),
+    [agentId, skillId, executions],
+  );
+
+  const isRunning = exec.status === "running";
 
   const handleCopyCurl = useCallback(() => {
     if (!selectedAgent || !skill) return;
@@ -90,18 +98,22 @@ export function TestPanel() {
         await runStreaming(
           selectedAgent.url,
           payload as unknown as JsonValue,
+          selectedAgent.id,
+          skill.id,
           authHeader,
           extraHeaders,
         );
       } catch (err) {
         finishTask(
+          selectedAgent.id,
+          skill.id,
           { error: err instanceof Error ? err.message : String(err) },
           "failed",
         );
       }
     } else {
       const payload = buildTaskSendPayload(skill.id, inputText, taskId);
-      startTask(taskId);
+      startTask(selectedAgent.id, skill.id, taskId);
       try {
         const result = unwrap(await commands.sendTask(
           selectedAgent.url,
@@ -110,9 +122,11 @@ export function TestPanel() {
           extraHeaders ?? null,
           null,
         ));
-        finishTask(result, "completed");
+        finishTask(selectedAgent.id, skill.id, result, "completed");
       } catch (err) {
         finishTask(
+          selectedAgent.id,
+          skill.id,
           { error: err instanceof Error ? err.message : String(err) },
           "failed",
         );
@@ -120,16 +134,15 @@ export function TestPanel() {
     }
 
     // Save history fire-and-forget
-    const { result, status: finalStatus, latencyMs: finalLatency } =
-      useTestStore.getState();
+    const finalExec = useTestStore.getState().getExecution(selectedAgent.id, skill.id);
     commands
       .saveHistory(
         selectedAgent.id,
         taskId,
         JSON.stringify({ skill: skill.id, text: inputText }),
-        result != null ? JSON.stringify(result) : null,
-        finalStatus,
-        finalLatency,
+        finalExec.result != null ? JSON.stringify(finalExec.result) : null,
+        finalExec.status,
+        finalExec.latencyMs,
       )
       .then(() => {
         // Refresh history list after saving
@@ -167,6 +180,7 @@ export function TestPanel() {
   }, [handleRun]);
 
   const handleHistorySelect = useCallback((entry: HistoryEntry) => {
+    if (!selectedAgent || !skill) return;
     // Load the request into the input form
     try {
       const req = JSON.parse(entry.requestJson);
@@ -179,12 +193,14 @@ export function TestPanel() {
       try {
         const resp = JSON.parse(entry.responseJson);
         useTestStore.getState().finishTask(
+          selectedAgent.id,
+          skill.id,
           resp,
           entry.status as "completed" | "failed",
         );
       } catch { /* ignore */ }
     }
-  }, []);
+  }, [selectedAgent, skill]);
 
   const handleRerun = useCallback(
     (payload: unknown) => {
@@ -389,7 +405,7 @@ export function TestPanel() {
             overflow: "hidden",
           }}
         >
-          <ResponseViewer />
+          <ResponseViewer agentId={selectedAgent.id} skillId={skill.id} />
 
           {/* History */}
           <div

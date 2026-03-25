@@ -33,14 +33,16 @@ function extractParts(result: unknown): { message: A2AMessage | null; raw: unkno
   return { message: message ?? null, raw: result };
 }
 
-export function ResponseViewer() {
-  const result = useTestStore((s) => s.result);
-  const status = useTestStore((s) => s.status);
-  const latencyMs = useTestStore((s) => s.latencyMs);
-  const chunks = useTestStore((s) => s.chunks);
+interface ResponseViewerProps {
+  agentId: string;
+  skillId: string;
+}
+
+export function ResponseViewer({ agentId, skillId }: ResponseViewerProps) {
+  const exec = useTestStore((s) => s.getExecution(agentId, skillId));
+  const { result, status, latencyMs, chunks, taskId } = exec;
   const responseTab = useTestStore((s) => s.responseTab);
   const setResponseTab = useTestStore((s) => s.setResponseTab);
-  const taskId = useTestStore((s) => s.taskId);
 
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "100%", overflow: "hidden" }}>

@@ -1,72 +1,89 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { useTestStore } from "../stores/testStore";
 
+const AGENT = "agent-1";
+const SKILL = "skill-1";
+
 describe("testStore", () => {
   beforeEach(() => {
     useTestStore.setState(useTestStore.getInitialState());
   });
 
-  it("has initial status idle and taskId null", () => {
-    const state = useTestStore.getState();
-    expect(state.status).toBe("idle");
-    expect(state.taskId).toBeNull();
-    expect(state.chunks).toEqual([]);
-    expect(state.latencyMs).toBeNull();
+  it("has initial execution with status idle and taskId null", () => {
+    const exec = useTestStore.getState().getExecution(AGENT, SKILL);
+    expect(exec.status).toBe("idle");
+    expect(exec.taskId).toBeNull();
+    expect(exec.chunks).toEqual([]);
+    expect(exec.latencyMs).toBeNull();
   });
 
   it("startTask sets status=running, taskId, and startedAt", () => {
-    useTestStore.getState().startTask("t1");
-    const state = useTestStore.getState();
+    useTestStore.getState().startTask(AGENT, SKILL, "t1");
+    const exec = useTestStore.getState().getExecution(AGENT, SKILL);
 
-    expect(state.status).toBe("running");
-    expect(state.taskId).toBe("t1");
-    expect(state.startedAt).toBeTypeOf("number");
+    expect(exec.status).toBe("running");
+    expect(exec.taskId).toBe("t1");
+    expect(exec.startedAt).toBeTypeOf("number");
   });
 
   it("appendChunk adds to chunks array", () => {
     const chunk = { raw: { data: "hello" } };
-    useTestStore.getState().appendChunk(chunk);
-    useTestStore.getState().appendChunk({ raw: { data: "world" } });
+    useTestStore.getState().appendChunk(AGENT, SKILL, chunk);
+    useTestStore.getState().appendChunk(AGENT, SKILL, { raw: { data: "world" } });
 
-    const state = useTestStore.getState();
-    expect(state.chunks).toHaveLength(2);
-    expect(state.chunks[0]).toEqual(chunk);
+    const exec = useTestStore.getState().getExecution(AGENT, SKILL);
+    expect(exec.chunks).toHaveLength(2);
+    expect(exec.chunks[0]).toEqual(chunk);
   });
 
   it("finishTask sets status and computes latencyMs as non-null number", () => {
-    useTestStore.getState().startTask("t1");
+    useTestStore.getState().startTask(AGENT, SKILL, "t1");
 
     // Small delay to ensure latency > 0
     const result = { final: true };
-    useTestStore.getState().finishTask(result);
+    useTestStore.getState().finishTask(AGENT, SKILL, result);
 
-    const state = useTestStore.getState();
-    expect(state.status).toBe("completed");
-    expect(state.result).toEqual(result);
-    expect(state.latencyMs).toBeTypeOf("number");
-    expect(state.latencyMs).not.toBeNull();
+    const exec = useTestStore.getState().getExecution(AGENT, SKILL);
+    expect(exec.status).toBe("completed");
+    expect(exec.result).toEqual(result);
+    expect(exec.latencyMs).toBeTypeOf("number");
+    expect(exec.latencyMs).not.toBeNull();
   });
 
   it("finishTask accepts custom status", () => {
-    useTestStore.getState().startTask("t1");
-    useTestStore.getState().finishTask(null, "failed");
+    useTestStore.getState().startTask(AGENT, SKILL, "t1");
+    useTestStore.getState().finishTask(AGENT, SKILL, null, "failed");
 
-    expect(useTestStore.getState().status).toBe("failed");
+    expect(useTestStore.getState().getExecution(AGENT, SKILL).status).toBe("failed");
   });
 
-  it("reset returns to initial state", () => {
-    useTestStore.getState().startTask("t1");
-    useTestStore.getState().appendChunk({ raw: {} });
-    useTestStore.getState().finishTask({ done: true });
+  it("reset returns execution to initial state", () => {
+    useTestStore.getState().startTask(AGENT, SKILL, "t1");
+    useTestStore.getState().appendChunk(AGENT, SKILL, { raw: {} });
+    useTestStore.getState().finishTask(AGENT, SKILL, { done: true });
 
-    useTestStore.getState().reset();
+    useTestStore.getState().reset(AGENT, SKILL);
 
-    const state = useTestStore.getState();
-    expect(state.status).toBe("idle");
-    expect(state.taskId).toBeNull();
-    expect(state.chunks).toEqual([]);
-    expect(state.result).toBeNull();
-    expect(state.latencyMs).toBeNull();
+    const exec = useTestStore.getState().getExecution(AGENT, SKILL);
+    expect(exec.status).toBe("idle");
+    expect(exec.taskId).toBeNull();
+    expect(exec.chunks).toEqual([]);
+    expect(exec.result).toBeNull();
+    expect(exec.latencyMs).toBeNull();
+  });
+
+  it("executions are independent per skill", () => {
+    useTestStore.getState().startTask("a1", "s1", "t1");
+    useTestStore.getState().startTask("a1", "s2", "t2");
+
+    const exec1 = useTestStore.getState().getExecution("a1", "s1");
+    const exec2 = useTestStore.getState().getExecution("a1", "s2");
+    expect(exec1.taskId).toBe("t1");
+    expect(exec2.taskId).toBe("t2");
+
+    useTestStore.getState().finishTask("a1", "s1", { r: 1 }, "completed");
+    expect(useTestStore.getState().getExecution("a1", "s1").status).toBe("completed");
+    expect(useTestStore.getState().getExecution("a1", "s2").status).toBe("running");
   });
 
   it("setInputText updates inputText", () => {
