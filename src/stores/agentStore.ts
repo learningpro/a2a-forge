@@ -124,9 +124,10 @@ export const useAgentStore = create<AgentState>()((set, get) => ({
   loadDefaultHeaders: async (agentId: string) => {
     try {
       const settings = unwrap(await commands.getSettings());
-      const raw = (settings as Record<string, string>)[`card:${agentId}:headers`];
+      const raw = (settings as Record<string, unknown>)[`card:${agentId}:headers`];
       if (raw) {
-        const headers = JSON.parse(raw) as Record<string, string>;
+        // raw may already be parsed as object by Rust serde_json, or may be a string
+        const headers = (typeof raw === "string" ? JSON.parse(raw) : raw) as Record<string, string>;
         set((state) => ({
           defaultHeaders: { ...state.defaultHeaders, [agentId]: headers },
         }));
