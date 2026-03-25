@@ -30,21 +30,35 @@ export function AppShell() {
     <div
       style={{
         display: "flex",
+        alignItems: "flex-start",
+        justifyContent: "center",
         height: "100vh",
-        minWidth: 1024,
-        borderRadius: "var(--radius-lg)",
-        overflow: "hidden",
-        border: "0.5px solid var(--border-default)",
-        boxShadow: "0 4px 32px rgba(0,0,0,0.08)",
+        padding: "24px",
         background: "var(--bg-tertiary)",
-        fontSize: 12,
+        overflow: "hidden",
       }}
     >
-      <Sidebar />
-      {!sidebarCollapsed && <ResizeHandle onResize={handleSidebarResize} />}
-      <SkillPanel width={skillPanelWidth} />
-      <ResizeHandle onResize={handleSkillPanelResize} />
-      <TestPanel />
+      <div
+        style={{
+          display: "flex",
+          width: "100%",
+          maxWidth: 1400,
+          height: "100%",
+          minWidth: 1024,
+          borderRadius: "var(--radius-lg)",
+          overflow: "hidden",
+          border: "0.5px solid var(--border-default)",
+          boxShadow: "0 4px 32px rgba(0,0,0,0.08)",
+          background: "var(--bg-tertiary)",
+          fontSize: 12,
+        }}
+      >
+        <Sidebar />
+        {!sidebarCollapsed && <ResizeHandle onResize={handleSidebarResize} />}
+        <SkillPanel width={skillPanelWidth} />
+        <ResizeHandle onResize={handleSkillPanelResize} />
+        <TestPanel />
+      </div>
     </div>
   );
 }
