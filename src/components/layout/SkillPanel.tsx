@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { useAgentStore } from "../../stores/agentStore";
+import { useTestStore } from "../../stores/testStore";
 import type { AgentSkill } from "../../bindings";
 import { AgentHeadersDialog } from "../agent/AgentHeadersDialog";
 
@@ -66,10 +67,12 @@ function SkillItem({
   skill,
   isSelected,
   onSelect,
+  taskStatus,
 }: {
   skill: AgentSkill;
   isSelected: boolean;
   onSelect: () => void;
+  taskStatus?: "running" | "completed" | "failed" | null;
 }) {
   return (
     <div
@@ -96,9 +99,34 @@ function SkillItem({
           color: "var(--text-primary)",
           fontFamily: "var(--font-mono, 'JetBrains Mono', monospace)",
           marginBottom: 2,
+          display: "flex",
+          alignItems: "center",
+          gap: 6,
         }}
       >
         {skill.name}
+        {taskStatus === "running" && (
+          <span style={{
+            width: 6, height: 6, borderRadius: "50%",
+            background: "var(--text-info, #185fa5)",
+            display: "inline-block", flexShrink: 0,
+            animation: "pulse 1.5s ease-in-out infinite",
+          }} />
+        )}
+        {taskStatus === "completed" && (
+          <span style={{
+            width: 6, height: 6, borderRadius: "50%",
+            background: "var(--dot-online, #1D9E75)",
+            display: "inline-block", flexShrink: 0,
+          }} />
+        )}
+        {taskStatus === "failed" && (
+          <span style={{
+            width: 6, height: 6, borderRadius: "50%",
+            background: "var(--dot-error, #E24B4A)",
+            display: "inline-block", flexShrink: 0,
+          }} />
+        )}
       </div>
       <div
         style={{
@@ -141,6 +169,8 @@ export function SkillPanel({ width }: SkillPanelProps) {
   const selectedAgentId = useAgentStore((s) => s.selectedAgentId);
   const selectedSkillId = useAgentStore((s) => s.selectedSkillId);
   const setSelectedSkillId = useAgentStore((s) => s.setSelectedSkillId);
+
+  const executions = useTestStore((s) => s.executions);
 
   const selectedAgent = useMemo(
     () => agents.find((a) => a.id === selectedAgentId),
@@ -344,14 +374,23 @@ export function SkillPanel({ width }: SkillPanelProps) {
             No skills match your search
           </div>
         ) : (
-          filteredSkills.map((skill) => (
-            <SkillItem
-              key={skill.id}
-              skill={skill}
-              isSelected={skill.id === selectedSkillId}
-              onSelect={() => setSelectedSkillId(skill.id)}
-            />
-          ))
+          filteredSkills.map((skill) => {
+              const execKey = selectedAgentId ? `${selectedAgentId}:${skill.id}` : "";
+              const exec = execKey ? executions[execKey] : undefined;
+              const taskStatus = exec?.status === "running" ? "running"
+                : exec?.status === "completed" ? "completed"
+                : exec?.status === "failed" ? "failed"
+                : null;
+              return (
+                <SkillItem
+                  key={skill.id}
+                  skill={skill}
+                  isSelected={skill.id === selectedSkillId}
+                  onSelect={() => setSelectedSkillId(skill.id)}
+                  taskStatus={taskStatus}
+                />
+              );
+            })
         )}
       </div>
 
