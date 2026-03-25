@@ -39,7 +39,7 @@ export function ResizeHandle({ onResize, onResizeStart, onResizeEnd }: ResizeHan
   return (
     <div
       style={{
-        width: 4,
+        width: 6,
         cursor: "col-resize",
         background: "transparent",
         flexShrink: 0,
@@ -54,16 +54,16 @@ export function ResizeHandle({ onResize, onResizeStart, onResizeEnd }: ResizeHan
           position: "absolute",
           top: 0,
           bottom: 0,
-          left: 1,
+          left: 2,
           width: 2,
-          background: "transparent",
+          background: "var(--border-subtle)",
           transition: "background 0.15s",
         }}
         onMouseEnter={(e) => {
           (e.currentTarget as HTMLDivElement).style.background = "var(--border-default)";
         }}
         onMouseLeave={(e) => {
-          (e.currentTarget as HTMLDivElement).style.background = "transparent";
+          (e.currentTarget as HTMLDivElement).style.background = "var(--border-subtle)";
         }}
       />
     </div>

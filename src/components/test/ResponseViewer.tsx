@@ -140,7 +140,10 @@ function EmptyState() {
         alignItems: "center",
         justifyContent: "center",
         color: "var(--text-muted)",
-        fontSize: 12,
+        fontSize: 11,
+        textAlign: "center",
+        padding: 20,
+        lineHeight: 1.6,
       }}
     >
       Run a test to see results here

@@ -265,9 +265,10 @@ export function TestPanel() {
           >
             <div
               style={{
-                fontSize: 12,
+                fontSize: 11,
                 color: "var(--text-muted)",
                 textAlign: "center",
+                lineHeight: 1.6,
               }}
             >
               Select a skill to begin testing
@@ -284,9 +285,10 @@ export function TestPanel() {
           >
             <div
               style={{
-                fontSize: 12,
+                fontSize: 11,
                 color: "var(--text-muted)",
                 textAlign: "center",
+                lineHeight: 1.6,
               }}
             >
               Select a skill and run a test to see results here
