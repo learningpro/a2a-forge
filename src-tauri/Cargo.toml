@@ -1,10 +1,10 @@
 [package]
-name = "a2a-workbench"
+name = "a2a-forge"
 version = "0.1.0"
 edition = "2021"
 
 [lib]
-name = "a2a_workbench"
+name = "a2a_forge"
 crate-type = ["lib", "cdylib", "staticlib"]
 
 [dependencies]

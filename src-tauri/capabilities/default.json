@@ -1,7 +1,7 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
-  "description": "Default capabilities for A2A Workbench",
+  "description": "Default capabilities for A2A-Forge",
   "windows": ["main"],
   "permissions": [
     "core:default",

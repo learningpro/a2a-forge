@@ -1,6 +1,6 @@
 {
-  "productName": "A2A Workbench",
-  "identifier": "com.a2aworkbench.app",
+  "productName": "A2A-Forge",
+  "identifier": "com.a2aforge.app",
   "build": {
     "beforeDevCommand": "lsof -ti :1421 | xargs kill -9 2>/dev/null; npm run dev -- --port 1421",
     "beforeBuildCommand": "npm run build",
@@ -10,7 +10,7 @@
   "app": {
     "windows": [
       {
-        "title": "A2A Workbench",
+        "title": "A2A-Forge",
         "width": 1280,
         "height": 800,
         "minWidth": 1024,

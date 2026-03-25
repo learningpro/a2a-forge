@@ -100,7 +100,7 @@ $B stop; lsof -ti :1421 | xargs kill -9 2>/dev/null
 
 ### Step 3: Full Tauri App Launch (30s survival test)
 ```bash
-pkill -f "a2a-workbench" 2>/dev/null; lsof -ti :1421 | xargs kill -9 2>/dev/null; sleep 2
+pkill -f "a2a-forge" 2>/dev/null; lsof -ti :1421 | xargs kill -9 2>/dev/null; sleep 2
 npm run tauri dev 2>&1 & APP_PID=$!; sleep 30
 kill -0 $APP_PID 2>/dev/null && echo "OK" || echo "CRASHED"
 kill $APP_PID 2>/dev/null

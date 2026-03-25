@@ -11,7 +11,7 @@ use crate::error::AppError;
 /// returns a clear error. The AES-SQLite fallback will be completed
 /// before Phase 3 introduces real credentials.
 
-const SERVICE_NAME: &str = "com.a2aworkbench.app";
+const SERVICE_NAME: &str = "com.a2aforge.app";
 
 /// Store a credential in the OS keychain.
 /// Tries keyring first; falls back to AES-encrypted SQLite (stub in Phase 1).
