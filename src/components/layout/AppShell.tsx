@@ -30,10 +30,10 @@ export function AppShell() {
     <div
       style={{
         display: "flex",
-        alignItems: "flex-start",
+        alignItems: "center",
         justifyContent: "center",
         height: "100vh",
-        padding: "24px",
+        padding: "32px 24px",
         background: "var(--bg-tertiary)",
         overflow: "hidden",
       }}
