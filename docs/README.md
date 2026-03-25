@@ -4,7 +4,7 @@
 
 **The desktop workbench for testing and debugging A2A protocol agents**
 
-[![Build](https://img.shields.io/github/actions/workflow/status/anthropics/a2a-forge/build.yml?style=flat-square)](https://github.com/anthropics/a2a-forge/actions)
+[![Build](https://img.shields.io/github/actions/workflow/status/learningpro/a2a-forge/build.yml?style=flat-square)](https://github.com/learningpro/a2a-forge/actions)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](LICENSE)
 [![Tauri](https://img.shields.io/badge/Tauri-2.x-FFC131?style=flat-square&logo=tauri)](https://v2.tauri.app/)
 [![React](https://img.shields.io/badge/React-18-61DAFB?style=flat-square&logo=react)](https://react.dev/)
@@ -55,7 +55,7 @@ Built with [Tauri 2](https://v2.tauri.app/) for a fast, lightweight, cross-platf
 ### Install & Run
 
 ```bash
-git clone https://github.com/user/a2a-forge.git
+git clone https://github.com/learningpro/a2a-forge.git
 cd a2a-forge
 npm install
 npm run tauri dev
@@ -191,7 +191,7 @@ A2A-Forge 是一款原生桌面应用，专为开发 [A2A（Agent-to-Agent）](h
 ### 安装运行
 
 ```bash
-git clone https://github.com/user/a2a-forge.git
+git clone https://github.com/learningpro/a2a-forge.git
 cd a2a-forge
 npm install
 npm run tauri dev
