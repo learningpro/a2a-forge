@@ -5,12 +5,12 @@ interface TaskStatusProps {
   latencyMs: number | null;
 }
 
-const statusColors: Record<TaskStatusType, string> = {
-  idle: "#1D9E75",
-  completed: "#1D9E75",
-  running: "#EF9F27",
-  failed: "#E24B4A",
-  canceled: "#9a9992",
+const pillStyles: Record<TaskStatusType, { bg: string; color: string }> = {
+  idle: { bg: "var(--bg-secondary)", color: "var(--text-muted)" },
+  completed: { bg: "var(--bg-success)", color: "var(--text-success)" },
+  running: { bg: "var(--bg-warning)", color: "var(--text-warning)" },
+  failed: { bg: "#fde8e8", color: "#E24B4A" },
+  canceled: { bg: "var(--bg-secondary)", color: "var(--text-muted)" },
 };
 
 function formatLatency(ms: number): string {
@@ -21,24 +21,43 @@ function formatLatency(ms: number): string {
 }
 
 export function TaskStatus({ status, latencyMs }: TaskStatusProps) {
-  const dotColor = statusColors[status];
+  const pill = pillStyles[status];
 
   return (
-    <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+    <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
       <span
         style={{
-          width: 6,
-          height: 6,
-          borderRadius: "50%",
-          background: dotColor,
-          flexShrink: 0,
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 5,
+          fontSize: 10,
+          padding: "2px 8px",
+          borderRadius: 10,
+          fontWeight: 500,
+          fontFamily: "var(--font-mono)",
+          background: pill.bg,
+          color: pill.color,
         }}
-      />
-      <span style={{ fontSize: 11, color: "var(--text-secondary)", fontWeight: 500 }}>
+      >
+        <span
+          style={{
+            width: 5,
+            height: 5,
+            borderRadius: "50%",
+            background: "currentColor",
+            flexShrink: 0,
+          }}
+        />
         {status}
       </span>
       {latencyMs != null && (
-        <span style={{ fontSize: 10, color: "var(--text-muted)" }}>
+        <span
+          style={{
+            fontSize: 10,
+            color: "var(--text-muted)",
+            fontFamily: "var(--font-mono)",
+          }}
+        >
           {formatLatency(latencyMs)}
         </span>
       )}

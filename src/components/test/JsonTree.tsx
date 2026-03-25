@@ -18,7 +18,7 @@ export function JsonTree({
     <pre
       style={{
         fontFamily: "var(--font-mono)",
-        fontSize: 12,
+        fontSize: 10,
         lineHeight: 1.7,
         margin: 0,
         whiteSpace: "pre-wrap",
