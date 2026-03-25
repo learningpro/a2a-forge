@@ -80,7 +80,7 @@ export function AgentHeadersDialog({
       style={{
         position: "fixed",
         inset: 0,
-        background: "rgba(0,0,0,0.4)",
+        background: "rgba(0,0,0,0.3)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -91,14 +91,15 @@ export function AgentHeadersDialog({
       <div
         onClick={(e) => e.stopPropagation()}
         style={{
-          background: "var(--bg-primary)",
-          border: "0.5px solid var(--border-default)",
+          background: "var(--bg-secondary)",
+          border: "0.5px solid var(--border-subtle)",
           borderRadius: "var(--radius-lg, 10px)",
-          padding: "18px 20px",
+          padding: 16,
           width: 420,
+          maxWidth: "90vw",
           maxHeight: "80vh",
           overflowY: "auto",
-          boxShadow: "0 8px 32px rgba(0,0,0,0.18)",
+          boxShadow: "0 4px 32px rgba(0,0,0,0.06)",
         }}
       >
         <div
@@ -115,7 +116,7 @@ export function AgentHeadersDialog({
           style={{
             fontSize: 10,
             color: "var(--text-muted)",
-            marginBottom: 14,
+            marginBottom: 16,
           }}
         >
           Set default headers for <strong>{agentName}</strong>. These are merged
@@ -136,11 +137,13 @@ export function AgentHeadersDialog({
                   flex: 1,
                   padding: "4px 8px",
                   fontSize: 11,
-                  background: "var(--bg-secondary)",
-                  border: "0.5px solid var(--border-subtle)",
+                  background: "var(--bg-primary)",
+                  border: "0.5px solid var(--border-default)",
                   borderRadius: "var(--radius-md, 6px)",
                   color: "var(--text-primary)",
                   fontFamily: "var(--font-mono, 'JetBrains Mono', monospace)",
+                  outline: "none",
+                  boxSizing: "border-box",
                 }}
               />
               <input
@@ -151,11 +154,13 @@ export function AgentHeadersDialog({
                   flex: 2,
                   padding: "4px 8px",
                   fontSize: 11,
-                  background: "var(--bg-secondary)",
-                  border: "0.5px solid var(--border-subtle)",
+                  background: "var(--bg-primary)",
+                  border: "0.5px solid var(--border-default)",
                   borderRadius: "var(--radius-md, 6px)",
                   color: "var(--text-primary)",
                   fontFamily: "var(--font-mono, 'JetBrains Mono', monospace)",
+                  outline: "none",
+                  boxSizing: "border-box",
                 }}
               />
               <button
@@ -202,7 +207,7 @@ export function AgentHeadersDialog({
           <button
             onClick={onClose}
             style={{
-              padding: "5px 14px",
+              padding: "6px 14px",
               fontSize: 11,
               background: "transparent",
               border: "0.5px solid var(--border-subtle)",
@@ -217,13 +222,13 @@ export function AgentHeadersDialog({
           <button
             onClick={handleSave}
             style={{
-              padding: "5px 14px",
+              padding: "6px 14px",
               fontSize: 11,
               fontWeight: 500,
-              background: "var(--bg-info)",
-              border: "0.5px solid var(--border-info)",
+              background: "var(--text-primary)",
+              border: "0.5px solid var(--border-strong)",
               borderRadius: "var(--radius-md, 6px)",
-              color: "var(--text-info)",
+              color: "var(--bg-primary)",
               cursor: "pointer",
               fontFamily: "inherit",
             }}
