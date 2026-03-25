@@ -2,44 +2,9 @@ import { useState, useEffect } from "react";
 import { useUiStore } from "../../stores/uiStore";
 import { useAgentStore } from "../../stores/agentStore";
 import { useWorkspaceStore } from "../../stores/workspaceStore";
-import { commands } from "../../bindings";
-import { unwrap } from "../../lib/tauri-helpers";
 import { AgentListItem } from "../agent/AgentListItem";
 import { AddAgentDialog } from "../agent/AddAgentDialog";
 import { SettingsModal } from "../settings/SettingsModal";
-
-async function handleExport(workspaceId: string) {
-  try {
-    const { save } = await import("@tauri-apps/plugin-dialog");
-    const filePath = await save({
-      defaultPath: "agents-export.json",
-      filters: [{ name: "JSON", extensions: ["json"] }],
-    });
-    if (!filePath) return;
-    const jsonData = unwrap(await commands.exportAgents(workspaceId));
-    const { writeTextFile } = await import("@tauri-apps/plugin-fs");
-    await writeTextFile(filePath, jsonData);
-  } catch (e) {
-    console.error("Export failed:", e);
-  }
-}
-
-async function handleImport(workspaceId: string) {
-  try {
-    const { open } = await import("@tauri-apps/plugin-dialog");
-    const filePath = await open({
-      filters: [{ name: "JSON", extensions: ["json"] }],
-      multiple: false,
-    });
-    if (!filePath || Array.isArray(filePath)) return;
-    const { readTextFile } = await import("@tauri-apps/plugin-fs");
-    const jsonData = await readTextFile(filePath as string);
-    unwrap(await commands.importAgents(jsonData, workspaceId));
-    await useAgentStore.getState().loadAgents(workspaceId);
-  } catch (e) {
-    console.error("Import failed:", e);
-  }
-}
 
 export function Sidebar() {
   const sidebarCollapsed = useUiStore((s) => s.sidebarCollapsed);
@@ -88,17 +53,6 @@ export function Sidebar() {
 
   const handleAddFromExample = () => {
     setShowAddDialog(true);
-  };
-
-  const importExportButtonStyle: React.CSSProperties = {
-    fontSize: 10,
-    padding: "3px 8px",
-    background: "transparent",
-    border: "0.5px solid var(--border-subtle)",
-    borderRadius: "var(--radius-md)",
-    color: "var(--text-secondary)",
-    cursor: "pointer",
-    fontFamily: "inherit",
   };
 
   return (
@@ -305,37 +259,6 @@ export function Sidebar() {
                   </option>
                 ))}
             </select>
-            {/* Import/Export buttons */}
-            <div style={{ display: "flex", gap: 4, marginTop: 4 }}>
-              <button
-                onClick={() => handleImport(activeWorkspaceId)}
-                style={importExportButtonStyle}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.borderColor = "var(--border-default)";
-                  e.currentTarget.style.color = "var(--text-primary)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = "var(--border-subtle)";
-                  e.currentTarget.style.color = "var(--text-secondary)";
-                }}
-              >
-                Import
-              </button>
-              <button
-                onClick={() => handleExport(activeWorkspaceId)}
-                style={importExportButtonStyle}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.borderColor = "var(--border-default)";
-                  e.currentTarget.style.color = "var(--text-primary)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = "var(--border-subtle)";
-                  e.currentTarget.style.color = "var(--text-secondary)";
-                }}
-              >
-                Export
-              </button>
-            </div>
           </>
         )}
         {/* Collapse toggle */}
