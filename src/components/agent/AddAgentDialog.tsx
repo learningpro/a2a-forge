@@ -132,7 +132,7 @@ export function AddAgentDialog({ open, onClose }: AddAgentDialogProps) {
           well-known card from{" "}
           <code
             style={{
-              fontFamily: "'JetBrains Mono', monospace",
+              fontFamily: "var(--font-mono, 'JetBrains Mono', monospace)",
               fontSize: 10,
             }}
           >
@@ -282,7 +282,7 @@ export function AddAgentDialog({ open, onClose }: AddAgentDialogProps) {
                 style={{
                   fontSize: 10,
                   color: "var(--text-muted)",
-                  fontFamily: "'JetBrains Mono', monospace",
+                  fontFamily: "var(--font-mono, 'JetBrains Mono', monospace)",
                 }}
               >
                 v{preview.card.version} &middot; A2A{" "}
@@ -308,7 +308,7 @@ export function AddAgentDialog({ open, onClose }: AddAgentDialogProps) {
                         background: "var(--bg-secondary)",
                         border: "0.5px solid var(--border-subtle)",
                         color: "var(--text-secondary)",
-                        fontFamily: "'JetBrains Mono', monospace",
+                        fontFamily: "var(--font-mono, 'JetBrains Mono', monospace)",
                       }}
                     >
                       {skill.name}
@@ -323,7 +323,7 @@ export function AddAgentDialog({ open, onClose }: AddAgentDialogProps) {
                         background: "var(--bg-secondary)",
                         border: "0.5px solid var(--border-subtle)",
                         color: "var(--text-secondary)",
-                        fontFamily: "'JetBrains Mono', monospace",
+                        fontFamily: "var(--font-mono, 'JetBrains Mono', monospace)",
                       }}
                     >
                       +{preview.card.skills.length - 4} more
@@ -335,7 +335,7 @@ export function AddAgentDialog({ open, onClose }: AddAgentDialogProps) {
           )}
 
           {preview.status === "error" && (
-            <div style={{ fontSize: 11, color: "#e24b4a" }}>
+            <div style={{ fontSize: 11, color: "var(--dot-error)" }}>
               {preview.message}
             </div>
           )}

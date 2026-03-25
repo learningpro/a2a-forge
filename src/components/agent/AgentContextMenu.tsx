@@ -86,7 +86,7 @@ export function AgentContextMenu({
             onClick={handleDelete}
             style={{
               ...buttonBase,
-              color: "#e24b4a",
+              color: "var(--dot-error)",
               fontWeight: 500,
             }}
           >

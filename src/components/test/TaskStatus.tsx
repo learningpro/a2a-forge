@@ -9,7 +9,7 @@ const pillStyles: Record<TaskStatusType, { bg: string; color: string }> = {
   idle: { bg: "var(--bg-secondary)", color: "var(--text-muted)" },
   completed: { bg: "var(--bg-success)", color: "var(--text-success)" },
   running: { bg: "var(--bg-warning)", color: "var(--text-warning)" },
-  failed: { bg: "#fde8e8", color: "#E24B4A" },
+  failed: { bg: "#fde8e8", color: "var(--dot-error)" },
   canceled: { bg: "var(--bg-secondary)", color: "var(--text-muted)" },
 };
 

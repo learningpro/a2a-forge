@@ -16,10 +16,10 @@ function formatTime(epochMs: number): string {
 }
 
 const statusDotColor: Record<string, string> = {
-  completed: "#1D9E75",
-  failed: "#E24B4A",
-  running: "#EF9F27",
-  canceled: "#9a9992",
+  completed: "var(--dot-online)",
+  failed: "var(--dot-error)",
+  running: "var(--dot-warning)",
+  canceled: "var(--text-muted)",
 };
 
 export function HistoryList({ agentId, onSelectHistory }: HistoryListProps) {

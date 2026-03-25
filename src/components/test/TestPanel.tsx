@@ -362,7 +362,7 @@ export function TestPanel() {
                 width: 6,
                 height: 6,
                 borderRadius: "50%",
-                background: isRunning ? "#EF9F27" : "#1D9E75",
+                background: isRunning ? "var(--dot-warning)" : "var(--dot-online)",
                 flexShrink: 0,
               }}
             />

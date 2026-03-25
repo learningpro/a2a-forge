@@ -12,9 +12,9 @@ interface AgentListItemProps {
 function getStatusDotColor(agent: AgentRow): string {
   const nowSeconds = Date.now() / 1000;
   if (nowSeconds - Number(agent.lastFetchedAt) > 3600) {
-    return "#EF9F27"; // amber -- stale > 1 hour
+    return "var(--dot-warning)"; // amber -- stale > 1 hour
   }
-  return "#1D9E75"; // green -- recently fetched
+  return "var(--dot-online)"; // green -- recently fetched
 }
 
 function getHostFromUrl(url: string): string {
