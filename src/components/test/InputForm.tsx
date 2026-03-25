@@ -7,8 +7,6 @@ const MonacoWrapper = React.lazy(() => import("./MonacoWrapper").then((m) => ({ 
 interface InputFormProps {
   skill: AgentSkill;
   card: AgentCard;
-  onRun: () => void;
-  isRunning: boolean;
 }
 
 interface HeaderEntry {
@@ -19,8 +17,6 @@ interface HeaderEntry {
 export function InputForm({
   skill,
   card: _card,
-  onRun,
-  isRunning,
 }: InputFormProps) {
   const inputText = useTestStore((s) => s.inputText);
   const setInputText = useTestStore((s) => s.setInputText);
@@ -95,8 +91,6 @@ export function InputForm({
     { id: "context", label: "context data" },
     { id: "headers", label: "headers" },
   ];
-
-  const runDotColor = isRunning ? "#EF9F27" : "#1D9E75";
 
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
@@ -325,45 +319,6 @@ export function InputForm({
         </>
       )}
 
-      {/* Run button */}
-      <div
-        style={{
-          padding: "6px 14px 10px",
-          display: "flex",
-          justifyContent: "flex-end",
-        }}
-      >
-        <button
-          onClick={onRun}
-          disabled={isRunning}
-          style={{
-            padding: "5px 14px",
-            fontSize: 11,
-            fontWeight: 500,
-            background: "var(--bg-primary)",
-            border: "0.5px solid var(--border-strong)",
-            borderRadius: "var(--radius-md, 6px)",
-            color: "var(--text-primary)",
-            cursor: isRunning ? "default" : "pointer",
-            display: "flex",
-            alignItems: "center",
-            gap: 5,
-            fontFamily: "inherit",
-            opacity: isRunning ? 0.7 : 1,
-          }}
-        >
-          <span
-            style={{
-              width: 6,
-              height: 6,
-              borderRadius: "50%",
-              background: runDotColor,
-              flexShrink: 0,
-            }}
-          />
-          {isRunning ? "Running..." : "Run"}
-        </button>
-      </div>
     </div>
   );
 }

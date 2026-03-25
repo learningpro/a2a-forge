@@ -161,14 +161,6 @@ export function TestPanel() {
     runStreaming,
   ]);
 
-  const handleExampleClick = useCallback(
-    (example: unknown) => {
-      const text = typeof example === "string" ? example : JSON.stringify(example, null, 2);
-      useTestStore.getState().setInputText(text);
-      useTestStore.getState().setInputTab("message");
-    },
-    [],
-  );
 
   // Listen for global keyboard shortcut event
   useEffect(() => {
@@ -325,7 +317,7 @@ export function TestPanel() {
           justifyContent: "space-between",
         }}
       >
-        <SkillMetadata skill={skill} onExampleClick={handleExampleClick} />
+        <SkillMetadata skill={skill} />
 
         <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
           <button
@@ -343,6 +335,36 @@ export function TestPanel() {
             }}
           >
             {curlCopied ? "Copied!" : "curl"}
+          </button>
+          <button
+            onClick={handleRun}
+            disabled={isRunning}
+            style={{
+              padding: "5px 14px",
+              fontSize: 11,
+              fontWeight: 500,
+              background: "var(--bg-primary)",
+              border: "0.5px solid var(--border-strong)",
+              borderRadius: "var(--radius-md, 6px)",
+              color: "var(--text-primary)",
+              cursor: isRunning ? "default" : "pointer",
+              display: "flex",
+              alignItems: "center",
+              gap: 5,
+              fontFamily: "inherit",
+              opacity: isRunning ? 0.7 : 1,
+            }}
+          >
+            <span
+              style={{
+                width: 6,
+                height: 6,
+                borderRadius: "50%",
+                background: isRunning ? "#EF9F27" : "#1D9E75",
+                flexShrink: 0,
+              }}
+            />
+            {isRunning ? "Running\u2026" : "Run"}
           </button>
         </div>
       </div>
@@ -363,8 +385,6 @@ export function TestPanel() {
           <InputForm
             skill={skill}
             card={selectedAgent.card}
-            onRun={handleRun}
-            isRunning={isRunning}
           />
 
           {/* Saved tests */}
