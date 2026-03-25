@@ -36,9 +36,20 @@ pub fn run() {
         ]);
 
     #[cfg(debug_assertions)]
-    builder
-        .export(Typescript::default(), "../src/bindings.ts")
-        .expect("Failed to export typescript bindings");
+    {
+        builder
+            .export(Typescript::default(), "../src/bindings.ts")
+            .expect("Failed to export typescript bindings");
+
+        // Prepend @ts-nocheck to generated bindings (specta generates conflicting types)
+        let bindings_path = std::path::Path::new("../src/bindings.ts");
+        if let Ok(content) = std::fs::read_to_string(bindings_path) {
+            if !content.starts_with("// @ts-nocheck") {
+                let patched = format!("// @ts-nocheck\n{}", content);
+                let _ = std::fs::write(bindings_path, patched);
+            }
+        }
+    }
 
     tauri::Builder::default()
         .plugin(
