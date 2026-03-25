@@ -111,18 +111,15 @@ export function InputForm({
               fontSize: 10,
               cursor: "pointer",
               color: inputTab === t.id ? "var(--text-primary)" : "var(--text-secondary)",
-              borderBottom:
-                inputTab === t.id
-                  ? "1.5px solid var(--text-primary)"
-                  : "1.5px solid transparent",
-              marginBottom: -0.5,
               fontWeight: inputTab === t.id ? 500 : 400,
               background: "none",
-              border: "none",
-              borderBottomStyle: "solid",
-              borderBottomWidth: 1.5,
-              borderBottomColor: inputTab === t.id ? "var(--text-primary)" : "transparent",
+              borderTop: "none",
+              borderLeft: "none",
+              borderRight: "none",
+              borderBottom: `1.5px solid ${inputTab === t.id ? "var(--text-primary)" : "transparent"}`,
+              marginBottom: -0.5,
               fontFamily: "inherit",
+              transition: "color 0.1s",
             }}
           >
             {t.label}
@@ -309,6 +306,15 @@ export function InputForm({
                     maxWidth: 140,
                     overflow: "hidden",
                     textOverflow: "ellipsis",
+                    transition: "all 0.1s",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = "var(--border-default)";
+                    e.currentTarget.style.color = "var(--text-primary)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = "var(--border-subtle)";
+                    e.currentTarget.style.color = "var(--text-secondary)";
                   }}
                 >
                   {label}

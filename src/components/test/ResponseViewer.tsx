@@ -463,14 +463,14 @@ function TabButton({
         fontSize: 10,
         cursor: "pointer",
         color: active ? "var(--text-primary)" : "var(--text-secondary)",
-        borderBottom: active ? "1.5px solid var(--text-primary)" : "1.5px solid transparent",
         fontWeight: active ? 500 : 400,
         background: "none",
-        border: "none",
-        borderBottomStyle: "solid",
-        borderBottomWidth: "1.5px",
-        borderBottomColor: active ? "var(--text-primary)" : "transparent",
+        borderTop: "none",
+        borderLeft: "none",
+        borderRight: "none",
+        borderBottom: `1.5px solid ${active ? "var(--text-primary)" : "transparent"}`,
         fontFamily: "inherit",
+        transition: "color 0.1s",
       }}
     >
       {label}
