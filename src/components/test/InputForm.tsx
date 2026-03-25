@@ -22,8 +22,11 @@ export function InputForm({
   onRun,
   isRunning,
 }: InputFormProps) {
-  const { inputText, setInputText, inputTab, setInputTab, customHeaders: _customHeaders, setCustomHeaders } =
-    useTestStore();
+  const inputText = useTestStore((s) => s.inputText);
+  const setInputText = useTestStore((s) => s.setInputText);
+  const inputTab = useTestStore((s) => s.inputTab);
+  const setInputTab = useTestStore((s) => s.setInputTab);
+  const setCustomHeaders = useTestStore((s) => s.setCustomHeaders);
 
   const [contextData, setContextData] = useState("{\n  \n}");
   const [headerEntries, setHeaderEntries] = useState<HeaderEntry[]>([

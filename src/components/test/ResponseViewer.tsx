@@ -34,8 +34,13 @@ function extractParts(result: unknown): { message: A2AMessage | null; raw: unkno
 }
 
 export function ResponseViewer() {
-  const { result, status, latencyMs, chunks, responseTab, setResponseTab, taskId } =
-    useTestStore();
+  const result = useTestStore((s) => s.result);
+  const status = useTestStore((s) => s.status);
+  const latencyMs = useTestStore((s) => s.latencyMs);
+  const chunks = useTestStore((s) => s.chunks);
+  const responseTab = useTestStore((s) => s.responseTab);
+  const setResponseTab = useTestStore((s) => s.setResponseTab);
+  const taskId = useTestStore((s) => s.taskId);
 
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "100%", overflow: "hidden" }}>

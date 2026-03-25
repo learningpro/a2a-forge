@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useAgentStore } from "../../stores/agentStore";
 
 interface HeaderEntry {
@@ -13,13 +13,19 @@ interface AgentHeadersDialogProps {
   agentName: string;
 }
 
+const EMPTY_HEADERS: Record<string, string> = {};
+
 export function AgentHeadersDialog({
   open,
   onClose,
   agentId,
   agentName,
 }: AgentHeadersDialogProps) {
-  const defaultHeaders = useAgentStore((s) => s.defaultHeaders[agentId] ?? {});
+  const allDefaultHeaders = useAgentStore((s) => s.defaultHeaders);
+  const defaultHeaders = useMemo(
+    () => allDefaultHeaders[agentId] ?? EMPTY_HEADERS,
+    [allDefaultHeaders, agentId],
+  );
   const setDefaultHeaders = useAgentStore((s) => s.setDefaultHeaders);
   const loadDefaultHeaders = useAgentStore((s) => s.loadDefaultHeaders);
 

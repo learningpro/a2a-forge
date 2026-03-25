@@ -24,12 +24,15 @@ export function TestPanel() {
     [agents, selectedAgentId],
   );
   const selectedSkillId = useAgentStore((s) => s.selectedSkillId);
-  const agentDefaultHeaders = useAgentStore(
-    (s) => (s.selectedAgentId ? s.defaultHeaders[s.selectedAgentId] : undefined) ?? {},
+  const defaultHeaders = useAgentStore((s) => s.defaultHeaders);
+  const agentDefaultHeaders = useMemo(
+    () => (selectedAgentId ? defaultHeaders[selectedAgentId] : undefined) ?? {},
+    [defaultHeaders, selectedAgentId],
   );
 
-  const { status, inputText, customHeaders } =
-    useTestStore();
+  const status = useTestStore((s) => s.status);
+  const inputText = useTestStore((s) => s.inputText);
+  const customHeaders = useTestStore((s) => s.customHeaders);
   const { run: runStreaming } = useStreamingTask();
 
   const [curlCopied, setCurlCopied] = useState(false);
