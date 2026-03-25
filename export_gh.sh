@@ -46,6 +46,7 @@ echo "==> Copying screenshots..."
 mkdir -p "$DEST_DIR/docs/screenshots"
 cp "$SRC_DIR/docs/screenshots/"*.png "$DEST_DIR/docs/screenshots/" 2>/dev/null || true
 cp "$SRC_DIR/docs/README.md" "$DEST_DIR/README.md"
+cp "$SRC_DIR/docs/README_CN.md" "$DEST_DIR/README_CN.md"
 
 echo "==> Creating LICENSE..."
 

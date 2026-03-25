@@ -51,9 +51,6 @@ export function Sidebar() {
     createWorkspace(name.trim());
   };
 
-  const handleAddFromExample = () => {
-    setShowAddDialog(true);
-  };
 
   return (
     <aside
@@ -152,21 +149,20 @@ export function Sidebar() {
               Get started by adding your first A2A agent
             </div>
             <button
-              onClick={handleAddFromExample}
+              onClick={() => setShowAddDialog(true)}
               style={{
                 fontSize: 10,
-                padding: "4px 8px",
+                padding: "4px 12px",
                 background: "var(--bg-info)",
                 border: "0.5px solid var(--border-info)",
                 borderRadius: "var(--radius-md)",
                 color: "var(--text-info)",
                 cursor: "pointer",
-                fontFamily: "var(--font-mono, 'JetBrains Mono', monospace)",
+                fontFamily: "inherit",
                 lineHeight: 1.4,
               }}
-              title="Add the AIGC example agent"
             >
-              https://aigc-service.echonlab.com
+              + Add agent
             </button>
           </div>
         )}
