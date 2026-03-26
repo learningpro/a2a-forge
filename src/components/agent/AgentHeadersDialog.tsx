@@ -1,5 +1,6 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { useAgentStore } from "../../stores/agentStore";
+import { fadeBackdrop, slideInRight } from "../../lib/animations";
 
 interface HeaderEntry {
   key: string;
@@ -76,7 +77,30 @@ export function AgentHeadersDialog({
   if (!open) return null;
 
   return (
+    <AgentHeadersDialogInner
+      entries={entries} handleChange={handleChange} addRow={addRow}
+      removeRow={removeRow} handleSave={handleSave} onClose={onClose}
+      agentName={agentName}
+    />
+  );
+}
+
+function AgentHeadersDialogInner({ entries, handleChange, addRow, removeRow, handleSave, onClose, agentName }: {
+  entries: HeaderEntry[]; handleChange: (i: number, f: "key" | "value", v: string) => void;
+  addRow: () => void; removeRow: (i: number) => void; handleSave: () => void;
+  onClose: () => void; agentName: string;
+}) {
+  const backdropRef = useRef<HTMLDivElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    fadeBackdrop(backdropRef.current);
+    slideInRight(dialogRef.current);
+  }, []);
+
+  return (
     <div
+      ref={backdropRef}
       style={{
         position: "fixed",
         inset: 0,
@@ -85,10 +109,12 @@ export function AgentHeadersDialog({
         alignItems: "center",
         justifyContent: "center",
         zIndex: 1000,
+        visibility: "hidden",
       }}
       onClick={onClose}
     >
       <div
+        ref={dialogRef}
         onClick={(e) => e.stopPropagation()}
         style={{
           background: "var(--bg-secondary)",

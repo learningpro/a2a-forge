@@ -1,7 +1,8 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { commands } from "../../bindings";
 import { unwrap } from "../../lib/tauri-helpers";
 import { useUiStore, type ThemeOverride } from "../../stores/uiStore";
+import { fadeBackdrop, slideInRight } from "../../lib/animations";
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -104,6 +105,36 @@ export function SettingsModal({ isOpen, onClose, cardId }: SettingsModalProps) {
 
   if (!isOpen) return null;
 
+  return (
+    <SettingsModalInner
+      cardId={cardId} onClose={onClose}
+      timeout={timeout} handleTimeoutChange={handleTimeoutChange}
+      proxyUrl={proxyUrl} handleProxyChange={handleProxyChange}
+      theme={theme} handleThemeChange={handleThemeChange}
+      telemetry={telemetry} handleTelemetryChange={handleTelemetryChange}
+      authHeader={authHeader} handleAuthHeaderChange={handleAuthHeaderChange}
+      baseUrlOverride={baseUrlOverride} handleBaseUrlChange={handleBaseUrlChange}
+    />
+  );
+}
+
+function SettingsModalInner({ cardId, onClose, timeout, handleTimeoutChange, proxyUrl, handleProxyChange, theme, handleThemeChange, telemetry, handleTelemetryChange, authHeader, handleAuthHeaderChange, baseUrlOverride, handleBaseUrlChange }: {
+  cardId?: string; onClose: () => void;
+  timeout: number; handleTimeoutChange: (v: number) => void;
+  proxyUrl: string; handleProxyChange: (v: string) => void;
+  theme: ThemeOverride; handleThemeChange: (v: ThemeOverride) => void;
+  telemetry: boolean; handleTelemetryChange: (v: boolean) => void;
+  authHeader: string; handleAuthHeaderChange: (v: string) => void;
+  baseUrlOverride: string; handleBaseUrlChange: (v: string) => void;
+}) {
+  const backdropRef = useRef<HTMLDivElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    fadeBackdrop(backdropRef.current);
+    slideInRight(dialogRef.current);
+  }, []);
+
   const inputStyle: React.CSSProperties = {
     width: "100%",
     padding: "7px 10px",
@@ -128,6 +159,7 @@ export function SettingsModal({ isOpen, onClose, cardId }: SettingsModalProps) {
 
   return (
     <div
+      ref={backdropRef}
       style={{
         position: "fixed",
         inset: 0,
@@ -136,12 +168,14 @@ export function SettingsModal({ isOpen, onClose, cardId }: SettingsModalProps) {
         alignItems: "center",
         justifyContent: "center",
         zIndex: 1000,
+        visibility: "hidden",
       }}
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
     >
       <div
+        ref={dialogRef}
         style={{
           background: "var(--bg-secondary)",
           borderRadius: "var(--radius-lg)",
@@ -151,7 +185,8 @@ export function SettingsModal({ isOpen, onClose, cardId }: SettingsModalProps) {
           maxHeight: "80vh",
           overflowY: "auto",
           border: "0.5px solid var(--border-subtle)",
-          boxShadow: "0 4px 32px rgba(0,0,0,0.06)",
+          boxShadow: "var(--shadow-lg)",
+          visibility: "hidden",
         }}
       >
         {/* Title */}
