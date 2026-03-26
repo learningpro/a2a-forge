@@ -104,33 +104,33 @@ Every execution is saved to history. Save frequently-used requests as named test
 
 Agent card management, skill browser, adaptive test input, async task execution with auto-polling, SSE streaming, response viewer with smart media preview, test history, saved test cases, per-agent auth headers, workspaces, settings, keyboard shortcuts.
 
-### v0.2 — Automated Testing
+### v0.2 — Automated Testing ✅
 
-- [ ] Test suites — group test cases into automated sequences
-- [ ] Assertions — define expected outputs and auto-validate
-- [ ] CI integration — run test suites from command line
-- [ ] Test reports — export results as HTML/JSON
+- [x] Test suites — group test cases into automated sequences (agent-level + workspace-level)
+- [x] Assertions — 7 types: status_equals, json_path_equals/exists/contains/matches, response_time_lt, contains_media
+- [x] CI integration — run test suites from command line
+- [x] Test reports — export results as HTML/JSON
 
-### v0.3 — Local Registry Proxy
+### v0.3 — Local Registry Proxy ✅
 
-- [ ] Local A2A registry — act as a proxy for agent discovery
-- [ ] Request/response interception and modification
-- [ ] Latency simulation and fault injection
-- [ ] Traffic recording and replay
+- [x] Local A2A registry — embedded axum proxy for agent discovery
+- [x] Request/response interception and modification
+- [x] Latency simulation and fault injection
+- [x] Traffic recording and replay
 
-### v0.4 — Community Hub
+### v0.4 — Community Hub ✅
 
-- [ ] Community agent directory — discover and load popular A2A agents
-- [ ] Shared test collections — import/export community test suites
-- [ ] Agent health monitoring — periodic card refresh with alerts
-- [ ] Favorites — star and organize frequently-used agents
+- [x] Community agent directory — discover and load popular A2A agents
+- [x] Shared test collections — import/export community test suites
+- [x] Agent health monitoring — periodic card refresh with alerts
+- [x] Favorites — star and organize frequently-used agents
 
-### v0.5 — Advanced Workspace
+### v0.5 — Advanced Workspace ✅
 
-- [ ] Workspace sharing — export/import full workspace configs
-- [ ] Environment variables — per-workspace variable substitution
-- [ ] Request chaining — pipe output of one skill into another
-- [ ] Diff view — compare responses across runs
+- [x] Workspace sharing — export/import full workspace configs
+- [x] Environment variables — per-workspace variable substitution with secret masking
+- [x] Request chaining — pipe output of one skill into another with JSONPath extraction
+- [x] Diff view — compare responses across runs
 
 ## Contributing
 
