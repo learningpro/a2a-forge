@@ -124,8 +124,11 @@ export function SavedTestsList({
                 cursor: "pointer",
                 lineHeight: 1,
                 flexShrink: 0,
+                transition: "color var(--duration-fast)",
               }}
               title="Delete saved test"
+              onMouseEnter={(e) => { e.currentTarget.style.color = "var(--dot-error)"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.color = "var(--text-muted)"; }}
             >
               x
             </span>

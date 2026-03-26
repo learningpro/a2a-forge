@@ -122,8 +122,9 @@ export function HistoryList({ agentId, onSelectHistory }: HistoryListProps) {
               display: "flex",
               alignItems: "center",
               gap: 8,
-              transition: "background 0.1s",
+              transition: "background var(--duration-fast)",
               borderBottom: "0.5px solid var(--border-subtle)",
+              borderLeft: `2px solid ${statusDotColor[entry.status] ?? "transparent"}`,
             }}
             onMouseEnter={(e) => (e.currentTarget.style.background = "var(--bg-secondary)")}
             onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
