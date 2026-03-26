@@ -1,13 +1,19 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { TestPanel as ManualTestPanel } from "../test/TestPanel";
 import { SuitePanel } from "../suite/SuitePanel";
 import { ProxyPanel } from "../proxy/ProxyPanel";
 import { CommunityPanel } from "../community/CommunityPanel";
+import { tabSwitch } from "../../lib/animations";
 
 type Tab = "test" | "suites" | "proxy" | "community";
 
 export function TestPanel() {
   const [activeTab, setActiveTab] = useState<Tab>("test");
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (contentRef.current) tabSwitch(contentRef.current);
+  }, [activeTab]);
 
   return (
     <div style={{ flex: 1, display: "flex", flexDirection: "column", background: "var(--bg-primary)", minWidth: 0 }}>
@@ -23,7 +29,7 @@ export function TestPanel() {
       </div>
 
       {/* Tab content */}
-      <div style={{ flex: 1, overflow: "hidden", display: "flex", flexDirection: "column" }}>
+      <div ref={contentRef} style={{ flex: 1, overflow: "hidden", display: "flex", flexDirection: "column" }}>
         {activeTab === "test" && <ManualTestPanel />}
         {activeTab === "suites" && <SuitePanel />}
         {activeTab === "proxy" && <ProxyPanel />}

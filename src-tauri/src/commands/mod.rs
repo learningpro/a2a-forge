@@ -6,4 +6,5 @@ pub mod saved_tests;
 pub mod settings;
 pub mod suites;
 pub mod tasks;
+pub mod workspace;
 pub mod workspaces;

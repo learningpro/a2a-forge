@@ -1,7 +1,8 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { useSuiteStore } from "../../stores/suiteStore";
 import { useAgentStore } from "../../stores/agentStore";
 import type { Assertion, AssertionType } from "../../lib/suite-commands";
+import { fadeBackdrop, slideInRight } from "../../lib/animations";
 
 interface AssertionEditorProps {
   assertions: Assertion[];
@@ -121,6 +122,13 @@ interface StepEditorProps {
 
 export function StepEditor({ suiteId, editingStep, onClose }: StepEditorProps) {
   const agents = useAgentStore((s) => s.agents);
+  const backdropRef = useRef<HTMLDivElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    fadeBackdrop(backdropRef.current);
+    slideInRight(dialogRef.current);
+  }, []);
   const [name, setName] = useState(editingStep?.name ?? "");
   const [agentId, setAgentId] = useState(editingStep?.agentId ?? agents[0]?.id ?? "");
   const [skillName, setSkillName] = useState(editingStep?.skillName ?? "");
@@ -161,19 +169,23 @@ export function StepEditor({ suiteId, editingStep, onClose }: StepEditorProps) {
 
   return (
     <div
+      ref={backdropRef}
       style={{
         position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)",
         display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000,
+        visibility: "hidden",
       }}
       onClick={onClose}
     >
       <div
+        ref={dialogRef}
         onClick={(e) => e.stopPropagation()}
         style={{
           background: "var(--bg-primary)", borderRadius: "var(--radius-lg, 12px)",
           border: "0.5px solid var(--border-default)", padding: 20,
           width: 480, maxHeight: "80vh", overflow: "auto",
           boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
+          visibility: "hidden",
         }}
       >
         <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text-primary)", marginBottom: 16 }}>

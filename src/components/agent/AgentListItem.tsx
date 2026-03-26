@@ -70,6 +70,7 @@ export function AgentListItem({ agent, isActive, onClick }: AgentListItemProps) 
 
   return (
     <div
+      data-agent-item
       onClick={onClick}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}

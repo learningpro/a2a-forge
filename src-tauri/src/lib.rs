@@ -72,6 +72,21 @@ pub fn run() {
             commands::community::list_health_checks,
             commands::community::export_test_suite,
             commands::community::import_test_suite,
+            commands::workspace::list_env_vars,
+            commands::workspace::set_env_var,
+            commands::workspace::delete_env_var,
+            commands::workspace::create_chain,
+            commands::workspace::update_chain,
+            commands::workspace::delete_chain,
+            commands::workspace::list_chains,
+            commands::workspace::add_chain_step,
+            commands::workspace::update_chain_step,
+            commands::workspace::delete_chain_step,
+            commands::workspace::list_chain_steps,
+            commands::workspace::run_chain,
+            commands::workspace::export_workspace,
+            commands::workspace::import_workspace,
+            commands::workspace::diff_responses,
         ]);
 
     #[cfg(debug_assertions)]

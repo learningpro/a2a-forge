@@ -247,5 +247,49 @@ pub fn migrations() -> Vec<Migration> {
             "#,
             kind: MigrationKind::Up,
         },
+        Migration {
+            version: 9,
+            description: "create_workspace_advanced_tables",
+            sql: r#"
+                CREATE TABLE IF NOT EXISTS env_variables (
+                    id           TEXT PRIMARY KEY,
+                    workspace_id TEXT NOT NULL,
+                    name         TEXT NOT NULL,
+                    value        TEXT NOT NULL,
+                    is_secret    INTEGER DEFAULT 0,
+                    created_at   TEXT DEFAULT (datetime('now')),
+                    FOREIGN KEY (workspace_id) REFERENCES workspaces(id) ON DELETE CASCADE,
+                    UNIQUE(workspace_id, name)
+                );
+
+                CREATE TABLE IF NOT EXISTS request_chains (
+                    id           TEXT PRIMARY KEY,
+                    name         TEXT NOT NULL,
+                    description  TEXT DEFAULT '',
+                    workspace_id TEXT NOT NULL,
+                    created_at   TEXT DEFAULT (datetime('now')),
+                    FOREIGN KEY (workspace_id) REFERENCES workspaces(id) ON DELETE CASCADE
+                );
+
+                CREATE TABLE IF NOT EXISTS chain_steps (
+                    id            TEXT PRIMARY KEY,
+                    chain_id      TEXT NOT NULL,
+                    sort_order    INTEGER NOT NULL,
+                    name          TEXT NOT NULL,
+                    agent_id      TEXT NOT NULL,
+                    skill_name    TEXT NOT NULL,
+                    request_json  TEXT NOT NULL,
+                    extract_json  TEXT DEFAULT '{}',
+                    timeout_ms    INTEGER DEFAULT 60000,
+                    FOREIGN KEY (chain_id) REFERENCES request_chains(id) ON DELETE CASCADE,
+                    FOREIGN KEY (agent_id) REFERENCES agents(id) ON DELETE CASCADE
+                );
+
+                CREATE INDEX idx_env_variables_workspace ON env_variables(workspace_id);
+                CREATE INDEX idx_request_chains_workspace ON request_chains(workspace_id);
+                CREATE INDEX idx_chain_steps_chain ON chain_steps(chain_id);
+            "#,
+            kind: MigrationKind::Up,
+        },
     ]
 }

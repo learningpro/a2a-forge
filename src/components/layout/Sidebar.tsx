@@ -1,10 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useUiStore } from "../../stores/uiStore";
 import { useAgentStore } from "../../stores/agentStore";
 import { useWorkspaceStore } from "../../stores/workspaceStore";
 import { AgentListItem } from "../agent/AgentListItem";
 import { AddAgentDialog } from "../agent/AddAgentDialog";
 import { SettingsModal } from "../settings/SettingsModal";
+import { staggerIn } from "../../lib/animations";
 
 export function Sidebar() {
   const sidebarCollapsed = useUiStore((s) => s.sidebarCollapsed);
@@ -23,6 +24,15 @@ export function Sidebar() {
 
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const agentListRef = useRef<HTMLDivElement>(null);
+
+  // Animate agent list when agents change
+  useEffect(() => {
+    if (agentListRef.current && agents.length > 0) {
+      const items = agentListRef.current.querySelectorAll("[data-agent-item]");
+      if (items.length > 0) staggerIn(items, 0.04);
+    }
+  }, [agents]);
 
   // Listen for global keyboard shortcut event
   useEffect(() => {
@@ -125,6 +135,7 @@ export function Sidebar() {
 
       {/* Agent list */}
       <div
+        ref={agentListRef}
         style={{
           flex: 1,
           overflowY: "auto",
