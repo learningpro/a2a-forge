@@ -2,8 +2,9 @@ import { useState } from "react";
 import { TestPanel as ManualTestPanel } from "../test/TestPanel";
 import { SuitePanel } from "../suite/SuitePanel";
 import { ProxyPanel } from "../proxy/ProxyPanel";
+import { CommunityPanel } from "../community/CommunityPanel";
 
-type Tab = "test" | "suites" | "proxy";
+type Tab = "test" | "suites" | "proxy" | "community";
 
 export function TestPanel() {
   const [activeTab, setActiveTab] = useState<Tab>("test");
@@ -18,6 +19,7 @@ export function TestPanel() {
         <TabButton label="Test" active={activeTab === "test"} onClick={() => setActiveTab("test")} />
         <TabButton label="Suites" active={activeTab === "suites"} onClick={() => setActiveTab("suites")} />
         <TabButton label="Proxy" active={activeTab === "proxy"} onClick={() => setActiveTab("proxy")} />
+        <TabButton label="Community" active={activeTab === "community"} onClick={() => setActiveTab("community")} />
       </div>
 
       {/* Tab content */}
@@ -25,6 +27,7 @@ export function TestPanel() {
         {activeTab === "test" && <ManualTestPanel />}
         {activeTab === "suites" && <SuitePanel />}
         {activeTab === "proxy" && <ProxyPanel />}
+        {activeTab === "community" && <CommunityPanel />}
       </div>
     </div>
   );

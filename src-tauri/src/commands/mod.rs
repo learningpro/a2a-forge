@@ -1,4 +1,5 @@
 pub mod agents;
+pub mod community;
 pub mod history;
 pub mod proxy;
 pub mod saved_tests;

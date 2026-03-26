@@ -202,5 +202,50 @@ pub fn migrations() -> Vec<Migration> {
             "#,
             kind: MigrationKind::Up,
         },
+        Migration {
+            version: 8,
+            description: "create_community_tables",
+            sql: r#"
+                CREATE TABLE IF NOT EXISTS community_agents (
+                    id           TEXT PRIMARY KEY,
+                    name         TEXT NOT NULL,
+                    description  TEXT DEFAULT '',
+                    url          TEXT NOT NULL UNIQUE,
+                    card_json    TEXT NOT NULL,
+                    tags         TEXT DEFAULT '[]',
+                    author       TEXT DEFAULT '',
+                    stars        INTEGER DEFAULT 0,
+                    last_checked TEXT DEFAULT (datetime('now')),
+                    created_at   TEXT DEFAULT (datetime('now'))
+                );
+
+                CREATE TABLE IF NOT EXISTS favorites (
+                    id         TEXT PRIMARY KEY,
+                    agent_id   TEXT NOT NULL,
+                    folder     TEXT DEFAULT 'default',
+                    notes      TEXT DEFAULT '',
+                    created_at TEXT DEFAULT (datetime('now')),
+                    FOREIGN KEY (agent_id) REFERENCES agents(id) ON DELETE CASCADE
+                );
+
+                CREATE TABLE IF NOT EXISTS health_checks (
+                    id         TEXT PRIMARY KEY,
+                    agent_id   TEXT NOT NULL,
+                    status     TEXT NOT NULL,
+                    latency_ms INTEGER,
+                    error      TEXT,
+                    checked_at TEXT DEFAULT (datetime('now')),
+                    FOREIGN KEY (agent_id) REFERENCES agents(id) ON DELETE CASCADE
+                );
+
+                ALTER TABLE test_suites ADD COLUMN shared INTEGER DEFAULT 0;
+                ALTER TABLE test_suites ADD COLUMN share_code TEXT;
+
+                CREATE INDEX idx_community_agents_url ON community_agents(url);
+                CREATE INDEX idx_favorites_agent ON favorites(agent_id);
+                CREATE INDEX idx_health_checks_agent ON health_checks(agent_id);
+            "#,
+            kind: MigrationKind::Up,
+        },
     ]
 }

@@ -62,6 +62,16 @@ pub fn run() {
             commands::proxy::get_recording,
             commands::proxy::delete_recording,
             commands::proxy::replay_recording,
+            commands::community::list_community_agents,
+            commands::community::submit_to_community,
+            commands::community::toggle_favorite,
+            commands::community::list_favorites,
+            commands::community::update_favorite,
+            commands::community::check_agent_health,
+            commands::community::check_all_health,
+            commands::community::list_health_checks,
+            commands::community::export_test_suite,
+            commands::community::import_test_suite,
         ]);
 
     #[cfg(debug_assertions)]
