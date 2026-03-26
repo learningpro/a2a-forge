@@ -31,9 +31,9 @@
   --text-success: #0f6e56;
   --bg-warning: #faeeda;
   --text-warning: #854f0b;
-  --bg-info: #e6f1fb;
-  --text-info: #185fa5;
-  --border-info: rgba(24,95,165,0.3);
+  --bg-info: #DBEAFE;
+  --text-info: #2563EB;
+  --border-info: rgba(37,99,235,0.3);
   --border-success: rgba(15,110,86,0.3);
   --dot-online: #1D9E75;
   --dot-warning: #EF9F27;
@@ -65,9 +65,9 @@
     --text-success: #5dcaa5;
     --bg-warning: #412402;
     --text-warning: #ef9f27;
-    --bg-info: #042c53;
-    --text-info: #85b7eb;
-    --border-info: rgba(133,183,235,0.3);
+    --bg-info: #1E3A5F;
+    --text-info: #3B82F6;
+    --border-info: rgba(59,130,246,0.3);
     --border-success: rgba(93,202,165,0.3);
     --bg-error: #3b1111;
     --text-error: #f87171;
@@ -172,20 +172,20 @@ button:active:not(:disabled) {
 }
 
 /* JSON Tree syntax colors — matches mockup exactly */
-.json-key  { color: #185fa5; }
+.json-key  { color: #2563EB; }
 .json-str  { color: #1d9e75; }
 .json-num  { color: #854f0b; }
 .json-bool { color: #993556; }
 .json-null { color: var(--text-muted); }
 
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .json-key  { color: #85b7eb; }
+  :root:not([data-theme="light"]) .json-key  { color: #3B82F6; }
   :root:not([data-theme="light"]) .json-str  { color: #5dcaa5; }
   :root:not([data-theme="light"]) .json-num  { color: #ef9f27; }
   :root:not([data-theme="light"]) .json-bool { color: #ed93b1; }
 }
 
-[data-theme="dark"] .json-key  { color: #85b7eb; }
+[data-theme="dark"] .json-key  { color: #3B82F6; }
 [data-theme="dark"] .json-str  { color: #5dcaa5; }
 [data-theme="dark"] .json-num  { color: #ef9f27; }
 [data-theme="dark"] .json-bool { color: #ed93b1; }

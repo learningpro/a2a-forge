@@ -109,7 +109,7 @@ function SkillItem({
         {taskStatus === "running" && (
           <span style={{
             width: 6, height: 6, borderRadius: "50%",
-            background: "var(--text-info, #185fa5)",
+            background: "var(--text-info, #2563EB)",
             display: "inline-block", flexShrink: 0,
             animation: "pulse 1.5s ease-in-out infinite",
           }} />
