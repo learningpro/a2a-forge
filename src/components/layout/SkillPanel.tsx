@@ -90,7 +90,7 @@ function SkillItem({
         cursor: "pointer",
         border: `0.5px solid ${isSelected ? "var(--border-default)" : "transparent"}`,
         background: isSelected ? "var(--bg-secondary)" : "transparent",
-        transition: "all 0.1s",
+        transition: "background 0.1s, border-color 0.1s",
       }}
     >
       <div

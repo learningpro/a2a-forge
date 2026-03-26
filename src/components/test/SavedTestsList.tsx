@@ -89,7 +89,7 @@ export function SavedTestsList({
               fontFamily: "var(--font-mono)",
               color: "var(--text-secondary)",
               cursor: "pointer",
-              transition: "all 0.1s",
+              transition: "background 0.1s, border-color 0.1s",
               maxWidth: 160,
             }}
             onMouseEnter={(e) => {

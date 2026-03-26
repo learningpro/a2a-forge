@@ -261,7 +261,7 @@ export function InputForm({
             fontSize: 11,
             color: isDragOver ? "var(--text-info)" : "var(--text-muted)",
             background: isDragOver ? "var(--bg-info)" : "transparent",
-            transition: "all var(--duration-fast)",
+            transition: "color var(--duration-fast), background var(--duration-fast), border-color var(--duration-fast)",
           }}
         >
           {droppedFile ? droppedFile.name : "Drop a file here or click to select"}
@@ -311,7 +311,7 @@ export function InputForm({
                     maxWidth: 140,
                     overflow: "hidden",
                     textOverflow: "ellipsis",
-                    transition: "all 0.1s",
+                    transition: "background 0.1s, border-color 0.1s",
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.borderColor = "var(--border-default)";
