@@ -29,6 +29,7 @@ export function InputForm({
     { key: "", value: "" },
   ]);
   const [droppedFile, setDroppedFile] = useState<{ name: string; data: string } | null>(null);
+  const [isDragOver, setIsDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const hasFileMode = skill.inputModes?.some((m) => m.includes("file")) ?? false;
@@ -66,6 +67,7 @@ export function InputForm({
 
   const handleFileDrop = (e: React.DragEvent) => {
     e.preventDefault();
+    setIsDragOver(false);
     const file = e.dataTransfer.files[0];
     if (!file) return;
     readFileAsBase64(file);
@@ -117,9 +119,9 @@ export function InputForm({
               borderLeft: "none",
               borderRight: "none",
               borderBottom: `1.5px solid ${inputTab === t.id ? "var(--text-primary)" : "transparent"}`,
-              marginBottom: -0.5,
+              marginBottom: "-0.5px",
               fontFamily: "inherit",
-              transition: "color 0.1s",
+              transition: "color var(--duration-fast), border-color var(--duration-fast)",
             }}
           >
             {t.label}
@@ -245,18 +247,21 @@ export function InputForm({
       {/* File drop zone (only when skill supports file input) */}
       {hasFileMode && (
         <div
-          onDragOver={(e) => e.preventDefault()}
+          onDragOver={(e) => { e.preventDefault(); setIsDragOver(true); }}
+          onDragLeave={() => setIsDragOver(false)}
           onDrop={handleFileDrop}
           onClick={() => fileInputRef.current?.click()}
           style={{
             margin: "0 14px 8px",
             padding: "12px",
-            border: "1.5px dashed var(--border-default)",
+            border: `1.5px dashed ${isDragOver ? "var(--border-info)" : "var(--border-default)"}`,
             borderRadius: "var(--radius-md, 6px)",
             textAlign: "center",
             cursor: "pointer",
             fontSize: 11,
-            color: "var(--text-muted)",
+            color: isDragOver ? "var(--text-info)" : "var(--text-muted)",
+            background: isDragOver ? "var(--bg-info)" : "transparent",
+            transition: "all var(--duration-fast)",
           }}
         >
           {droppedFile ? droppedFile.name : "Drop a file here or click to select"}
