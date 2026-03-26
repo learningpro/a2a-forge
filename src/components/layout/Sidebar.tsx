@@ -112,7 +112,7 @@ export function Sidebar() {
                 alignItems: "center",
                 gap: 6,
                 fontFamily: "inherit",
-                transition: "all var(--duration-normal)",
+                transition: "background var(--duration-normal), color var(--duration-normal), border-color var(--duration-normal)",
               }}
               onMouseEnter={(e) => {
                 const el = e.currentTarget;
@@ -162,8 +162,8 @@ export function Sidebar() {
             <button
               onClick={() => setShowAddDialog(true)}
               style={{
-                fontSize: 10,
-                padding: "4px 12px",
+                fontSize: 11,
+                padding: "6px 16px",
                 background: "var(--bg-info)",
                 border: "0.5px solid var(--border-info)",
                 borderRadius: "var(--radius-md)",
@@ -171,6 +171,8 @@ export function Sidebar() {
                 cursor: "pointer",
                 fontFamily: "inherit",
                 lineHeight: 1.4,
+                minHeight: 32,
+                transition: "background var(--duration-normal), border-color var(--duration-normal)",
               }}
             >
               + Add agent
@@ -218,9 +220,24 @@ export function Sidebar() {
                     border: "none",
                     cursor: "pointer",
                     color: "var(--text-muted)",
-                    fontSize: 13,
-                    padding: 0,
+                    fontSize: 14,
+                    padding: "4px 6px",
                     lineHeight: 1,
+                    borderRadius: "var(--radius-md)",
+                    minWidth: 28,
+                    minHeight: 28,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    transition: "color var(--duration-normal), background var(--duration-normal)",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = "var(--bg-tertiary)";
+                    e.currentTarget.style.color = "var(--text-primary)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = "transparent";
+                    e.currentTarget.style.color = "var(--text-muted)";
                   }}
                 >
                   +
@@ -233,9 +250,24 @@ export function Sidebar() {
                     border: "none",
                     cursor: "pointer",
                     color: "var(--text-muted)",
-                    fontSize: 12,
-                    padding: 0,
+                    fontSize: 14,
+                    padding: "4px 6px",
                     lineHeight: 1,
+                    borderRadius: "var(--radius-md)",
+                    minWidth: 28,
+                    minHeight: 28,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    transition: "color var(--duration-normal), background var(--duration-normal)",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = "var(--bg-tertiary)";
+                    e.currentTarget.style.color = "var(--text-primary)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = "transparent";
+                    e.currentTarget.style.color = "var(--text-muted)";
                   }}
                 >
                   {"\u2699"}
@@ -277,8 +309,17 @@ export function Sidebar() {
             cursor: "pointer",
             color: "var(--text-muted)",
             fontSize: 12,
-            padding: "4px 0",
+            padding: "6px 0",
             textAlign: sidebarCollapsed ? "center" : "left",
+            minHeight: 32,
+            borderRadius: "var(--radius-md)",
+            transition: "color var(--duration-normal), background var(--duration-normal)",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.color = "var(--text-primary)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.color = "var(--text-muted)";
           }}
           title={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
         >

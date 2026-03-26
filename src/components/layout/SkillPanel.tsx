@@ -317,8 +317,8 @@ export function SkillPanel({ width }: SkillPanelProps) {
             key={value}
             onClick={() => setActiveFilter(value)}
             style={{
-              fontSize: 10,
-              padding: "2px 7px",
+              fontSize: 11,
+              padding: "4px 10px",
               borderRadius: 10,
               border: `0.5px solid ${activeFilter === value ? "var(--border-info)" : "var(--border-subtle)"}`,
               background:
@@ -329,6 +329,8 @@ export function SkillPanel({ width }: SkillPanelProps) {
                   : "var(--text-secondary)",
               cursor: "pointer",
               fontFamily: "inherit",
+              minHeight: 28,
+              transition: "background var(--duration-normal), color var(--duration-normal), border-color var(--duration-normal)",
             }}
           >
             {label}
