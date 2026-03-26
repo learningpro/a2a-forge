@@ -3,9 +3,10 @@ import { TestPanel as ManualTestPanel } from "../test/TestPanel";
 import { SuitePanel } from "../suite/SuitePanel";
 import { ProxyPanel } from "../proxy/ProxyPanel";
 import { CommunityPanel } from "../community/CommunityPanel";
+import { WorkspacePanel } from "../workspace/WorkspacePanel";
 import { tabSwitch } from "../../lib/animations";
 
-type Tab = "test" | "suites" | "proxy" | "community";
+type Tab = "test" | "suites" | "proxy" | "community" | "workspace";
 
 export function TestPanel() {
   const [activeTab, setActiveTab] = useState<Tab>("test");
@@ -26,6 +27,7 @@ export function TestPanel() {
         <TabButton label="Suites" active={activeTab === "suites"} onClick={() => setActiveTab("suites")} />
         <TabButton label="Proxy" active={activeTab === "proxy"} onClick={() => setActiveTab("proxy")} />
         <TabButton label="Community" active={activeTab === "community"} onClick={() => setActiveTab("community")} />
+        <TabButton label="Workspace" active={activeTab === "workspace"} onClick={() => setActiveTab("workspace")} />
       </div>
 
       {/* Tab content */}
@@ -34,6 +36,7 @@ export function TestPanel() {
         {activeTab === "suites" && <SuitePanel />}
         {activeTab === "proxy" && <ProxyPanel />}
         {activeTab === "community" && <CommunityPanel />}
+        {activeTab === "workspace" && <WorkspacePanel />}
       </div>
     </div>
   );
