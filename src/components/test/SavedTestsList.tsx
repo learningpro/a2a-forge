@@ -64,7 +64,7 @@ export function SavedTestsList({
 
   if (loading) {
     return (
-      <div style={{ padding: 8, fontSize: 10, color: "var(--text-muted)" }}>
+      <div style={{ padding: 8, fontSize: 11, color: "var(--text-muted)" }}>
         Loading saved tests...
       </div>
     );
@@ -85,7 +85,7 @@ export function SavedTestsList({
               borderRadius: 10,
               background: "var(--bg-secondary)",
               border: "0.5px solid var(--border-subtle)",
-              fontSize: 10,
+              fontSize: 11,
               fontFamily: "var(--font-mono)",
               color: "var(--text-secondary)",
               cursor: "pointer",
@@ -120,7 +120,7 @@ export function SavedTestsList({
               }}
               style={{
                 color: "var(--text-muted)",
-                fontSize: 10,
+                fontSize: 11,
                 cursor: "pointer",
                 lineHeight: 1,
                 flexShrink: 0,
@@ -136,7 +136,7 @@ export function SavedTestsList({
         ))}
 
         {tests.length === 0 ? (
-          <span style={{ fontSize: 10, color: "var(--text-muted)" }}>
+          <span style={{ fontSize: 11, color: "var(--text-muted)" }}>
             No saved tests for this skill
           </span>
         ) : null}
@@ -149,7 +149,7 @@ export function SavedTestsList({
           style={{
             alignSelf: "flex-start",
             padding: "3px 8px",
-            fontSize: 10,
+            fontSize: 11,
             background: "transparent",
             border: "0.5px solid var(--border-subtle)",
             borderRadius: "var(--radius-md)",

@@ -54,7 +54,7 @@ export function SuiteList({ workspaceId, agentId }: SuiteListProps) {
       >
         <span
           style={{
-            fontSize: 10,
+            fontSize: 11,
             fontWeight: 500,
             color: "var(--text-muted)",
             textTransform: "uppercase",
@@ -67,7 +67,7 @@ export function SuiteList({ workspaceId, agentId }: SuiteListProps) {
           onClick={() => setShowCreate(true)}
           style={{
             padding: "2px 8px",
-            fontSize: 10,
+            fontSize: 11,
             background: "transparent",
             border: "0.5px solid var(--border-subtle)",
             borderRadius: "var(--radius-md, 6px)",
@@ -173,7 +173,7 @@ function SuiteListItem({
         >
           {suite.name}
         </div>
-        <div style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 2 }}>
+        <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2 }}>
           {suite.runMode} · {suite.agentId ? "agent" : "workspace"}
         </div>
       </div>
@@ -181,7 +181,7 @@ function SuiteListItem({
         onClick={(e) => onDelete(e, suite.id)}
         style={{
           padding: "2px 4px",
-          fontSize: 9,
+          fontSize: 11,
           background: "transparent",
           border: "none",
           color: "var(--text-muted)",

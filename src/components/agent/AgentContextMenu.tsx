@@ -39,7 +39,7 @@ export function AgentContextMenu({
     padding: "2px 4px",
     background: "transparent",
     border: "none",
-    fontSize: 9,
+    fontSize: 11,
     color: "var(--text-muted)",
     cursor: "pointer",
     fontFamily: "inherit",
@@ -65,7 +65,7 @@ export function AgentContextMenu({
       >
         <div
           style={{
-            fontSize: 10,
+            fontSize: 11,
             color: "var(--text-primary)",
             marginBottom: 6,
           }}

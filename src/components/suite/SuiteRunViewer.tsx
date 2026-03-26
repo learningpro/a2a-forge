@@ -65,7 +65,7 @@ export function SuiteRunViewer() {
         {runHistory.length > 0 && (
           <div style={{ borderTop: "0.5px solid var(--border-subtle)", maxHeight: 200, overflow: "auto" }}>
             <div style={{
-              fontSize: 10, fontWeight: 500, color: "var(--text-muted)",
+              fontSize: 11, fontWeight: 500, color: "var(--text-muted)",
               textTransform: "uppercase", letterSpacing: "0.07em", padding: "8px 12px 4px",
             }}>
               Run History
@@ -75,7 +75,7 @@ export function SuiteRunViewer() {
                 key={run.id}
                 onClick={() => handleViewRun(run.id)}
                 style={{
-                  padding: "6px 12px", cursor: "pointer", fontSize: 10,
+                  padding: "6px 12px", cursor: "pointer", fontSize: 11,
                   borderBottom: "0.5px solid var(--border-subtle)",
                   display: "flex", justifyContent: "space-between", alignItems: "center",
                 }}
@@ -110,7 +110,7 @@ export function SuiteRunViewer() {
             <StatusIcon status={run.status} />
             {" "}{run.status.toUpperCase()} — {run.passedSteps}/{run.totalSteps} passed
           </div>
-          <div style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 2 }}>
+          <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2 }}>
             {run.durationMs}ms · {run.startedAt.slice(0, 16)}
           </div>
         </div>
@@ -146,13 +146,13 @@ export function SuiteRunViewer() {
                 <div style={{ fontSize: 11, fontWeight: 500, color: "var(--text-primary)" }}>
                   <StatusIcon status={sr.status} /> {stepName}
                 </div>
-                <span style={{ fontSize: 10, color: "var(--text-muted)" }}>{sr.durationMs}ms</span>
+                <span style={{ fontSize: 11, color: "var(--text-muted)" }}>{sr.durationMs}ms</span>
               </div>
 
               {/* Assertion results */}
               {assertionResults.map((ar, i) => (
                 <div key={i} style={{
-                  padding: "2px 0 2px 16px", fontSize: 10,
+                  padding: "2px 0 2px 16px", fontSize: 11,
                   color: ar.passed ? "var(--dot-online, #22c55e)" : "var(--dot-error, #ef4444)",
                 }}>
                   {ar.passed ? "\u2705" : "\u274C"} {ar.message}
@@ -167,7 +167,7 @@ export function SuiteRunViewer() {
               {/* Error message */}
               {sr.errorMessage && (
                 <div style={{
-                  padding: "2px 0 2px 16px", fontSize: 10,
+                  padding: "2px 0 2px 16px", fontSize: 11,
                   color: "var(--dot-error, #ef4444)",
                 }}>
                   Error: {sr.errorMessage}
@@ -182,7 +182,7 @@ export function SuiteRunViewer() {
       {runHistory.length > 1 && (
         <div style={{ borderTop: "0.5px solid var(--border-subtle)", maxHeight: 150, overflow: "auto" }}>
           <div style={{
-            fontSize: 10, fontWeight: 500, color: "var(--text-muted)",
+            fontSize: 11, fontWeight: 500, color: "var(--text-muted)",
             textTransform: "uppercase", letterSpacing: "0.07em", padding: "8px 12px 4px",
           }}>
             Previous Runs
@@ -192,7 +192,7 @@ export function SuiteRunViewer() {
               key={r.id}
               onClick={() => handleViewRun(r.id)}
               style={{
-                padding: "4px 12px", cursor: "pointer", fontSize: 10,
+                padding: "4px 12px", cursor: "pointer", fontSize: 11,
                 borderBottom: "0.5px solid var(--border-subtle)",
                 display: "flex", justifyContent: "space-between",
               }}
@@ -220,7 +220,7 @@ function StatusIcon({ status }: { status: string }) {
 }
 
 const exportBtnStyle: React.CSSProperties = {
-  padding: "3px 8px", fontSize: 10, background: "transparent",
+  padding: "3px 8px", fontSize: 11, background: "transparent",
   border: "0.5px solid var(--border-subtle)", borderRadius: "var(--radius-md, 6px)",
   color: "var(--text-secondary)", cursor: "pointer",
 };

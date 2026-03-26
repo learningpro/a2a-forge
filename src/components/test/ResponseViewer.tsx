@@ -91,7 +91,7 @@ export function ResponseViewer({ agentId, skillId }: ResponseViewerProps) {
         {taskId && (
           <div
             style={{
-              fontSize: 10,
+              fontSize: 11,
               color: "var(--text-muted)",
               fontFamily: "var(--font-mono)",
               padding: "2px 0",
@@ -214,7 +214,7 @@ function PartBubble({
     >
       <div
         style={{
-          fontSize: 9,
+          fontSize: 11,
           textTransform: "uppercase",
           letterSpacing: "0.08em",
           color: "var(--text-muted)",
@@ -346,7 +346,7 @@ function MediaPreview({ item }: { item: MediaItem }) {
   };
 
   const labelStyle: React.CSSProperties = {
-    fontSize: 9,
+    fontSize: 11,
     textTransform: "uppercase",
     letterSpacing: "0.08em",
     color: "var(--text-muted)",
@@ -354,7 +354,7 @@ function MediaPreview({ item }: { item: MediaItem }) {
   };
 
   const linkStyle: React.CSSProperties = {
-    fontSize: 10,
+    fontSize: 11,
     color: "var(--text-info)",
     padding: "0 10px 6px",
     fontFamily: "var(--font-mono)",
@@ -431,7 +431,7 @@ function StreamingView({ chunks }: { chunks: { raw: unknown; status?: { state: s
             background: "var(--bg-secondary)",
             borderRadius: "var(--radius-md)",
             border: "0.5px solid var(--border-subtle)",
-            fontSize: 10,
+            fontSize: 11,
             fontFamily: "var(--font-mono)",
           }}
         >
@@ -463,7 +463,7 @@ function TabButton({
       onClick={onClick}
       style={{
         padding: "6px 12px",
-        fontSize: 10,
+        fontSize: 11,
         cursor: "pointer",
         color: active ? "var(--text-primary)" : "var(--text-secondary)",
         fontWeight: active ? 500 : 400,

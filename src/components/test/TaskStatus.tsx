@@ -30,7 +30,7 @@ export function TaskStatus({ status, latencyMs }: TaskStatusProps) {
           display: "inline-flex",
           alignItems: "center",
           gap: 5,
-          fontSize: 10,
+          fontSize: 11,
           padding: "2px 8px",
           borderRadius: 10,
           fontWeight: 500,
@@ -53,7 +53,7 @@ export function TaskStatus({ status, latencyMs }: TaskStatusProps) {
       {latencyMs != null && (
         <span
           style={{
-            fontSize: 10,
+            fontSize: 11,
             color: "var(--text-muted)",
             fontFamily: "var(--font-mono)",
           }}

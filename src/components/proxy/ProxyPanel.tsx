@@ -41,7 +41,7 @@ export function ProxyPanel() {
           <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text-primary)" }}>
             Local Proxy
           </div>
-          <div style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 2 }}>
+          <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2 }}>
             {status.running ? (
               <span>
                 <span style={{ display: "inline-block", width: 6, height: 6, borderRadius: "50%", background: "var(--dot-online, #22c55e)", marginRight: 4, verticalAlign: "middle" }} />
@@ -59,7 +59,7 @@ export function ProxyPanel() {
               value={port}
               onChange={(e) => setPort(Number(e.target.value))}
               style={{
-                width: 60, padding: "3px 6px", fontSize: 10,
+                width: 60, padding: "3px 6px", fontSize: 11,
                 background: "var(--bg-secondary)", border: "0.5px solid var(--border-subtle)",
                 borderRadius: "var(--radius-md, 6px)", color: "var(--text-primary)", textAlign: "center",
               }}
@@ -84,7 +84,7 @@ export function ProxyPanel() {
       </div>
 
       {error && (
-        <div style={{ padding: "6px 14px", fontSize: 10, color: "var(--dot-error, #ef4444)", background: "var(--bg-secondary)" }}>
+        <div style={{ padding: "6px 14px", fontSize: 11, color: "var(--dot-error, #ef4444)", background: "var(--bg-secondary)" }}>
           {error}
         </div>
       )}
@@ -96,7 +96,7 @@ export function ProxyPanel() {
             key={tab}
             onClick={() => setActiveTab(tab)}
             style={{
-              padding: "6px 14px", fontSize: 10, fontWeight: activeTab === tab ? 600 : 400,
+              padding: "6px 14px", fontSize: 11, fontWeight: activeTab === tab ? 600 : 400,
               color: activeTab === tab ? "var(--text-primary)" : "var(--text-muted)",
               background: "transparent", border: "none",
               borderBottom: activeTab === tab ? "2px solid var(--text-primary)" : "2px solid transparent",
@@ -137,7 +137,7 @@ function RulesTab({ workspaceId, rules }: { workspaceId: string; rules: import("
   }, [name, matchType, matchValue, actionType, actionJson, workspaceId]);
 
   const inputStyle = {
-    width: "100%", padding: "3px 6px", fontSize: 10,
+    width: "100%", padding: "3px 6px", fontSize: 11,
     background: "var(--bg-secondary)", border: "0.5px solid var(--border-subtle)",
     borderRadius: "var(--radius-md, 6px)", color: "var(--text-primary)", outline: "none",
   };
@@ -145,11 +145,11 @@ function RulesTab({ workspaceId, rules }: { workspaceId: string; rules: import("
   return (
     <div>
       <div style={{ padding: "8px 12px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <span style={{ fontSize: 10, fontWeight: 500, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.07em" }}>
+        <span style={{ fontSize: 11, fontWeight: 500, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.07em" }}>
           Intercept Rules
         </span>
         <button onClick={() => setShowCreate(!showCreate)} style={{
-          padding: "2px 8px", fontSize: 10, background: "transparent",
+          padding: "2px 8px", fontSize: 11, background: "transparent",
           border: "0.5px solid var(--border-subtle)", borderRadius: "var(--radius-md, 6px)",
           color: "var(--text-secondary)", cursor: "pointer",
         }}>+ New</button>
@@ -181,8 +181,8 @@ function RulesTab({ workspaceId, rules }: { workspaceId: string; rules: import("
           <textarea value={actionJson} onChange={(e) => setActionJson(e.target.value)} rows={3}
             style={{ ...inputStyle, fontFamily: "var(--font-mono, monospace)", resize: "vertical" }} />
           <div style={{ display: "flex", gap: 4, justifyContent: "flex-end" }}>
-            <button onClick={() => setShowCreate(false)} style={{ padding: "3px 10px", fontSize: 10, background: "transparent", border: "0.5px solid var(--border-subtle)", borderRadius: "var(--radius-md, 6px)", color: "var(--text-secondary)", cursor: "pointer" }}>Cancel</button>
-            <button onClick={handleCreate} style={{ padding: "3px 10px", fontSize: 10, background: "transparent", border: "0.5px solid var(--border-strong)", borderRadius: "var(--radius-md, 6px)", color: "var(--text-primary)", cursor: "pointer", fontWeight: 500 }}>Create</button>
+            <button onClick={() => setShowCreate(false)} style={{ padding: "3px 10px", fontSize: 11, background: "transparent", border: "0.5px solid var(--border-subtle)", borderRadius: "var(--radius-md, 6px)", color: "var(--text-secondary)", cursor: "pointer" }}>Cancel</button>
+            <button onClick={handleCreate} style={{ padding: "3px 10px", fontSize: 11, background: "transparent", border: "0.5px solid var(--border-strong)", borderRadius: "var(--radius-md, 6px)", color: "var(--text-primary)", cursor: "pointer", fontWeight: 500 }}>Create</button>
           </div>
         </div>
       )}
@@ -201,20 +201,20 @@ function RulesTab({ workspaceId, rules }: { workspaceId: string; rules: import("
         }}>
           <div style={{ minWidth: 0 }}>
             <div style={{ fontSize: 11, fontWeight: 500, color: "var(--text-primary)" }}>{rule.name}</div>
-            <div style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 1 }}>
+            <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 1 }}>
               {rule.matchType === "all" ? "All requests" : `${rule.matchType}: ${rule.matchValue}`} → {rule.actionType}
             </div>
           </div>
           <div style={{ display: "flex", gap: 4, alignItems: "center", flexShrink: 0 }}>
             <button
               onClick={() => useProxyStore.getState().toggleRule(rule.id, !rule.enabled)}
-              style={{ padding: "2px 6px", fontSize: 9, background: "transparent", border: "0.5px solid var(--border-subtle)", borderRadius: "var(--radius-md, 6px)", color: "var(--text-secondary)", cursor: "pointer" }}
+              style={{ padding: "2px 6px", fontSize: 11, background: "transparent", border: "0.5px solid var(--border-subtle)", borderRadius: "var(--radius-md, 6px)", color: "var(--text-secondary)", cursor: "pointer" }}
             >
               {rule.enabled ? "Disable" : "Enable"}
             </button>
             <button
               onClick={() => useProxyStore.getState().deleteRule(rule.id)}
-              style={{ padding: "2px 4px", fontSize: 9, background: "transparent", border: "none", color: "var(--text-muted)", cursor: "pointer" }}
+              style={{ padding: "2px 4px", fontSize: 11, background: "transparent", border: "none", color: "var(--text-muted)", cursor: "pointer" }}
             >×</button>
           </div>
         </div>
@@ -246,7 +246,7 @@ function RecordingTab({ workspaceId, recordings, isRecording }: { workspaceId: s
             <span style={{ display: "inline-block", width: 8, height: 8, borderRadius: "50%", background: "var(--dot-error)", animation: "pulse 1s infinite" }} />
             <span style={{ fontSize: 11, color: "var(--text-primary)" }}>Recording...</span>
             <button onClick={handleStop} style={{
-              padding: "3px 10px", fontSize: 10, background: "transparent",
+              padding: "3px 10px", fontSize: 11, background: "transparent",
               border: "0.5px solid var(--border-strong)", borderRadius: "var(--radius-md, 6px)",
               color: "var(--text-primary)", cursor: "pointer", fontWeight: 500, marginLeft: "auto",
             }}>Stop</button>
@@ -260,13 +260,13 @@ function RecordingTab({ workspaceId, recordings, isRecording }: { workspaceId: s
               onKeyDown={(e) => { if (e.key === "Enter") handleStart(); }}
               placeholder="Session name..."
               style={{
-                flex: 1, padding: "3px 6px", fontSize: 10,
+                flex: 1, padding: "3px 6px", fontSize: 11,
                 background: "var(--bg-secondary)", border: "0.5px solid var(--border-subtle)",
                 borderRadius: "var(--radius-md, 6px)", color: "var(--text-primary)", outline: "none",
               }}
             />
             <button onClick={handleStart} disabled={!sessionName.trim()} style={{
-              padding: "3px 10px", fontSize: 10, background: "transparent",
+              padding: "3px 10px", fontSize: 11, background: "transparent",
               border: "0.5px solid var(--border-strong)", borderRadius: "var(--radius-md, 6px)",
               color: "var(--text-primary)", cursor: sessionName.trim() ? "pointer" : "default",
               fontWeight: 500, opacity: sessionName.trim() ? 1 : 0.5,
@@ -288,19 +288,19 @@ function RecordingTab({ workspaceId, recordings, isRecording }: { workspaceId: s
         }}>
           <div>
             <div style={{ fontSize: 11, fontWeight: 500, color: "var(--text-primary)" }}>{rec.name}</div>
-            <div style={{ fontSize: 10, color: "var(--text-muted)" }}>{rec.count} request{rec.count !== 1 ? "s" : ""}</div>
+            <div style={{ fontSize: 11, color: "var(--text-muted)" }}>{rec.count} request{rec.count !== 1 ? "s" : ""}</div>
           </div>
           <div style={{ display: "flex", gap: 4, flexShrink: 0 }}>
             <button onClick={() => useProxyStore.getState().viewRecording(rec.name, workspaceId)}
-              style={{ padding: "2px 6px", fontSize: 9, background: "transparent", border: "0.5px solid var(--border-subtle)", borderRadius: "var(--radius-md, 6px)", color: "var(--text-secondary)", cursor: "pointer" }}>
+              style={{ padding: "2px 6px", fontSize: 11, background: "transparent", border: "0.5px solid var(--border-subtle)", borderRadius: "var(--radius-md, 6px)", color: "var(--text-secondary)", cursor: "pointer" }}>
               View
             </button>
             <button onClick={() => useProxyStore.getState().replayRecording(rec.name, workspaceId)}
-              style={{ padding: "2px 6px", fontSize: 9, background: "transparent", border: "0.5px solid var(--border-subtle)", borderRadius: "var(--radius-md, 6px)", color: "var(--text-secondary)", cursor: "pointer" }}>
+              style={{ padding: "2px 6px", fontSize: 11, background: "transparent", border: "0.5px solid var(--border-subtle)", borderRadius: "var(--radius-md, 6px)", color: "var(--text-secondary)", cursor: "pointer" }}>
               Replay
             </button>
             <button onClick={() => useProxyStore.getState().deleteRecording(rec.name, workspaceId)}
-              style={{ padding: "2px 4px", fontSize: 9, background: "transparent", border: "none", color: "var(--text-muted)", cursor: "pointer" }}>
+              style={{ padding: "2px 4px", fontSize: 11, background: "transparent", border: "none", color: "var(--text-muted)", cursor: "pointer" }}>
               ×
             </button>
           </div>
@@ -335,19 +335,19 @@ function TrafficTab({ records }: { records: import("../../lib/proxy-commands").T
           >
             <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
               <StatusDot code={rec.statusCode} />
-              <span style={{ fontSize: 10, color: "var(--text-primary)" }}>
+              <span style={{ fontSize: 11, color: "var(--text-primary)" }}>
                 {rec.skillName ?? "unknown"}
               </span>
-              <span style={{ fontSize: 10, color: "var(--text-muted)" }}>
+              <span style={{ fontSize: 11, color: "var(--text-muted)" }}>
                 {rec.agentId?.slice(0, 8)}
               </span>
             </div>
-            <span style={{ fontSize: 10, color: "var(--text-muted)" }}>
+            <span style={{ fontSize: 11, color: "var(--text-muted)" }}>
               {rec.durationMs != null ? `${rec.durationMs}ms` : ""}
             </span>
           </div>
           {expandedId === rec.id && (
-            <div style={{ padding: "4px 12px 8px", fontSize: 10, fontFamily: "var(--font-mono, monospace)" }}>
+            <div style={{ padding: "4px 12px 8px", fontSize: 11, fontFamily: "var(--font-mono, monospace)" }}>
               <div style={{ color: "var(--text-muted)", marginBottom: 4 }}>Request:</div>
               <pre style={{ margin: 0, whiteSpace: "pre-wrap", wordBreak: "break-all", color: "var(--text-secondary)", maxHeight: 150, overflow: "auto" }}>
                 {formatJson(rec.requestJson)}

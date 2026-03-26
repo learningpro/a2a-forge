@@ -86,7 +86,7 @@ export function Sidebar() {
           <>
             <div
               style={{
-                fontSize: 10,
+                fontSize: 11,
                 fontWeight: 500,
                 color: "var(--text-muted)",
                 letterSpacing: "0.08em",
@@ -203,7 +203,7 @@ export function Sidebar() {
           <>
             <div
               style={{
-                fontSize: 10,
+                fontSize: 11,
                 color: "var(--text-muted)",
                 display: "flex",
                 alignItems: "center",

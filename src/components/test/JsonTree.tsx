@@ -18,7 +18,7 @@ export function JsonTree({
     <pre
       style={{
         fontFamily: "var(--font-mono)",
-        fontSize: 10,
+        fontSize: 11,
         lineHeight: 1.7,
         margin: 0,
         whiteSpace: "pre-wrap",
@@ -126,7 +126,7 @@ function CollapsibleNode({
       <>
         <Chevron collapsed onClick={toggle} />
         {open}
-        <span style={{ color: "var(--text-muted)", fontSize: 10 }}>
+        <span style={{ color: "var(--text-muted)", fontSize: 11 }}>
           {" "}{badge} {type === "array" ? (badge === 1 ? "item" : "items") : (badge === 1 ? "key" : "keys")}{" "}
         </span>
         {close}{comma}{"\n"}
@@ -177,7 +177,7 @@ function Chevron({ collapsed, onClick }: { collapsed: boolean; onClick: () => vo
         textAlign: "center",
         userSelect: "none",
         color: "var(--text-muted)",
-        fontSize: 10,
+        fontSize: 11,
       }}
       role="button"
       aria-label={collapsed ? "expand" : "collapse"}

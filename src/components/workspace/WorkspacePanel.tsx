@@ -19,7 +19,7 @@ export function WorkspacePanel() {
       <div style={{ display: "flex", borderBottom: "0.5px solid var(--border-subtle)", flexShrink: 0 }}>
         {(["env", "chains", "diff", "export"] as WsTab[]).map((tab) => (
           <button key={tab} onClick={() => setActiveTab(tab)} style={{
-            padding: "6px 14px", fontSize: 10, fontWeight: activeTab === tab ? 600 : 400,
+            padding: "6px 14px", fontSize: 11, fontWeight: activeTab === tab ? 600 : 400,
             color: activeTab === tab ? "var(--text-primary)" : "var(--text-muted)",
             background: "transparent", border: "none",
             borderBottom: activeTab === tab ? "2px solid var(--text-primary)" : "2px solid transparent",
@@ -57,7 +57,7 @@ function EnvVarsTab({ workspaceId }: { workspaceId: string }) {
   }, [name, value, isSecret, workspaceId]);
 
   const inputStyle: React.CSSProperties = {
-    padding: "3px 6px", fontSize: 10, background: "var(--bg-secondary)",
+    padding: "3px 6px", fontSize: 11, background: "var(--bg-secondary)",
     border: "0.5px solid var(--border-subtle)", borderRadius: "var(--radius-md, 6px)",
     color: "var(--text-primary)", outline: "none",
   };
@@ -68,11 +68,11 @@ function EnvVarsTab({ workspaceId }: { workspaceId: string }) {
         <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
           <input value={name} onChange={(e) => setName(e.target.value)} placeholder="VAR_NAME" style={{ ...inputStyle, flex: 1, fontFamily: "var(--font-mono, monospace)" }} />
           <input value={value} onChange={(e) => setValue(e.target.value)} placeholder="value" type={isSecret ? "password" : "text"} style={{ ...inputStyle, flex: 2 }} />
-          <label style={{ fontSize: 10, color: "var(--text-muted)", display: "flex", alignItems: "center", gap: 2, cursor: "pointer" }}>
+          <label style={{ fontSize: 11, color: "var(--text-muted)", display: "flex", alignItems: "center", gap: 2, cursor: "pointer" }}>
             <input type="checkbox" checked={isSecret} onChange={(e) => setIsSecret(e.target.checked)} /> Secret
           </label>
           <button onClick={handleAdd} style={{
-            padding: "3px 10px", fontSize: 10, background: "transparent",
+            padding: "3px 10px", fontSize: 11, background: "transparent",
             border: "0.5px solid var(--border-strong)", borderRadius: "var(--radius-md, 6px)",
             color: "var(--text-primary)", cursor: "pointer", fontWeight: 500,
           }}>Add</button>
@@ -90,11 +90,11 @@ function EnvVarsTab({ workspaceId }: { workspaceId: string }) {
         }}>
           <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
             <span style={{ fontSize: 11, fontFamily: "var(--font-mono, monospace)", color: "var(--text-primary)", fontWeight: 500 }}>{v.name}</span>
-            <span style={{ fontSize: 10, color: "var(--text-muted)" }}>{v.isSecret ? "********" : v.value}</span>
-            {v.isSecret && <span style={{ fontSize: 9, padding: "1px 4px", background: "var(--bg-secondary)", borderRadius: 4, color: "var(--text-muted)" }}>secret</span>}
+            <span style={{ fontSize: 11, color: "var(--text-muted)" }}>{v.isSecret ? "********" : v.value}</span>
+            {v.isSecret && <span style={{ fontSize: 11, padding: "1px 4px", background: "var(--bg-secondary)", borderRadius: 4, color: "var(--text-muted)" }}>secret</span>}
           </div>
           <button onClick={() => useWorkspaceAdvancedStore.getState().deleteEnvVar(v.id)} style={{
-            padding: "2px 4px", fontSize: 9, background: "transparent", border: "none", color: "var(--text-muted)", cursor: "pointer",
+            padding: "2px 4px", fontSize: 11, background: "transparent", border: "none", color: "var(--text-muted)", cursor: "pointer",
           }}>x</button>
         </div>
       ))}
@@ -135,7 +135,7 @@ function ChainsTab({ workspaceId }: { workspaceId: string }) {
   const skills = selectedAgent?.card.skills ?? [];
 
   const inputStyle: React.CSSProperties = {
-    width: "100%", padding: "3px 6px", fontSize: 10, background: "var(--bg-secondary)",
+    width: "100%", padding: "3px 6px", fontSize: 11, background: "var(--bg-secondary)",
     border: "0.5px solid var(--border-subtle)", borderRadius: "var(--radius-md, 6px)",
     color: "var(--text-primary)", outline: "none",
   };
@@ -147,7 +147,7 @@ function ChainsTab({ workspaceId }: { workspaceId: string }) {
         <div style={{ padding: "6px 8px", borderBottom: "0.5px solid var(--border-subtle)", display: "flex", gap: 4 }}>
           <input value={newName} onChange={(e) => setNewName(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") handleCreateChain(); }}
             placeholder="New chain..." style={{ ...inputStyle, flex: 1 }} />
-          <button onClick={handleCreateChain} style={{ padding: "2px 6px", fontSize: 10, background: "transparent", border: "0.5px solid var(--border-subtle)", borderRadius: "var(--radius-md, 6px)", color: "var(--text-secondary)", cursor: "pointer" }}>+</button>
+          <button onClick={handleCreateChain} style={{ padding: "2px 6px", fontSize: 11, background: "transparent", border: "0.5px solid var(--border-subtle)", borderRadius: "var(--radius-md, 6px)", color: "var(--text-secondary)", cursor: "pointer" }}>+</button>
         </div>
         <div style={{ flex: 1, overflow: "auto" }}>
           {chains.map((c) => (
@@ -159,7 +159,7 @@ function ChainsTab({ workspaceId }: { workspaceId: string }) {
             }}>
               <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.name}</span>
               <button onClick={(e) => { e.stopPropagation(); useWorkspaceAdvancedStore.getState().deleteChain(c.id); }}
-                style={{ padding: "0 2px", fontSize: 9, background: "transparent", border: "none", color: "var(--text-muted)", cursor: "pointer" }}>x</button>
+                style={{ padding: "0 2px", fontSize: 11, background: "transparent", border: "none", color: "var(--text-muted)", cursor: "pointer" }}>x</button>
             </div>
           ))}
         </div>
@@ -174,11 +174,11 @@ function ChainsTab({ workspaceId }: { workspaceId: string }) {
         ) : (
           <>
             <div style={{ padding: "8px 12px", borderBottom: "0.5px solid var(--border-subtle)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <span style={{ fontSize: 10, fontWeight: 500, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.07em" }}>Steps</span>
+              <span style={{ fontSize: 11, fontWeight: 500, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.07em" }}>Steps</span>
               <div style={{ display: "flex", gap: 4 }}>
-                <button onClick={() => setShowAddStep(!showAddStep)} style={{ padding: "2px 8px", fontSize: 10, background: "transparent", border: "0.5px solid var(--border-subtle)", borderRadius: "var(--radius-md, 6px)", color: "var(--text-secondary)", cursor: "pointer" }}>+ Step</button>
+                <button onClick={() => setShowAddStep(!showAddStep)} style={{ padding: "2px 8px", fontSize: 11, background: "transparent", border: "0.5px solid var(--border-subtle)", borderRadius: "var(--radius-md, 6px)", color: "var(--text-secondary)", cursor: "pointer" }}>+ Step</button>
                 <button onClick={() => useWorkspaceAdvancedStore.getState().runChain(selectedChainId)} disabled={isRunningChain || chainSteps.length === 0}
-                  style={{ padding: "2px 8px", fontSize: 10, fontWeight: 500, background: "transparent", border: "0.5px solid var(--border-strong)", borderRadius: "var(--radius-md, 6px)", color: "var(--text-primary)", cursor: isRunningChain ? "default" : "pointer", opacity: isRunningChain || chainSteps.length === 0 ? 0.5 : 1 }}>
+                  style={{ padding: "2px 8px", fontSize: 11, fontWeight: 500, background: "transparent", border: "0.5px solid var(--border-strong)", borderRadius: "var(--radius-md, 6px)", color: "var(--text-primary)", cursor: isRunningChain ? "default" : "pointer", opacity: isRunningChain || chainSteps.length === 0 ? 0.5 : 1 }}>
                   {isRunningChain ? "Running..." : "Run"}
                 </button>
               </div>
@@ -202,8 +202,8 @@ function ChainsTab({ workspaceId }: { workspaceId: string }) {
                 <textarea value={stepExtract} onChange={(e) => setStepExtract(e.target.value)} rows={2} placeholder='Extract: {"varName": "$.result.url"}'
                   style={{ ...inputStyle, fontFamily: "var(--font-mono, monospace)", resize: "vertical" }} />
                 <div style={{ display: "flex", gap: 4, justifyContent: "flex-end" }}>
-                  <button onClick={() => setShowAddStep(false)} style={{ padding: "3px 8px", fontSize: 10, background: "transparent", border: "0.5px solid var(--border-subtle)", borderRadius: "var(--radius-md, 6px)", color: "var(--text-secondary)", cursor: "pointer" }}>Cancel</button>
-                  <button onClick={handleAddStep} style={{ padding: "3px 8px", fontSize: 10, fontWeight: 500, background: "transparent", border: "0.5px solid var(--border-strong)", borderRadius: "var(--radius-md, 6px)", color: "var(--text-primary)", cursor: "pointer" }}>Add</button>
+                  <button onClick={() => setShowAddStep(false)} style={{ padding: "3px 8px", fontSize: 11, background: "transparent", border: "0.5px solid var(--border-subtle)", borderRadius: "var(--radius-md, 6px)", color: "var(--text-secondary)", cursor: "pointer" }}>Cancel</button>
+                  <button onClick={handleAddStep} style={{ padding: "3px 8px", fontSize: 11, fontWeight: 500, background: "transparent", border: "0.5px solid var(--border-strong)", borderRadius: "var(--radius-md, 6px)", color: "var(--text-primary)", cursor: "pointer" }}>Add</button>
                 </div>
               </div>
             )}
@@ -217,25 +217,25 @@ function ChainsTab({ workspaceId }: { workspaceId: string }) {
                     <div style={{ fontSize: 11, fontWeight: 500, color: "var(--text-primary)" }}>
                       {runStep && <StatusDot status={runStep.status} />} {i + 1}. {step.name}
                     </div>
-                    <div style={{ fontSize: 10, color: "var(--text-muted)" }}>
+                    <div style={{ fontSize: 11, color: "var(--text-muted)" }}>
                       {agent?.nickname || agent?.card.name} · {step.skillName}
                       {runStep && <span> · {runStep.durationMs}ms</span>}
                     </div>
-                    {runStep?.error && <div style={{ fontSize: 10, color: "var(--dot-error, #ef4444)" }}>{runStep.error}</div>}
+                    {runStep?.error && <div style={{ fontSize: 11, color: "var(--dot-error, #ef4444)" }}>{runStep.error}</div>}
                     {runStep && Object.keys(runStep.extracted).length > 0 && (
-                      <div style={{ fontSize: 9, color: "var(--text-muted)", marginTop: 2 }}>
+                      <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2 }}>
                         Extracted: {Object.entries(runStep.extracted).map(([k, v]) => `${k}=${v.slice(0, 30)}`).join(", ")}
                       </div>
                     )}
                   </div>
                   <button onClick={() => useWorkspaceAdvancedStore.getState().deleteChainStep(step.id)}
-                    style={{ padding: "2px 4px", fontSize: 9, background: "transparent", border: "none", color: "var(--text-muted)", cursor: "pointer" }}>x</button>
+                    style={{ padding: "2px 4px", fontSize: 11, background: "transparent", border: "none", color: "var(--text-muted)", cursor: "pointer" }}>x</button>
                 </div>
               );
             })}
 
             {chainRunResult && (
-              <div style={{ padding: "8px 12px", background: "var(--bg-secondary)", fontSize: 10 }}>
+              <div style={{ padding: "8px 12px", background: "var(--bg-secondary)", fontSize: 11 }}>
                 <span style={{ fontWeight: 500 }}>
                   <StatusDot status={chainRunResult.status} /> {chainRunResult.status.toUpperCase()}
                 </span>
@@ -261,7 +261,7 @@ function DiffTab() {
   }, [responseA, responseB]);
 
   const textareaStyle: React.CSSProperties = {
-    width: "100%", padding: "6px 8px", fontSize: 10, background: "var(--bg-secondary)",
+    width: "100%", padding: "6px 8px", fontSize: 11, background: "var(--bg-secondary)",
     border: "0.5px solid var(--border-subtle)", borderRadius: "var(--radius-md, 6px)",
     color: "var(--text-primary)", fontFamily: "var(--font-mono, monospace)", resize: "vertical", outline: "none",
   };
@@ -270,11 +270,11 @@ function DiffTab() {
     <div style={{ padding: 12, display: "flex", flexDirection: "column", gap: 8 }}>
       <div style={{ display: "flex", gap: 8 }}>
         <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 10, fontWeight: 500, color: "var(--text-muted)", marginBottom: 4 }}>Response A</div>
+          <div style={{ fontSize: 11, fontWeight: 500, color: "var(--text-muted)", marginBottom: 4 }}>Response A</div>
           <textarea value={responseA} onChange={(e) => setResponseA(e.target.value)} rows={6} style={textareaStyle} placeholder="Paste JSON response..." />
         </div>
         <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 10, fontWeight: 500, color: "var(--text-muted)", marginBottom: 4 }}>Response B</div>
+          <div style={{ fontSize: 11, fontWeight: 500, color: "var(--text-muted)", marginBottom: 4 }}>Response B</div>
           <textarea value={responseB} onChange={(e) => setResponseB(e.target.value)} rows={6} style={textareaStyle} placeholder="Paste JSON response..." />
         </div>
       </div>
@@ -290,17 +290,17 @@ function DiffTab() {
             {diffResult.identical ? "Identical" : `${diffResult.changed.length} changed, ${diffResult.added.length} added, ${diffResult.removed.length} removed`}
           </div>
           {diffResult.changed.map((c, i) => (
-            <div key={i} style={{ padding: "4px 0", fontSize: 10, borderBottom: "0.5px solid var(--border-subtle)" }}>
+            <div key={i} style={{ padding: "4px 0", fontSize: 11, borderBottom: "0.5px solid var(--border-subtle)" }}>
               <div style={{ fontFamily: "var(--font-mono, monospace)", color: "var(--text-primary)", fontWeight: 500 }}>{c.path}</div>
               <div style={{ color: "var(--dot-error, #ef4444)" }}>- {c.oldValue}</div>
               <div style={{ color: "var(--dot-online, #22c55e)" }}>+ {c.newValue}</div>
             </div>
           ))}
           {diffResult.added.map((p, i) => (
-            <div key={`a${i}`} style={{ padding: "2px 0", fontSize: 10, color: "var(--dot-online, #22c55e)", fontFamily: "var(--font-mono, monospace)" }}>+ {p}</div>
+            <div key={`a${i}`} style={{ padding: "2px 0", fontSize: 11, color: "var(--dot-online, #22c55e)", fontFamily: "var(--font-mono, monospace)" }}>+ {p}</div>
           ))}
           {diffResult.removed.map((p, i) => (
-            <div key={`r${i}`} style={{ padding: "2px 0", fontSize: 10, color: "var(--dot-error, #ef4444)", fontFamily: "var(--font-mono, monospace)" }}>- {p}</div>
+            <div key={`r${i}`} style={{ padding: "2px 0", fontSize: 11, color: "var(--dot-error, #ef4444)", fontFamily: "var(--font-mono, monospace)" }}>- {p}</div>
           ))}
         </div>
       )}
@@ -330,28 +330,28 @@ function ExportTab({ workspaceId }: { workspaceId: string }) {
   return (
     <div style={{ padding: 12, display: "flex", flexDirection: "column", gap: 12 }}>
       <div>
-        <div style={{ fontSize: 10, fontWeight: 500, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 6 }}>Export</div>
+        <div style={{ fontSize: 11, fontWeight: 500, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 6 }}>Export</div>
         <button onClick={handleExport} style={{
           padding: "5px 14px", fontSize: 11, fontWeight: 500, background: "var(--bg-primary)",
           border: "0.5px solid var(--border-strong)", borderRadius: "var(--radius-md, 6px)",
           color: "var(--text-primary)", cursor: "pointer",
         }}>Export Workspace to Clipboard</button>
         {exportData && (
-          <pre style={{ marginTop: 8, padding: 8, fontSize: 9, background: "var(--bg-secondary)", borderRadius: "var(--radius-md, 6px)", maxHeight: 200, overflow: "auto", color: "var(--text-secondary)", fontFamily: "var(--font-mono, monospace)" }}>
+          <pre style={{ marginTop: 8, padding: 8, fontSize: 11, background: "var(--bg-secondary)", borderRadius: "var(--radius-md, 6px)", maxHeight: 200, overflow: "auto", color: "var(--text-secondary)", fontFamily: "var(--font-mono, monospace)" }}>
             {exportData}
           </pre>
         )}
       </div>
       <div>
-        <div style={{ fontSize: 10, fontWeight: 500, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 6 }}>Import</div>
+        <div style={{ fontSize: 11, fontWeight: 500, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 6 }}>Import</div>
         <textarea value={importData} onChange={(e) => setImportData(e.target.value)} rows={4} placeholder="Paste workspace JSON..."
-          style={{ width: "100%", padding: "6px 8px", fontSize: 10, background: "var(--bg-secondary)", border: "0.5px solid var(--border-subtle)", borderRadius: "var(--radius-md, 6px)", color: "var(--text-primary)", fontFamily: "var(--font-mono, monospace)", resize: "vertical", outline: "none" }} />
+          style={{ width: "100%", padding: "6px 8px", fontSize: 11, background: "var(--bg-secondary)", border: "0.5px solid var(--border-subtle)", borderRadius: "var(--radius-md, 6px)", color: "var(--text-primary)", fontFamily: "var(--font-mono, monospace)", resize: "vertical", outline: "none" }} />
         <button onClick={handleImport} disabled={!importData.trim()} style={{
           marginTop: 4, padding: "5px 14px", fontSize: 11, fontWeight: 500, background: "var(--bg-primary)",
           border: "0.5px solid var(--border-strong)", borderRadius: "var(--radius-md, 6px)",
           color: "var(--text-primary)", cursor: importData.trim() ? "pointer" : "default", opacity: importData.trim() ? 1 : 0.5,
         }}>Import Workspace</button>
-        {importResult && <div style={{ marginTop: 4, fontSize: 10, color: "var(--dot-online, #22c55e)" }}>{importResult}</div>}
+        {importResult && <div style={{ marginTop: 4, fontSize: 11, color: "var(--dot-online, #22c55e)" }}>{importResult}</div>}
       </div>
     </div>
   );

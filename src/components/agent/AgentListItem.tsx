@@ -138,7 +138,7 @@ export function AgentListItem({ agent, isActive, onClick }: AgentListItemProps) 
         )}
         <div
           style={{
-            fontSize: 10,
+            fontSize: 11,
             color: "var(--text-muted)",
             fontFamily: "var(--font-mono, 'JetBrains Mono', monospace)",
             whiteSpace: "nowrap",
@@ -151,7 +151,7 @@ export function AgentListItem({ agent, isActive, onClick }: AgentListItemProps) 
       </div>
 
       {/* Skill count */}
-      <div style={{ fontSize: 10, color: "var(--text-muted)", flexShrink: 0 }}>
+      <div style={{ fontSize: 11, color: "var(--text-muted)", flexShrink: 0 }}>
         {skillCount}
       </div>
 

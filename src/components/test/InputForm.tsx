@@ -110,7 +110,7 @@ export function InputForm({
             onClick={() => setInputTab(t.id)}
             style={{
               padding: "6px 12px",
-              fontSize: 10,
+              fontSize: 11,
               cursor: "pointer",
               color: inputTab === t.id ? "var(--text-primary)" : "var(--text-secondary)",
               fontWeight: inputTab === t.id ? 500 : 400,
@@ -213,7 +213,7 @@ export function InputForm({
                   onClick={() => removeHeader(i)}
                   style={{
                     padding: "2px 6px",
-                    fontSize: 10,
+                    fontSize: 11,
                     background: "transparent",
                     border: "0.5px solid var(--border-subtle)",
                     borderRadius: "var(--radius-md, 6px)",
@@ -230,7 +230,7 @@ export function InputForm({
               style={{
                 alignSelf: "flex-start",
                 padding: "3px 10px",
-                fontSize: 10,
+                fontSize: 11,
                 background: "var(--bg-secondary)",
                 border: "0.5px solid var(--border-subtle)",
                 borderRadius: "var(--radius-md, 6px)",
@@ -277,7 +277,7 @@ export function InputForm({
       {/* Examples row */}
       {skill.examples && skill.examples.length > 0 && (
         <>
-          <div style={{ padding: "0 14px 4px", fontSize: 10, color: "var(--text-muted)" }}>
+          <div style={{ padding: "0 14px 4px", fontSize: 11, color: "var(--text-muted)" }}>
             Examples
           </div>
           <div
@@ -299,7 +299,7 @@ export function InputForm({
                     setInputTab("message");
                   }}
                   style={{
-                    fontSize: 10,
+                    fontSize: 11,
                     padding: "3px 8px",
                     borderRadius: 10,
                     background: "var(--bg-secondary)",

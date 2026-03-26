@@ -33,7 +33,7 @@ function ModeTag({ mode }: { mode: string }) {
   return (
     <span
       style={{
-        fontSize: 9,
+        fontSize: 11,
         padding: "1px 5px",
         borderRadius: 4,
         fontWeight: 500,
@@ -50,7 +50,7 @@ function NoExamplesBadge() {
   return (
     <span
       style={{
-        fontSize: 9,
+        fontSize: 11,
         padding: "1px 5px",
         borderRadius: 4,
         background: "var(--bg-secondary)",
@@ -130,7 +130,7 @@ function SkillItem({
       </div>
       <div
         style={{
-          fontSize: 10,
+          fontSize: 11,
           color: "var(--text-muted)",
           lineHeight: 1.4,
           WebkitLineClamp: 2,
@@ -240,7 +240,7 @@ export function SkillPanel({ width }: SkillPanelProps) {
               {selectedAgent.nickname ?? selectedAgent.card.name}
               <span
                 style={{
-                  fontSize: 9,
+                  fontSize: 11,
                   padding: "2px 6px",
                   borderRadius: 10,
                   fontWeight: 500,
@@ -269,7 +269,7 @@ export function SkillPanel({ width }: SkillPanelProps) {
             </div>
             <div
               style={{
-                fontSize: 10,
+                fontSize: 11,
                 color: "var(--text-muted)",
                 fontFamily: "var(--font-mono, 'JetBrains Mono', monospace)",
                 marginTop: 2,

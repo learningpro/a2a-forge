@@ -36,13 +36,13 @@ export function AssertionEditor({ assertions, onChange }: AssertionEditorProps) 
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-        <span style={{ fontSize: 10, fontWeight: 500, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.07em" }}>
+        <span style={{ fontSize: 11, fontWeight: 500, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.07em" }}>
           Assertions
         </span>
         <button
           onClick={handleAdd}
           style={{
-            padding: "2px 8px", fontSize: 10, background: "transparent",
+            padding: "2px 8px", fontSize: 11, background: "transparent",
             border: "0.5px solid var(--border-subtle)", borderRadius: "var(--radius-md, 6px)",
             color: "var(--text-secondary)", cursor: "pointer",
           }}
@@ -51,7 +51,7 @@ export function AssertionEditor({ assertions, onChange }: AssertionEditorProps) 
         </button>
       </div>
       {assertions.length === 0 && (
-        <div style={{ fontSize: 10, color: "var(--text-muted)", padding: "4px 0" }}>
+        <div style={{ fontSize: 11, color: "var(--text-muted)", padding: "4px 0" }}>
           No assertions. Add one to validate responses.
         </div>
       )}
@@ -63,7 +63,7 @@ export function AssertionEditor({ assertions, onChange }: AssertionEditorProps) 
               value={a.type}
               onChange={(e) => handleUpdate(a.id, { type: e.target.value as AssertionType })}
               style={{
-                flex: "0 0 140px", padding: "3px 4px", fontSize: 10,
+                flex: "0 0 140px", padding: "3px 4px", fontSize: 11,
                 background: "var(--bg-secondary)", border: "0.5px solid var(--border-subtle)",
                 borderRadius: "var(--radius-md, 6px)", color: "var(--text-primary)",
               }}
@@ -78,7 +78,7 @@ export function AssertionEditor({ assertions, onChange }: AssertionEditorProps) 
                 onChange={(e) => handleUpdate(a.id, { path: e.target.value })}
                 placeholder="$.result.status"
                 style={{
-                  flex: 1, padding: "3px 6px", fontSize: 10,
+                  flex: 1, padding: "3px 6px", fontSize: 11,
                   background: "var(--bg-secondary)", border: "0.5px solid var(--border-subtle)",
                   borderRadius: "var(--radius-md, 6px)", color: "var(--text-primary)",
                   fontFamily: "var(--font-mono, monospace)",
@@ -91,7 +91,7 @@ export function AssertionEditor({ assertions, onChange }: AssertionEditorProps) 
                 onChange={(e) => handleUpdate(a.id, { expected: e.target.value })}
                 placeholder={a.type === "response_time_lt" ? "30000" : "expected value"}
                 style={{
-                  flex: 1, padding: "3px 6px", fontSize: 10,
+                  flex: 1, padding: "3px 6px", fontSize: 11,
                   background: "var(--bg-secondary)", border: "0.5px solid var(--border-subtle)",
                   borderRadius: "var(--radius-md, 6px)", color: "var(--text-primary)",
                   fontFamily: "var(--font-mono, monospace)",
@@ -101,7 +101,7 @@ export function AssertionEditor({ assertions, onChange }: AssertionEditorProps) 
             <button
               onClick={() => handleRemove(a.id)}
               style={{
-                padding: "2px 4px", fontSize: 10, background: "transparent",
+                padding: "2px 4px", fontSize: 11, background: "transparent",
                 border: "none", color: "var(--text-muted)", cursor: "pointer",
               }}
             >
@@ -163,7 +163,7 @@ export function StepEditor({ suiteId, editingStep, onClose }: StepEditorProps) {
   };
 
   const labelStyle = {
-    fontSize: 10, fontWeight: 500 as const, color: "var(--text-muted)",
+    fontSize: 11, fontWeight: 500 as const, color: "var(--text-muted)",
     marginBottom: 3, display: "block" as const,
   };
 

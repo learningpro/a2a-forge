@@ -33,7 +33,7 @@ export function SkillMetadata({ skill }: SkillMetadataProps) {
       {/* Compact ID line */}
       <div
         style={{
-          fontSize: 10,
+          fontSize: 11,
           color: "var(--text-muted)",
           fontFamily: "var(--font-mono, 'JetBrains Mono', monospace)",
           marginTop: 2,

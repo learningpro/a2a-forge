@@ -154,7 +154,7 @@ export function HistoryList({ agentId, onSelectHistory }: HistoryListProps) {
               </div>
               <div
                 style={{
-                  fontSize: 10,
+                  fontSize: 11,
                   color: "var(--text-muted)",
                   display: "flex",
                   gap: 6,
@@ -177,7 +177,7 @@ export function HistoryList({ agentId, onSelectHistory }: HistoryListProps) {
             style={{
               width: "100%",
               padding: "5px 10px",
-              fontSize: 10,
+              fontSize: 11,
               background: "transparent",
               border: "0.5px solid var(--border-subtle)",
               borderRadius: "var(--radius-md)",

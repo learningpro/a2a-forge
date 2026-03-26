@@ -108,7 +108,7 @@ export function SuiteEditor({ suiteId }: SuiteEditorProps) {
               value={suite.runMode}
               onChange={(e) => handleRunModeChange(e.target.value)}
               style={{
-                fontSize: 10, padding: "1px 4px",
+                fontSize: 11, padding: "1px 4px",
                 background: "var(--bg-secondary)", border: "0.5px solid var(--border-subtle)",
                 borderRadius: "var(--radius-md, 6px)", color: "var(--text-secondary)",
               }}
@@ -116,7 +116,7 @@ export function SuiteEditor({ suiteId }: SuiteEditorProps) {
               <option value="sequential">Sequential</option>
               <option value="parallel">Parallel</option>
             </select>
-            <span style={{ fontSize: 10, color: "var(--text-muted)" }}>
+            <span style={{ fontSize: 11, color: "var(--text-muted)" }}>
               {steps.length} step{steps.length !== 1 ? "s" : ""}
             </span>
           </div>
@@ -147,13 +147,13 @@ export function SuiteEditor({ suiteId }: SuiteEditorProps) {
           padding: "8px 14px 4px",
           display: "flex", justifyContent: "space-between", alignItems: "center",
         }}>
-          <span style={{ fontSize: 10, fontWeight: 500, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.07em" }}>
+          <span style={{ fontSize: 11, fontWeight: 500, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.07em" }}>
             Steps
           </span>
           <button
             onClick={() => { setEditingStep(null); setShowStepEditor(true); }}
             style={{
-              padding: "2px 8px", fontSize: 10, background: "transparent",
+              padding: "2px 8px", fontSize: 11, background: "transparent",
               border: "0.5px solid var(--border-subtle)", borderRadius: "var(--radius-md, 6px)",
               color: "var(--text-secondary)", cursor: "pointer",
             }}
@@ -186,7 +186,7 @@ export function SuiteEditor({ suiteId }: SuiteEditorProps) {
                 <div style={{ fontSize: 11, fontWeight: 500, color: "var(--text-primary)" }}>
                   {index + 1}. {step.name}
                 </div>
-                <div style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 2 }}>
+                <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2 }}>
                   {agent?.nickname || agent?.card.name || "Unknown"} · {step.skillName}
                   {assertionCount > 0 && ` · ${assertionCount} assertion${assertionCount > 1 ? "s" : ""}`}
                 </div>
@@ -201,11 +201,11 @@ export function SuiteEditor({ suiteId }: SuiteEditorProps) {
                   ▼
                 </button>
                 <button onClick={() => handleEditStep(step)}
-                  style={{ padding: "2px 6px", fontSize: 9, background: "transparent", border: "0.5px solid var(--border-subtle)", borderRadius: "var(--radius-md, 6px)", color: "var(--text-secondary)", cursor: "pointer" }}>
+                  style={{ padding: "2px 6px", fontSize: 11, background: "transparent", border: "0.5px solid var(--border-subtle)", borderRadius: "var(--radius-md, 6px)", color: "var(--text-secondary)", cursor: "pointer" }}>
                   Edit
                 </button>
                 <button onClick={() => handleDeleteStep(step.id)}
-                  style={{ padding: "2px 4px", fontSize: 9, background: "transparent", border: "none", color: "var(--text-muted)", cursor: "pointer" }}>
+                  style={{ padding: "2px 4px", fontSize: 11, background: "transparent", border: "none", color: "var(--text-muted)", cursor: "pointer" }}>
                   ×
                 </button>
               </div>

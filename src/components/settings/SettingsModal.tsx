@@ -149,7 +149,7 @@ function SettingsModalInner({ cardId, onClose, timeout, handleTimeoutChange, pro
   };
 
   const labelStyle: React.CSSProperties = {
-    fontSize: 10,
+    fontSize: 11,
     fontWeight: 500,
     color: "var(--text-secondary)",
     textTransform: "uppercase",

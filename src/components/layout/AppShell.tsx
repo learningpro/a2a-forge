@@ -50,7 +50,7 @@ export function AppShell() {
           border: "0.5px solid var(--border-default)",
           boxShadow: "0 4px 32px rgba(0,0,0,0.08)",
           background: "var(--bg-tertiary)",
-          fontSize: 12,
+          fontSize: 13,
         }}
       >
         <Sidebar />

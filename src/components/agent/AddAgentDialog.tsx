@@ -158,7 +158,7 @@ function AddAgentDialogInner({ url, setUrl, nickname, setNickname, preview, addD
           <code
             style={{
               fontFamily: "var(--font-mono, 'JetBrains Mono', monospace)",
-              fontSize: 10,
+              fontSize: 11,
             }}
           >
             /.well-known/agent.json
@@ -169,7 +169,7 @@ function AddAgentDialogInner({ url, setUrl, nickname, setNickname, preview, addD
         {/* Base URL label */}
         <div
           style={{
-            fontSize: 10,
+            fontSize: 11,
             fontWeight: 500,
             color: "var(--text-secondary)",
             textTransform: "uppercase",
@@ -204,7 +204,7 @@ function AddAgentDialogInner({ url, setUrl, nickname, setNickname, preview, addD
         {/* Nickname label */}
         <div
           style={{
-            fontSize: 10,
+            fontSize: 11,
             fontWeight: 500,
             color: "var(--text-secondary)",
             textTransform: "uppercase",
@@ -239,7 +239,7 @@ function AddAgentDialogInner({ url, setUrl, nickname, setNickname, preview, addD
         {/* Preview label */}
         <div
           style={{
-            fontSize: 10,
+            fontSize: 11,
             fontWeight: 500,
             color: "var(--text-secondary)",
             textTransform: "uppercase",
@@ -305,7 +305,7 @@ function AddAgentDialogInner({ url, setUrl, nickname, setNickname, preview, addD
               </div>
               <div
                 style={{
-                  fontSize: 10,
+                  fontSize: 11,
                   color: "var(--text-muted)",
                   fontFamily: "var(--font-mono, 'JetBrains Mono', monospace)",
                 }}
@@ -327,7 +327,7 @@ function AddAgentDialogInner({ url, setUrl, nickname, setNickname, preview, addD
                     <span
                       key={skill.id}
                       style={{
-                        fontSize: 10,
+                        fontSize: 11,
                         padding: "2px 7px",
                         borderRadius: 8,
                         background: "var(--bg-secondary)",
@@ -342,7 +342,7 @@ function AddAgentDialogInner({ url, setUrl, nickname, setNickname, preview, addD
                   {preview.card.skills.length > 4 && (
                     <span
                       style={{
-                        fontSize: 10,
+                        fontSize: 11,
                         padding: "2px 7px",
                         borderRadius: 8,
                         background: "var(--bg-secondary)",

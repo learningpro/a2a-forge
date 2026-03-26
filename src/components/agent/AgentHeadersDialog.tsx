@@ -140,7 +140,7 @@ function AgentHeadersDialogInner({ entries, handleChange, addRow, removeRow, han
         </div>
         <div
           style={{
-            fontSize: 10,
+            fontSize: 11,
             color: "var(--text-muted)",
             marginBottom: 16,
           }}
@@ -193,7 +193,7 @@ function AgentHeadersDialogInner({ entries, handleChange, addRow, removeRow, han
                 onClick={() => removeRow(i)}
                 style={{
                   padding: "2px 6px",
-                  fontSize: 10,
+                  fontSize: 11,
                   background: "transparent",
                   border: "0.5px solid var(--border-subtle)",
                   borderRadius: "var(--radius-md, 6px)",
@@ -210,7 +210,7 @@ function AgentHeadersDialogInner({ entries, handleChange, addRow, removeRow, han
             style={{
               alignSelf: "flex-start",
               padding: "3px 10px",
-              fontSize: 10,
+              fontSize: 11,
               background: "var(--bg-secondary)",
               border: "0.5px solid var(--border-subtle)",
               borderRadius: "var(--radius-md, 6px)",

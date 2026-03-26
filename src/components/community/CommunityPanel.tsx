@@ -23,7 +23,7 @@ export function CommunityPanel() {
             key={tab}
             onClick={() => setActiveTab(tab)}
             style={{
-              padding: "6px 14px", fontSize: 10, fontWeight: activeTab === tab ? 600 : 400,
+              padding: "6px 14px", fontSize: 11, fontWeight: activeTab === tab ? 600 : 400,
               color: activeTab === tab ? "var(--text-primary)" : "var(--text-muted)",
               background: "transparent", border: "none",
               borderBottom: activeTab === tab ? "2px solid var(--text-primary)" : "2px solid transparent",
@@ -77,7 +77,7 @@ function DirectoryTab() {
           }}
         />
         <button onClick={handleSearch} style={{
-          padding: "4px 10px", fontSize: 10, background: "transparent",
+          padding: "4px 10px", fontSize: 11, background: "transparent",
           border: "0.5px solid var(--border-strong)", borderRadius: "var(--radius-md, 6px)",
           color: "var(--text-primary)", cursor: "pointer",
         }}>Search</button>
@@ -86,13 +86,13 @@ function DirectoryTab() {
       {/* Submit your agents */}
       {agents.length > 0 && (
         <div style={{ padding: "8px 12px", borderBottom: "0.5px solid var(--border-subtle)" }}>
-          <div style={{ fontSize: 10, fontWeight: 500, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 4 }}>
+          <div style={{ fontSize: 11, fontWeight: 500, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 4 }}>
             Share Your Agents
           </div>
           <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
             {agents.map((a) => (
               <button key={a.id} onClick={() => handleSubmit(a.id)} style={{
-                padding: "3px 8px", fontSize: 10, background: "transparent",
+                padding: "3px 8px", fontSize: 11, background: "transparent",
                 border: "0.5px solid var(--border-subtle)", borderRadius: "var(--radius-md, 6px)",
                 color: "var(--text-secondary)", cursor: "pointer",
               }}>
@@ -118,12 +118,12 @@ function DirectoryTab() {
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
               <div style={{ minWidth: 0 }}>
                 <div style={{ fontSize: 11, fontWeight: 500, color: "var(--text-primary)" }}>{ca.name}</div>
-                <div style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 1 }}>{ca.description || ca.url}</div>
+                <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 1 }}>{ca.description || ca.url}</div>
                 {tags.length > 0 && (
                   <div style={{ display: "flex", gap: 4, marginTop: 4 }}>
                     {tags.map((t, i) => (
                       <span key={i} style={{
-                        padding: "1px 6px", fontSize: 9, background: "var(--bg-secondary)",
+                        padding: "1px 6px", fontSize: 11, background: "var(--bg-secondary)",
                         borderRadius: "var(--radius-md, 6px)", color: "var(--text-muted)",
                       }}>{t}</span>
                     ))}
@@ -160,7 +160,7 @@ function FavoritesTab() {
       {/* Quick favorite buttons for current agents */}
       {agents.length > 0 && (
         <div style={{ padding: "8px 12px", borderBottom: "0.5px solid var(--border-subtle)" }}>
-          <div style={{ fontSize: 10, fontWeight: 500, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 4 }}>
+          <div style={{ fontSize: 11, fontWeight: 500, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 4 }}>
             Quick Favorite
           </div>
           <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
@@ -168,7 +168,7 @@ function FavoritesTab() {
               const isFav = favorites.some((f) => f.agentId === a.id);
               return (
                 <button key={a.id} onClick={() => handleToggle(a.id)} style={{
-                  padding: "3px 8px", fontSize: 10,
+                  padding: "3px 8px", fontSize: 11,
                   background: isFav ? "var(--bg-secondary)" : "transparent",
                   border: "0.5px solid var(--border-subtle)", borderRadius: "var(--radius-md, 6px)",
                   color: isFav ? "var(--text-primary)" : "var(--text-secondary)", cursor: "pointer",
@@ -190,7 +190,7 @@ function FavoritesTab() {
       {Object.entries(folders).map(([folder, favs]) => (
         <div key={folder}>
           <div style={{
-            padding: "6px 12px", fontSize: 10, fontWeight: 500, color: "var(--text-muted)",
+            padding: "6px 12px", fontSize: 11, fontWeight: 500, color: "var(--text-muted)",
             textTransform: "uppercase", letterSpacing: "0.07em", background: "var(--bg-secondary)",
           }}>
             {folder}
@@ -206,10 +206,10 @@ function FavoritesTab() {
                   <div style={{ fontSize: 11, color: "var(--text-primary)" }}>
                     ★ {agent?.nickname || agent?.card.name || fav.agentId}
                   </div>
-                  {fav.notes && <div style={{ fontSize: 10, color: "var(--text-muted)" }}>{fav.notes}</div>}
+                  {fav.notes && <div style={{ fontSize: 11, color: "var(--text-muted)" }}>{fav.notes}</div>}
                 </div>
                 <button onClick={() => handleToggle(fav.agentId)} style={{
-                  padding: "2px 4px", fontSize: 9, background: "transparent",
+                  padding: "2px 4px", fontSize: 11, background: "transparent",
                   border: "none", color: "var(--text-muted)", cursor: "pointer",
                 }}>×</button>
               </div>
@@ -241,11 +241,11 @@ function HealthTab({ workspaceId }: { workspaceId: string }) {
         padding: "8px 12px", borderBottom: "0.5px solid var(--border-subtle)",
         display: "flex", justifyContent: "space-between", alignItems: "center",
       }}>
-        <span style={{ fontSize: 10, fontWeight: 500, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.07em" }}>
+        <span style={{ fontSize: 11, fontWeight: 500, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.07em" }}>
           Agent Health
         </span>
         <button onClick={handleCheckAll} disabled={isChecking} style={{
-          padding: "3px 10px", fontSize: 10, background: "transparent",
+          padding: "3px 10px", fontSize: 11, background: "transparent",
           border: "0.5px solid var(--border-strong)", borderRadius: "var(--radius-md, 6px)",
           color: "var(--text-primary)", cursor: isChecking ? "default" : "pointer",
           fontWeight: 500, opacity: isChecking ? 0.5 : 1,
@@ -273,7 +273,7 @@ function HealthTab({ workspaceId }: { workspaceId: string }) {
                 <div style={{ fontSize: 11, color: "var(--text-primary)" }}>
                   {agent.nickname || agent.card.name}
                 </div>
-                <div style={{ fontSize: 10, color: "var(--text-muted)" }}>
+                <div style={{ fontSize: 11, color: "var(--text-muted)" }}>
                   {hc ? (
                     <>
                       {hc.status} · {hc.latencyMs}ms
@@ -284,7 +284,7 @@ function HealthTab({ workspaceId }: { workspaceId: string }) {
               </div>
             </div>
             <button onClick={() => handleCheckOne(agent.id)} style={{
-              padding: "2px 8px", fontSize: 9, background: "transparent",
+              padding: "2px 8px", fontSize: 11, background: "transparent",
               border: "0.5px solid var(--border-subtle)", borderRadius: "var(--radius-md, 6px)",
               color: "var(--text-secondary)", cursor: "pointer",
             }}>Check</button>

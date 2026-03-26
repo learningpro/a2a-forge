@@ -327,7 +327,7 @@ export function TestPanel() {
             title="Copy as curl (Cmd+Shift+C)"
             style={{
               padding: "4px 8px",
-              fontSize: 10,
+              fontSize: 11,
               background: "transparent",
               border: "0.5px solid var(--border-subtle)",
               borderRadius: "var(--radius-md, 6px)",
@@ -398,7 +398,7 @@ export function TestPanel() {
           >
             <div
               style={{
-                fontSize: 10,
+                fontSize: 11,
                 fontWeight: 500,
                 color: "var(--text-muted)",
                 textTransform: "uppercase",
@@ -441,7 +441,7 @@ export function TestPanel() {
           >
             <div
               style={{
-                fontSize: 10,
+                fontSize: 11,
                 fontWeight: 500,
                 color: "var(--text-muted)",
                 textTransform: "uppercase",
