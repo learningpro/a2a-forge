@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { TestPanel as ManualTestPanel } from "../test/TestPanel";
 import { SuitePanel } from "../suite/SuitePanel";
+import { ProxyPanel } from "../proxy/ProxyPanel";
 
-type Tab = "test" | "suites";
+type Tab = "test" | "suites" | "proxy";
 
 export function TestPanel() {
   const [activeTab, setActiveTab] = useState<Tab>("test");
@@ -16,11 +17,14 @@ export function TestPanel() {
       }}>
         <TabButton label="Test" active={activeTab === "test"} onClick={() => setActiveTab("test")} />
         <TabButton label="Suites" active={activeTab === "suites"} onClick={() => setActiveTab("suites")} />
+        <TabButton label="Proxy" active={activeTab === "proxy"} onClick={() => setActiveTab("proxy")} />
       </div>
 
       {/* Tab content */}
       <div style={{ flex: 1, overflow: "hidden", display: "flex", flexDirection: "column" }}>
-        {activeTab === "test" ? <ManualTestPanel /> : <SuitePanel />}
+        {activeTab === "test" && <ManualTestPanel />}
+        {activeTab === "suites" && <SuitePanel />}
+        {activeTab === "proxy" && <ProxyPanel />}
       </div>
     </div>
   );

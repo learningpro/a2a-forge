@@ -3,6 +3,7 @@ mod commands;
 mod credentials;
 mod db;
 mod error;
+mod proxy;
 mod state;
 
 use specta_typescript::Typescript;
@@ -47,6 +48,20 @@ pub fn run() {
             commands::suites::get_suite_run,
             commands::suites::list_suite_runs,
             commands::suites::export_report,
+            commands::proxy::start_proxy,
+            commands::proxy::stop_proxy,
+            commands::proxy::get_proxy_status,
+            commands::proxy::create_rule,
+            commands::proxy::update_rule,
+            commands::proxy::delete_rule,
+            commands::proxy::list_rules,
+            commands::proxy::toggle_rule,
+            commands::proxy::start_recording,
+            commands::proxy::stop_recording,
+            commands::proxy::list_recordings,
+            commands::proxy::get_recording,
+            commands::proxy::delete_recording,
+            commands::proxy::replay_recording,
         ]);
 
     #[cfg(debug_assertions)]

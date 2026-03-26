@@ -164,5 +164,43 @@ pub fn migrations() -> Vec<Migration> {
             "#,
             kind: MigrationKind::Up,
         },
+        Migration {
+            version: 7,
+            description: "create_proxy_tables",
+            sql: r#"
+                CREATE TABLE IF NOT EXISTS intercept_rules (
+                    id           TEXT PRIMARY KEY,
+                    name         TEXT NOT NULL,
+                    enabled      INTEGER DEFAULT 1,
+                    match_type   TEXT NOT NULL,
+                    match_value  TEXT DEFAULT '',
+                    action_type  TEXT NOT NULL,
+                    action_json  TEXT NOT NULL,
+                    priority     INTEGER DEFAULT 0,
+                    workspace_id TEXT NOT NULL,
+                    created_at   TEXT DEFAULT (datetime('now')),
+                    FOREIGN KEY (workspace_id) REFERENCES workspaces(id) ON DELETE CASCADE
+                );
+
+                CREATE TABLE IF NOT EXISTS traffic_records (
+                    id            TEXT PRIMARY KEY,
+                    session_name  TEXT NOT NULL,
+                    agent_id      TEXT,
+                    skill_name    TEXT,
+                    request_json  TEXT NOT NULL,
+                    response_json TEXT,
+                    status_code   INTEGER,
+                    duration_ms   INTEGER,
+                    timestamp     TEXT DEFAULT (datetime('now')),
+                    workspace_id  TEXT NOT NULL,
+                    FOREIGN KEY (workspace_id) REFERENCES workspaces(id) ON DELETE CASCADE
+                );
+
+                CREATE INDEX idx_intercept_rules_workspace ON intercept_rules(workspace_id);
+                CREATE INDEX idx_traffic_records_session ON traffic_records(session_name);
+                CREATE INDEX idx_traffic_records_workspace ON traffic_records(workspace_id);
+            "#,
+            kind: MigrationKind::Up,
+        },
     ]
 }

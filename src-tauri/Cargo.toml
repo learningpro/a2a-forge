@@ -29,6 +29,9 @@ keyring = "3"
 jsonpath-rust = "0.7"
 nanoid = "0.4"
 regex = "1"
+axum = "0.8"
+hyper = { version = "1", features = ["full"] }
+tower = "0.5"
 specta = { version = "=2.0.0-rc.22", features = ["serde_json"] }
 specta-typescript = "0.0.9"
 tauri-specta = { version = "=2.0.0-rc.21", features = ["typescript"] }
