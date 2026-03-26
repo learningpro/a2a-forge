@@ -4,6 +4,7 @@ import { useWorkspaceStore } from "../../stores/workspaceStore";
 import { SuiteList } from "./SuiteList";
 import { SuiteEditor } from "./SuiteEditor";
 import { SuiteRunViewer } from "./SuiteRunViewer";
+import { EmptyState } from "../shared/EmptyState";
 
 export function SuitePanel() {
   const activeWorkspaceId = useWorkspaceStore((s) => s.activeWorkspaceId);
@@ -39,11 +40,12 @@ export function SuitePanel() {
         ) : (
           <div style={{
             flex: 1, display: "flex", alignItems: "center", justifyContent: "center",
-            color: "var(--text-muted)", fontSize: 11, lineHeight: 1.6, textAlign: "center", padding: 20,
           }}>
-            Select or create a test suite to get started.
-            <br />
-            Suites let you group test cases into automated sequences.
+            <EmptyState
+              icon="suite"
+              title="Select a test suite"
+              description="Pick a suite from the list or create a new one to start automating tests."
+            />
           </div>
         )}
       </div>
