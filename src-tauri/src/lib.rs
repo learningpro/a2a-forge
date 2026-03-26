@@ -33,6 +33,20 @@ pub fn run() {
             commands::workspaces::create_workspace,
             commands::workspaces::delete_workspace,
             commands::workspaces::set_active_workspace,
+            commands::suites::create_suite,
+            commands::suites::update_suite,
+            commands::suites::delete_suite,
+            commands::suites::list_suites,
+            commands::suites::get_suite,
+            commands::suites::add_step,
+            commands::suites::update_step,
+            commands::suites::delete_step,
+            commands::suites::reorder_steps,
+            commands::suites::list_steps,
+            commands::suites::run_test_suite,
+            commands::suites::get_suite_run,
+            commands::suites::list_suite_runs,
+            commands::suites::export_report,
         ]);
 
     #[cfg(debug_assertions)]

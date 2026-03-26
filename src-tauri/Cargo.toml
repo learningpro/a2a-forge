@@ -26,6 +26,9 @@ futures = "0.3"
 log = "0.4"
 sqlx = { version = "0.8", features = ["sqlite", "runtime-tokio"] }
 keyring = "3"
+jsonpath-rust = "0.7"
+nanoid = "0.4"
+regex = "1"
 specta = { version = "=2.0.0-rc.22", features = ["serde_json"] }
 specta-typescript = "0.0.9"
 tauri-specta = { version = "=2.0.0-rc.21", features = ["typescript"] }
