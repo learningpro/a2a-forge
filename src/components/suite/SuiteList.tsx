@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 import { useSuiteStore } from "../../stores/suiteStore";
 import type { Suite } from "../../lib/suite-commands";
+import { EmptyState } from "../shared/EmptyState";
 
 interface SuiteListProps {
   workspaceId: string;
@@ -108,19 +109,12 @@ export function SuiteList({ workspaceId, agentId }: SuiteListProps) {
       {/* Suite list */}
       <div style={{ flex: 1, overflow: "auto" }}>
         {suites.length === 0 && !showCreate && (
-          <div
-            style={{
-              padding: 16,
-              textAlign: "center",
-              color: "var(--text-muted)",
-              fontSize: 11,
-              lineHeight: 1.6,
-            }}
-          >
-            No test suites yet.
-            <br />
-            Create one to start automating tests.
-          </div>
+          <EmptyState
+            icon="suite"
+            title="No test suites yet"
+            description="Create a suite to group test cases into automated sequences."
+            action={{ label: "+ New suite", onClick: () => setShowCreate(true) }}
+          />
         )}
         {suites.map((suite) => (
           <SuiteListItem

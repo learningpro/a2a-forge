@@ -16,6 +16,8 @@ import { ResponseViewer } from "./ResponseViewer";
 import { HistoryList } from "./HistoryList";
 import { SavedTestsList } from "./SavedTestsList";
 
+import { EmptyState } from "../shared/EmptyState";
+
 export function TestPanel() {
   const agents = useAgentStore((s) => s.agents);
   const selectedAgentId = useAgentStore((s) => s.selectedAgentId);
@@ -260,19 +262,13 @@ export function TestPanel() {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              padding: 20,
             }}
           >
-            <div
-              style={{
-                fontSize: 11,
-                color: "var(--text-muted)",
-                textAlign: "center",
-                lineHeight: 1.6,
-              }}
-            >
-              Select a skill to begin testing
-            </div>
+            <EmptyState
+              icon="test"
+              title="Ready to test"
+              description="Pick an agent from the sidebar, then select a skill to start sending requests."
+            />
           </div>
           <div
             style={{
@@ -280,19 +276,13 @@ export function TestPanel() {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              padding: 20,
             }}
           >
-            <div
-              style={{
-                fontSize: 11,
-                color: "var(--text-muted)",
-                textAlign: "center",
-                lineHeight: 1.6,
-              }}
-            >
-              Select a skill and run a test to see results here
-            </div>
+            <EmptyState
+              icon="skill"
+              title="Results will appear here"
+              description="Run a test to see the response, latency, and status."
+            />
           </div>
         </div>
       </div>

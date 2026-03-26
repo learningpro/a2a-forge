@@ -6,6 +6,7 @@ import { AgentListItem } from "../agent/AgentListItem";
 import { AddAgentDialog } from "../agent/AddAgentDialog";
 import { SettingsModal } from "../settings/SettingsModal";
 import { staggerIn } from "../../lib/animations";
+import { EmptyState } from "../shared/EmptyState";
 
 export function Sidebar() {
   const sidebarCollapsed = useUiStore((s) => s.sidebarCollapsed);
@@ -146,38 +147,12 @@ export function Sidebar() {
         }}
       >
         {agents.length === 0 && !sidebarCollapsed && (
-          <div
-            style={{
-              padding: "20px 12px",
-              textAlign: "center",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: 8,
-            }}
-          >
-            <div style={{ fontSize: 11, color: "var(--text-muted)", lineHeight: 1.5 }}>
-              Get started by adding your first A2A agent
-            </div>
-            <button
-              onClick={() => setShowAddDialog(true)}
-              style={{
-                fontSize: 11,
-                padding: "6px 16px",
-                background: "var(--bg-info)",
-                border: "0.5px solid var(--border-info)",
-                borderRadius: "var(--radius-md)",
-                color: "var(--text-info)",
-                cursor: "pointer",
-                fontFamily: "inherit",
-                lineHeight: 1.4,
-                minHeight: 32,
-                transition: "background var(--duration-normal), border-color var(--duration-normal)",
-              }}
-            >
-              + Add agent
-            </button>
-          </div>
+          <EmptyState
+            icon="agent"
+            title="No agents yet"
+            description="Add your first A2A agent to get started."
+            action={{ label: "+ Add agent", onClick: () => setShowAddDialog(true) }}
+          />
         )}
         {agents.map((agent) => (
           <AgentListItem

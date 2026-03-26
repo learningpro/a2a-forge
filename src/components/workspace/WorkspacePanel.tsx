@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useWorkspaceAdvancedStore } from "../../stores/workspaceAdvancedStore";
 import { useWorkspaceStore } from "../../stores/workspaceStore";
 import { useAgentStore } from "../../stores/agentStore";
+import { EmptyState } from "../shared/EmptyState";
 
 type WsTab = "env" | "chains" | "diff" | "export";
 
@@ -79,9 +80,11 @@ function EnvVarsTab({ workspaceId }: { workspaceId: string }) {
         </div>
       </div>
       {envVars.length === 0 && (
-        <div style={{ padding: 16, textAlign: "center", color: "var(--text-muted)", fontSize: 11 }}>
-          No environment variables. Add variables to use {"{{VAR_NAME}}"} substitution in request chains.
-        </div>
+        <EmptyState
+          icon="variable"
+          title="No environment variables"
+          description="Add variables to use {{VAR_NAME}} substitution in request chains."
+        />
       )}
       {envVars.map((v) => (
         <div key={v.id} style={{

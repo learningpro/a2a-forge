@@ -3,6 +3,7 @@ import { useAgentStore } from "../../stores/agentStore";
 import { useTestStore } from "../../stores/testStore";
 import type { AgentSkill } from "../../bindings";
 import { AgentHeadersDialog } from "../agent/AgentHeadersDialog";
+import { EmptyState } from "../shared/EmptyState";
 
 interface SkillPanelProps {
   width: number;
@@ -354,27 +355,17 @@ export function SkillPanel({ width }: SkillPanelProps) {
         }}
       >
         {!selectedAgent ? (
-          <div
-            style={{
-              fontSize: 11,
-              color: "var(--text-muted)",
-              textAlign: "center",
-              padding: "20px 10px",
-            }}
-          >
-            Select an agent to browse skills
-          </div>
+          <EmptyState
+            icon="skill"
+            title="No agent selected"
+            description="Select an agent from the sidebar to browse its skills."
+          />
         ) : filteredSkills.length === 0 ? (
-          <div
-            style={{
-              fontSize: 11,
-              color: "var(--text-muted)",
-              textAlign: "center",
-              padding: "20px 10px",
-            }}
-          >
-            No skills match your search
-          </div>
+          <EmptyState
+            icon="search"
+            title="No skills found"
+            description="Try a different search term or filter."
+          />
         ) : (
           filteredSkills.map((skill) => {
               const execKey = selectedAgentId ? `${selectedAgentId}:${skill.id}` : "";

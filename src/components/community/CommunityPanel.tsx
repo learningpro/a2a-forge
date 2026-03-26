@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useCommunityStore } from "../../stores/communityStore";
 import { useAgentStore } from "../../stores/agentStore";
 import { useWorkspaceStore } from "../../stores/workspaceStore";
+import { EmptyState } from "../shared/EmptyState";
 
 type CommunityTab = "directory" | "favorites" | "health";
 
@@ -105,9 +106,11 @@ function DirectoryTab() {
 
       {/* Community list */}
       {communityAgents.length === 0 && (
-        <div style={{ padding: 20, textAlign: "center", color: "var(--text-muted)", fontSize: 11 }}>
-          No community agents yet. Share your agents to build the directory.
-        </div>
+        <EmptyState
+          icon="community"
+          title="No community agents yet"
+          description="Share your agents to build the directory and discover others."
+        />
       )}
       {communityAgents.map((ca) => {
         const tags: string[] = (() => { try { return JSON.parse(ca.tags); } catch { return []; } })();

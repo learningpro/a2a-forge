@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useProxyStore } from "../../stores/proxyStore";
 import { useWorkspaceStore } from "../../stores/workspaceStore";
+import { EmptyState } from "../shared/EmptyState";
 
 type ProxyTab = "rules" | "recording" | "traffic";
 
@@ -188,9 +189,12 @@ function RulesTab({ workspaceId, rules }: { workspaceId: string; rules: import("
       )}
 
       {rules.length === 0 && !showCreate && (
-        <div style={{ padding: 16, textAlign: "center", color: "var(--text-muted)", fontSize: 11 }}>
-          No intercept rules. Create one to modify, delay, or mock requests.
-        </div>
+        <EmptyState
+          icon="proxy"
+          title="No intercept rules"
+          description="Create a rule to modify, delay, or mock requests passing through the proxy."
+          action={{ label: "+ New rule", onClick: () => setShowCreate(true) }}
+        />
       )}
 
       {rules.map((rule) => (
