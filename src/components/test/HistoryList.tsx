@@ -130,8 +130,8 @@ export function HistoryList({ agentId, onSelectHistory }: HistoryListProps) {
           >
             <span
               style={{
-                width: 5,
-                height: 5,
+                width: 6,
+                height: 6,
                 borderRadius: "50%",
                 background: statusDotColor[entry.status] ?? "var(--text-muted)",
                 flexShrink: 0,

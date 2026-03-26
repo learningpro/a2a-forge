@@ -193,11 +193,11 @@ export function SuiteEditor({ suiteId }: SuiteEditorProps) {
               </div>
               <div style={{ display: "flex", gap: 2, flexShrink: 0 }}>
                 <button onClick={() => handleMoveStep(index, -1)} disabled={index === 0}
-                  style={{ padding: "2px 4px", fontSize: 9, background: "transparent", border: "none", color: "var(--text-muted)", cursor: index === 0 ? "default" : "pointer", opacity: index === 0 ? 0.3 : 0.7 }}>
+                  style={{ padding: "2px 4px", fontSize: 11, background: "transparent", border: "none", color: "var(--text-muted)", cursor: index === 0 ? "default" : "pointer", opacity: index === 0 ? 0.3 : 0.7, transition: "opacity var(--duration-fast)" }}>
                   ▲
                 </button>
                 <button onClick={() => handleMoveStep(index, 1)} disabled={index === steps.length - 1}
-                  style={{ padding: "2px 4px", fontSize: 9, background: "transparent", border: "none", color: "var(--text-muted)", cursor: index === steps.length - 1 ? "default" : "pointer", opacity: index === steps.length - 1 ? 0.3 : 0.7 }}>
+                  style={{ padding: "2px 4px", fontSize: 11, background: "transparent", border: "none", color: "var(--text-muted)", cursor: index === steps.length - 1 ? "default" : "pointer", opacity: index === steps.length - 1 ? 0.3 : 0.7, transition: "opacity var(--duration-fast)" }}>
                   ▼
                 </button>
                 <button onClick={() => handleEditStep(step)}

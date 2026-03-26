@@ -94,7 +94,7 @@ export function AgentHeadersDialog({
           background: "var(--bg-secondary)",
           border: "0.5px solid var(--border-subtle)",
           borderRadius: "var(--radius-lg, 10px)",
-          padding: 16,
+          padding: 20,
           width: 420,
           maxWidth: "90vw",
           maxHeight: "80vh",

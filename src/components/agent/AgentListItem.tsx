@@ -90,8 +90,8 @@ export function AgentListItem({ agent, isActive, onClick }: AgentListItemProps) 
       {/* Status dot */}
       <div
         style={{
-          width: 8,
-          height: 8,
+          width: 6,
+          height: 6,
           borderRadius: "50%",
           flexShrink: 0,
           background: dotColor,

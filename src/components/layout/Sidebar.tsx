@@ -112,7 +112,7 @@ export function Sidebar() {
                 alignItems: "center",
                 gap: 6,
                 fontFamily: "inherit",
-                transition: "all 0.15s",
+                transition: "all var(--duration-normal)",
               }}
               onMouseEnter={(e) => {
                 const el = e.currentTarget;

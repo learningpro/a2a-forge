@@ -141,7 +141,7 @@ export function AgentContextMenu({
         style={buttonBase}
         title="Delete agent"
         onMouseEnter={(e) => {
-          e.currentTarget.style.color = "#e24b4a";
+          e.currentTarget.style.color = "var(--dot-error)";
         }}
         onMouseLeave={(e) => {
           e.currentTarget.style.color = "var(--text-muted)";

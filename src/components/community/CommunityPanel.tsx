@@ -28,7 +28,10 @@ export function CommunityPanel() {
               background: "transparent", border: "none",
               borderBottom: activeTab === tab ? "2px solid var(--text-primary)" : "2px solid transparent",
               cursor: "pointer", textTransform: "capitalize",
+              transition: "color var(--duration-fast), border-color var(--duration-fast)",
             }}
+            onMouseEnter={(e) => { if (activeTab !== tab) e.currentTarget.style.color = "var(--text-secondary)"; }}
+            onMouseLeave={(e) => { if (activeTab !== tab) e.currentTarget.style.color = "var(--text-muted)"; }}
           >
             {tab}
           </button>
@@ -299,7 +302,7 @@ function HealthDot({ status }: { status?: string }) {
     : "var(--text-muted)";
   return (
     <span style={{
-      display: "inline-block", width: 8, height: 8, borderRadius: "50%",
+      display: "inline-block", width: 6, height: 6, borderRadius: "50%",
       background: color, flexShrink: 0,
     }} />
   );

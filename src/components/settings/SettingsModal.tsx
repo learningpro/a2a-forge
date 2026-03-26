@@ -145,7 +145,7 @@ export function SettingsModal({ isOpen, onClose, cardId }: SettingsModalProps) {
         style={{
           background: "var(--bg-secondary)",
           borderRadius: "var(--radius-lg)",
-          padding: 24,
+          padding: 20,
           width: 480,
           maxWidth: "90vw",
           maxHeight: "80vh",

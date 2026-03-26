@@ -24,7 +24,11 @@ export function WorkspacePanel() {
             background: "transparent", border: "none",
             borderBottom: activeTab === tab ? "2px solid var(--text-primary)" : "2px solid transparent",
             cursor: "pointer", textTransform: "capitalize",
-          }}>
+            transition: "color var(--duration-fast), border-color var(--duration-fast)",
+          }}
+          onMouseEnter={(e) => { if (activeTab !== tab) e.currentTarget.style.color = "var(--text-secondary)"; }}
+          onMouseLeave={(e) => { if (activeTab !== tab) e.currentTarget.style.color = "var(--text-muted)"; }}
+          >
             {tab === "env" ? "Variables" : tab === "chains" ? "Chains" : tab === "diff" ? "Diff" : "Export"}
           </button>
         ))}

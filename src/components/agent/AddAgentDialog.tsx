@@ -1,7 +1,8 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { commands, type AgentCard } from "../../bindings";
 import { unwrap } from "../../lib/tauri-helpers";
 import { useAgentStore } from "../../stores/agentStore";
+import { fadeBackdrop, slideInRight } from "../../lib/animations";
 
 type PreviewState =
   | { status: "idle" }
@@ -81,7 +82,30 @@ export function AddAgentDialog({ open, onClose }: AddAgentDialogProps) {
   const addDisabled = preview.status !== "success" || isAdding;
 
   return (
+    <AddAgentDialogInner
+      url={url} setUrl={setUrl} nickname={nickname} setNickname={setNickname}
+      preview={preview} addDisabled={addDisabled}
+      handleAdd={handleAdd} handleCancel={handleCancel}
+    />
+  );
+}
+
+function AddAgentDialogInner({ url, setUrl, nickname, setNickname, preview, addDisabled, handleAdd, handleCancel }: {
+  url: string; setUrl: (v: string) => void; nickname: string; setNickname: (v: string) => void;
+  preview: PreviewState; addDisabled: boolean;
+  handleAdd: () => void; handleCancel: () => void;
+}) {
+  const backdropRef = useRef<HTMLDivElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    fadeBackdrop(backdropRef.current);
+    slideInRight(dialogRef.current);
+  }, []);
+
+  return (
     <div
+      ref={backdropRef}
       style={{
         position: "fixed",
         inset: 0,
@@ -90,17 +114,18 @@ export function AddAgentDialog({ open, onClose }: AddAgentDialogProps) {
         alignItems: "center",
         justifyContent: "center",
         zIndex: 1000,
+        visibility: "hidden",
       }}
       onClick={(e) => {
         if (e.target === e.currentTarget) handleCancel();
       }}
     >
-      <style>{`@keyframes a2a-spin { to { transform: rotate(360deg); } }`}</style>
       <div
+        ref={dialogRef}
         style={{
           background: "var(--bg-secondary)",
           borderRadius: "var(--radius-lg)",
-          padding: 16,
+          padding: 20,
           width: 420,
           maxWidth: "90vw",
           border: "0.5px solid var(--border-subtle)",

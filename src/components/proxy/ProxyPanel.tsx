@@ -101,7 +101,10 @@ export function ProxyPanel() {
               background: "transparent", border: "none",
               borderBottom: activeTab === tab ? "2px solid var(--text-primary)" : "2px solid transparent",
               cursor: "pointer", textTransform: "capitalize",
+              transition: "color var(--duration-fast), border-color var(--duration-fast)",
             }}
+            onMouseEnter={(e) => { if (activeTab !== tab) e.currentTarget.style.color = "var(--text-secondary)"; }}
+            onMouseLeave={(e) => { if (activeTab !== tab) e.currentTarget.style.color = "var(--text-muted)"; }}
           >
             {tab}
           </button>
@@ -240,7 +243,7 @@ function RecordingTab({ workspaceId, recordings, isRecording }: { workspaceId: s
       <div style={{ padding: "8px 12px", borderBottom: "0.5px solid var(--border-subtle)" }}>
         {isRecording ? (
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <span style={{ display: "inline-block", width: 8, height: 8, borderRadius: "50%", background: "#ef4444", animation: "pulse 1s infinite" }} />
+            <span style={{ display: "inline-block", width: 8, height: 8, borderRadius: "50%", background: "var(--dot-error)", animation: "pulse 1s infinite" }} />
             <span style={{ fontSize: 11, color: "var(--text-primary)" }}>Recording...</span>
             <button onClick={handleStop} style={{
               padding: "3px 10px", fontSize: 10, background: "transparent",

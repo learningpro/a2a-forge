@@ -56,7 +56,10 @@ function TabButton({ label, active, onClick }: { label: string; active: boolean;
         borderBottom: active ? "2px solid var(--text-primary)" : "2px solid transparent",
         cursor: "pointer",
         fontFamily: "inherit",
+        transition: "color var(--duration-fast), border-color var(--duration-fast)",
       }}
+      onMouseEnter={(e) => { if (!active) e.currentTarget.style.color = "var(--text-secondary)"; }}
+      onMouseLeave={(e) => { if (!active) e.currentTarget.style.color = "var(--text-muted)"; }}
     >
       {label}
     </button>

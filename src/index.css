@@ -5,6 +5,10 @@
   50% { opacity: 0.4; }
 }
 
+@keyframes a2a-spin {
+  to { transform: rotate(360deg); }
+}
+
 @theme {
   --font-sans: "Inter", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", monospace;
@@ -34,6 +38,15 @@
   --dot-online: #1D9E75;
   --dot-warning: #EF9F27;
   --dot-error: #E24B4A;
+  --bg-error: #fde8e8;
+  --text-error: #dc2626;
+  --border-error: rgba(220,38,38,0.3);
+  --duration-fast: 0.1s;
+  --duration-normal: 0.15s;
+  --duration-slow: 0.3s;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.06);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.1);
 }
 
 /* Dark mode -- system preference */
@@ -56,6 +69,12 @@
     --text-info: #85b7eb;
     --border-info: rgba(133,183,235,0.3);
     --border-success: rgba(93,202,165,0.3);
+    --bg-error: #3b1111;
+    --text-error: #f87171;
+    --border-error: rgba(248,113,113,0.3);
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.15);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.25);
+    --shadow-lg: 0 8px 32px rgba(0,0,0,0.4);
   }
 }
 
@@ -78,6 +97,12 @@
   --text-info: #85b7eb;
   --border-info: rgba(133,183,235,0.3);
   --border-success: rgba(93,202,165,0.3);
+  --bg-error: #3b1111;
+  --text-error: #f87171;
+  --border-error: rgba(248,113,113,0.3);
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.15);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.25);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.4);
 }
 
 /* Bundled fonts */
@@ -100,6 +125,30 @@ body {
   color: var(--text-primary);
   min-height: 100vh;
   overflow: hidden;
+}
+
+/* Focus-visible ring for keyboard navigation */
+:focus-visible {
+  outline: 2px solid var(--text-info);
+  outline-offset: 1px;
+}
+input:focus-visible, textarea:focus-visible, select:focus-visible {
+  outline: none;
+  border-color: var(--border-info) !important;
+  box-shadow: 0 0 0 2px var(--bg-info);
+}
+
+/* Button press feedback */
+button:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+/* Respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 /* JSON Tree syntax colors — matches mockup exactly */
