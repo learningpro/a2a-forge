@@ -3,3 +3,12 @@ dist/
 node_modules/
 src-tauri/target/
 .gstack/
+.codebuddy/
+.continue/
+.iflow/
+.kiro/
+.qoder/
+.trae/
+conversations/
+skills/
+skills-lock.json
