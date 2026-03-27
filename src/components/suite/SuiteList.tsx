@@ -2,6 +2,7 @@ import { useState, useCallback } from "react";
 import { useSuiteStore } from "../../stores/suiteStore";
 import type { Suite } from "../../lib/suite-commands";
 import { EmptyState } from "../shared/EmptyState";
+import { useT } from "../../lib/i18n";
 
 interface SuiteListProps {
   workspaceId: string;
@@ -9,6 +10,7 @@ interface SuiteListProps {
 }
 
 export function SuiteList({ workspaceId, agentId }: SuiteListProps) {
+  const { t } = useT();
   const suites = useSuiteStore((s) => s.suites);
   const selectedSuiteId = useSuiteStore((s) => s.selectedSuiteId);
   const isLoading = useSuiteStore((s) => s.isLoading);
@@ -111,9 +113,9 @@ export function SuiteList({ workspaceId, agentId }: SuiteListProps) {
         {suites.length === 0 && !showCreate && (
           <EmptyState
             icon="suite"
-            title="No test suites yet"
-            description="Create a suite to group test cases into automated sequences."
-            action={{ label: "+ New suite", onClick: () => setShowCreate(true) }}
+            title={t("empty.noSuites")}
+            description={t("empty.noSuitesDesc")}
+            action={{ label: t("action.newSuite"), onClick: () => setShowCreate(true) }}
           />
         )}
         {suites.map((suite) => (

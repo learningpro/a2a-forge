@@ -3,6 +3,7 @@ import { useWorkspaceAdvancedStore } from "../../stores/workspaceAdvancedStore";
 import { useWorkspaceStore } from "../../stores/workspaceStore";
 import { useAgentStore } from "../../stores/agentStore";
 import { EmptyState } from "../shared/EmptyState";
+import { useT } from "../../lib/i18n";
 
 type WsTab = "env" | "chains" | "diff" | "export";
 
@@ -50,6 +51,7 @@ function EnvVarsTab({ workspaceId }: { workspaceId: string }) {
   const [name, setName] = useState("");
   const [value, setValue] = useState("");
   const [isSecret, setIsSecret] = useState(false);
+  const { t } = useT();
 
   const handleAdd = useCallback(async () => {
     if (!name.trim()) return;
@@ -82,8 +84,8 @@ function EnvVarsTab({ workspaceId }: { workspaceId: string }) {
       {envVars.length === 0 && (
         <EmptyState
           icon="variable"
-          title="No environment variables"
-          description="Add variables to use {{VAR_NAME}} substitution in request chains."
+          title={t("empty.noEnvVars")}
+          description={t("empty.noEnvVarsDesc")}
         />
       )}
       {envVars.map((v) => (

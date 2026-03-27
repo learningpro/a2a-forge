@@ -6,11 +6,13 @@ import { AgentListItem } from "../agent/AgentListItem";
 import { AddAgentDialog } from "../agent/AddAgentDialog";
 import { staggerIn } from "../../lib/animations";
 import { EmptyState } from "../shared/EmptyState";
+import { useT } from "../../lib/i18n";
 
 export function Sidebar() {
   const sidebarCollapsed = useUiStore((s) => s.sidebarCollapsed);
   const setSidebarCollapsed = useUiStore((s) => s.setSidebarCollapsed);
   const sidebarWidth = useUiStore((s) => s.sidebarWidth);
+  const { t } = useT();
 
   const agents = useAgentStore((s) => s.agents);
   const selectedAgentId = useAgentStore((s) => s.selectedAgentId);
@@ -93,11 +95,11 @@ export function Sidebar() {
                 marginBottom: 8,
               }}
             >
-              Agents
+              {t("sidebar.agents")}
             </div>
             <button
               onClick={() => setShowAddDialog(true)}
-              title="Add agent (Cmd+N)"
+              title={t("sidebar.addAgentCard")}
               style={{
                 width: "100%",
                 padding: "6px 10px",
@@ -126,7 +128,7 @@ export function Sidebar() {
                 el.style.borderColor = "var(--border-default)";
               }}
             >
-              <span style={{ fontSize: 14, lineHeight: 1 }}>+</span> Add agent card
+              <span style={{ fontSize: 14, lineHeight: 1 }}>+</span> {t("sidebar.addAgentCard")}
             </button>
           </>
         )}
@@ -147,9 +149,9 @@ export function Sidebar() {
         {agents.length === 0 && !sidebarCollapsed && (
           <EmptyState
             icon="agent"
-            title="No agents yet"
-            description="Add your first A2A agent to get started."
-            action={{ label: "+ Add agent", onClick: () => setShowAddDialog(true) }}
+            title={t("empty.noAgents")}
+            description={t("empty.noAgentsDesc")}
+            action={{ label: t("sidebar.addAgent"), onClick: () => setShowAddDialog(true) }}
           />
         )}
         {agents.map((agent) => (
@@ -183,11 +185,11 @@ export function Sidebar() {
                 justifyContent: "space-between",
               }}
             >
-              <span>Workspace</span>
+              <span>{t("sidebar.workspace")}</span>
               <div style={{ display: "flex", gap: 4 }}>
                 <button
                   onClick={handleAddWorkspace}
-                  title="Create workspace"
+                  title={t("sidebar.createWorkspace")}
                   style={{
                     background: "transparent",
                     border: "none",
@@ -264,7 +266,7 @@ export function Sidebar() {
           onMouseLeave={(e) => {
             e.currentTarget.style.color = "var(--text-muted)";
           }}
-          title={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+          title={sidebarCollapsed ? t("sidebar.expand") : t("sidebar.collapse")}
         >
           {sidebarCollapsed ? "\u25B6" : "\u25C0"}
         </button>

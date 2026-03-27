@@ -5,12 +5,14 @@ import { ProxyPanel } from "../proxy/ProxyPanel";
 import { CommunityPanel } from "../community/CommunityPanel";
 import { WorkspacePanel } from "../workspace/WorkspacePanel";
 import { tabSwitch } from "../../lib/animations";
+import { useT } from "../../lib/i18n";
 
 type Tab = "test" | "suites" | "proxy" | "community" | "workspace";
 
 export function TestPanel() {
   const [activeTab, setActiveTab] = useState<Tab>("test");
   const contentRef = useRef<HTMLDivElement>(null);
+  const { t } = useT();
 
   useEffect(() => {
     if (contentRef.current) tabSwitch(contentRef.current);
@@ -23,11 +25,11 @@ export function TestPanel() {
         display: "flex", gap: 0, borderBottom: "0.5px solid var(--border-subtle)",
         background: "var(--bg-primary)", flexShrink: 0,
       }}>
-        <TabButton label="Test" active={activeTab === "test"} onClick={() => setActiveTab("test")} />
-        <TabButton label="Suites" active={activeTab === "suites"} onClick={() => setActiveTab("suites")} />
-        <TabButton label="Proxy" active={activeTab === "proxy"} onClick={() => setActiveTab("proxy")} />
-        <TabButton label="Community" active={activeTab === "community"} onClick={() => setActiveTab("community")} />
-        <TabButton label="Workspace" active={activeTab === "workspace"} onClick={() => setActiveTab("workspace")} />
+        <TabButton label={t("tab.test")} active={activeTab === "test"} onClick={() => setActiveTab("test")} />
+        <TabButton label={t("tab.suites")} active={activeTab === "suites"} onClick={() => setActiveTab("suites")} />
+        <TabButton label={t("tab.proxy")} active={activeTab === "proxy"} onClick={() => setActiveTab("proxy")} />
+        <TabButton label={t("tab.community")} active={activeTab === "community"} onClick={() => setActiveTab("community")} />
+        <TabButton label={t("tab.workspace")} active={activeTab === "workspace"} onClick={() => setActiveTab("workspace")} />
       </div>
 
       {/* Tab content */}

@@ -17,6 +17,7 @@ import { HistoryList } from "./HistoryList";
 import { SavedTestsList } from "./SavedTestsList";
 
 import { EmptyState } from "../shared/EmptyState";
+import { useT } from "../../lib/i18n";
 
 export function TestPanel() {
   const agents = useAgentStore((s) => s.agents);
@@ -39,6 +40,7 @@ export function TestPanel() {
 
   const [curlCopied, setCurlCopied] = useState(false);
   const [historyRefreshKey, setHistoryRefreshKey] = useState(0);
+  const { t } = useT();
 
   // Find selected skill
   const skill: AgentSkill | null =
@@ -249,7 +251,7 @@ export function TestPanel() {
               fontFamily: "var(--font-mono, 'JetBrains Mono', monospace)",
             }}
           >
-            No skill selected
+            {t("skill.noSkillSelected")}
           </div>
         </div>
 
@@ -266,8 +268,8 @@ export function TestPanel() {
           >
             <EmptyState
               icon="test"
-              title="Ready to test"
-              description="Pick an agent from the sidebar, then select a skill to start sending requests."
+              title={t("empty.readyToTest")}
+              description={t("empty.readyToTestDesc")}
             />
           </div>
           <div
@@ -280,8 +282,8 @@ export function TestPanel() {
           >
             <EmptyState
               icon="skill"
-              title="Results will appear here"
-              description="Run a test to see the response, latency, and status."
+              title={t("empty.resultsHere")}
+              description={t("empty.resultsHereDesc")}
             />
           </div>
         </div>

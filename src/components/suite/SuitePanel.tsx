@@ -5,10 +5,12 @@ import { SuiteList } from "./SuiteList";
 import { SuiteEditor } from "./SuiteEditor";
 import { SuiteRunViewer } from "./SuiteRunViewer";
 import { EmptyState } from "../shared/EmptyState";
+import { useT } from "../../lib/i18n";
 
 export function SuitePanel() {
   const activeWorkspaceId = useWorkspaceStore((s) => s.activeWorkspaceId);
   const selectedSuiteId = useSuiteStore((s) => s.selectedSuiteId);
+  const { t } = useT();
 
   useEffect(() => {
     useSuiteStore.getState().loadSuites(activeWorkspaceId);
@@ -43,8 +45,8 @@ export function SuitePanel() {
           }}>
             <EmptyState
               icon="suite"
-              title="Select a test suite"
-              description="Pick a suite from the list or create a new one to start automating tests."
+              title={t("empty.selectSuite")}
+              description={t("empty.selectSuiteDesc")}
             />
           </div>
         )}

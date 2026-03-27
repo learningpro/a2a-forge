@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useProxyStore } from "../../stores/proxyStore";
 import { useWorkspaceStore } from "../../stores/workspaceStore";
 import { EmptyState } from "../shared/EmptyState";
+import { useT } from "../../lib/i18n";
 
 type ProxyTab = "rules" | "recording" | "traffic";
 
@@ -130,6 +131,7 @@ function RulesTab({ workspaceId, rules }: { workspaceId: string; rules: import("
   const [matchValue, setMatchValue] = useState("");
   const [actionType, setActionType] = useState("delay");
   const [actionJson, setActionJson] = useState('{"delay_ms": 1000}');
+  const { t } = useT();
 
   const handleCreate = useCallback(async () => {
     if (!name.trim()) return;
@@ -191,9 +193,9 @@ function RulesTab({ workspaceId, rules }: { workspaceId: string; rules: import("
       {rules.length === 0 && !showCreate && (
         <EmptyState
           icon="proxy"
-          title="No intercept rules"
-          description="Create a rule to modify, delay, or mock requests passing through the proxy."
-          action={{ label: "+ New rule", onClick: () => setShowCreate(true) }}
+          title={t("empty.noRules")}
+          description={t("empty.noRulesDesc")}
+          action={{ label: t("action.newRule"), onClick: () => setShowCreate(true) }}
         />
       )}
 

@@ -4,6 +4,7 @@ import { useTestStore } from "../../stores/testStore";
 import type { AgentSkill } from "../../bindings";
 import { AgentHeadersDialog } from "../agent/AgentHeadersDialog";
 import { EmptyState } from "../shared/EmptyState";
+import { useT } from "../../lib/i18n";
 
 interface SkillPanelProps {
   width: number;
@@ -165,6 +166,7 @@ export function SkillPanel({ width }: SkillPanelProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState<ModeFilter>("all");
   const [headersOpen, setHeadersOpen] = useState(false);
+  const { t } = useT();
 
   const agents = useAgentStore((s) => s.agents);
   const selectedAgentId = useAgentStore((s) => s.selectedAgentId);
@@ -290,7 +292,7 @@ export function SkillPanel({ width }: SkillPanelProps) {
           </div>
         )}
         <input
-          placeholder="Search skills..."
+          placeholder={t("skill.searchPlaceholder")}
           disabled={!selectedAgent}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
@@ -357,14 +359,14 @@ export function SkillPanel({ width }: SkillPanelProps) {
         {!selectedAgent ? (
           <EmptyState
             icon="skill"
-            title="No agent selected"
-            description="Select an agent from the sidebar to browse its skills."
+            title={t("empty.noAgentSelected")}
+            description={t("empty.noAgentSelectedDesc")}
           />
         ) : filteredSkills.length === 0 ? (
           <EmptyState
             icon="search"
-            title="No skills found"
-            description="Try a different search term or filter."
+            title={t("empty.noSkillsFound")}
+            description={t("empty.noSkillsFoundDesc")}
           />
         ) : (
           filteredSkills.map((skill) => {

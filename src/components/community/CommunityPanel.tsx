@@ -3,6 +3,7 @@ import { useCommunityStore } from "../../stores/communityStore";
 import { useAgentStore } from "../../stores/agentStore";
 import { useWorkspaceStore } from "../../stores/workspaceStore";
 import { EmptyState } from "../shared/EmptyState";
+import { useT } from "../../lib/i18n";
 
 type CommunityTab = "directory" | "favorites" | "health";
 
@@ -53,6 +54,7 @@ function DirectoryTab() {
   const communityAgents = useCommunityStore((s) => s.communityAgents);
   const agents = useAgentStore((s) => s.agents);
   const [search, setSearch] = useState("");
+  const { t } = useT();
 
   const handleSearch = useCallback(() => {
     useCommunityStore.getState().searchCommunity(search || undefined);
@@ -108,8 +110,8 @@ function DirectoryTab() {
       {communityAgents.length === 0 && (
         <EmptyState
           icon="community"
-          title="No community agents yet"
-          description="Share your agents to build the directory and discover others."
+          title={t("empty.noCommunity")}
+          description={t("empty.noCommunityDesc")}
         />
       )}
       {communityAgents.map((ca) => {
