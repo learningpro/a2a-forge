@@ -5,7 +5,7 @@ const translations: Record<string, { en: string; zh: string }> = {
   // Sidebar
   "sidebar.agents": { en: "Agents", zh: "代理" },
   "sidebar.workspace": { en: "Workspace", zh: "工作区" },
-  "sidebar.addAgentCard": { en: "+ Add agent card", zh: "+ 添加代理卡片" },
+  "sidebar.addAgentCard": { en: "Add agent card", zh: "添加代理卡片" },
   "sidebar.addAgent": { en: "+ Add agent", zh: "+ 添加代理" },
   "sidebar.createWorkspace": { en: "Create workspace", zh: "创建工作区" },
   "sidebar.collapse": { en: "Collapse sidebar", zh: "收起侧栏" },
