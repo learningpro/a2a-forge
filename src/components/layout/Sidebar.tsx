@@ -76,10 +76,11 @@ export function Sidebar() {
         overflow: "hidden",
       }}
     >
-      {/* Header */}
+      {/* Header — extra top padding for macOS traffic lights */}
       <div
+        data-tauri-drag-region
         style={{
-          padding: sidebarCollapsed ? "14px 8px 10px" : "14px 14px 10px",
+          padding: sidebarCollapsed ? "38px 8px 10px" : "38px 14px 10px",
           borderBottom: "0.5px solid var(--border-subtle)",
         }}
       >

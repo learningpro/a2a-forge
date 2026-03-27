@@ -224,7 +224,7 @@ export function SkillPanel({ width }: SkillPanelProps) {
       {/* Header */}
       <div
         style={{
-          padding: "12px 14px 8px",
+          padding: "36px 14px 8px",
           borderBottom: "0.5px solid var(--border-subtle)",
         }}
       >

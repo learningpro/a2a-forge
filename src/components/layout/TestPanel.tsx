@@ -20,10 +20,10 @@ export function TestPanel() {
 
   return (
     <div style={{ flex: 1, display: "flex", flexDirection: "column", background: "var(--bg-primary)", minWidth: 0 }}>
-      {/* Tab bar */}
-      <div style={{
+      {/* Tab bar — extra top padding for macOS title bar overlay */}
+      <div data-tauri-drag-region style={{
         display: "flex", gap: 0, borderBottom: "0.5px solid var(--border-subtle)",
-        background: "var(--bg-primary)", flexShrink: 0,
+        background: "var(--bg-primary)", flexShrink: 0, paddingTop: 24,
       }}>
         <TabButton label={t("tab.test")} active={activeTab === "test"} onClick={() => setActiveTab("test")} />
         <TabButton label={t("tab.suites")} active={activeTab === "suites"} onClick={() => setActiveTab("suites")} />
