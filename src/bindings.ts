@@ -22,6 +22,22 @@ async saveSetting(key: string, value: string) : Promise<Result<null, AppError>> 
     else return { status: "error", error: e  as any };
 }
 },
+async getDataPath() : Promise<Result<string, AppError>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("get_data_path") };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async setDataPath(path: string) : Promise<Result<null, AppError>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("set_data_path", { path }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
 async fetchAgentCard(baseUrl: string) : Promise<Result<AgentCard, AppError>> {
     try {
     return { status: "ok", data: await TAURI_INVOKE("fetch_agent_card", { baseUrl }) };
@@ -181,6 +197,430 @@ async setActiveWorkspace(workspaceId: string) : Promise<Result<null, AppError>> 
     if(e instanceof Error) throw e;
     else return { status: "error", error: e  as any };
 }
+},
+async createSuite(name: string, description: string | null, agentId: string | null, workspaceId: string, runMode: string | null) : Promise<Result<Suite, AppError>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("create_suite", { name, description, agentId, workspaceId, runMode }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async updateSuite(id: string, name: string | null, description: string | null, runMode: string | null) : Promise<Result<null, AppError>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("update_suite", { id, name, description, runMode }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async deleteSuite(id: string) : Promise<Result<null, AppError>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("delete_suite", { id }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async listSuites(workspaceId: string, agentId: string | null) : Promise<Result<Suite[], AppError>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("list_suites", { workspaceId, agentId }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async getSuite(id: string) : Promise<Result<Suite, AppError>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("get_suite", { id }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async addStep(suiteId: string, name: string, agentId: string, skillName: string, requestJson: string, assertionsJson: string | null, timeoutMs: number | null) : Promise<Result<TestStep, AppError>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("add_step", { suiteId, name, agentId, skillName, requestJson, assertionsJson, timeoutMs }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async updateStep(id: string, name: string | null, requestJson: string | null, assertionsJson: string | null, timeoutMs: number | null) : Promise<Result<null, AppError>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("update_step", { id, name, requestJson, assertionsJson, timeoutMs }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async deleteStep(id: string) : Promise<Result<null, AppError>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("delete_step", { id }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async reorderSteps(suiteId: string, stepIds: string[]) : Promise<Result<null, AppError>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("reorder_steps", { suiteId, stepIds }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async listSteps(suiteId: string) : Promise<Result<TestStep[], AppError>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("list_steps", { suiteId }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async runTestSuite(suiteId: string) : Promise<Result<string, AppError>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("run_test_suite", { suiteId }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async getSuiteRun(runId: string) : Promise<Result<SuiteRunDetail, AppError>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("get_suite_run", { runId }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async listSuiteRuns(suiteId: string, limit: number | null) : Promise<Result<SuiteRun[], AppError>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("list_suite_runs", { suiteId, limit }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async exportReport(runId: string, format: string) : Promise<Result<string, AppError>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("export_report", { runId, format }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async startProxy(port: number | null, workspaceId: string) : Promise<Result<ProxyStatus, AppError>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("start_proxy", { port, workspaceId }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async stopProxy() : Promise<Result<null, AppError>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("stop_proxy") };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async getProxyStatus() : Promise<Result<ProxyStatus, AppError>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("get_proxy_status") };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async createRule(name: string, matchType: string, matchValue: string, actionType: string, actionJson: string, priority: number | null, workspaceId: string) : Promise<Result<InterceptRule, AppError>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("create_rule", { name, matchType, matchValue, actionType, actionJson, priority, workspaceId }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async updateRule(id: string, name: string | null, matchType: string | null, matchValue: string | null, actionType: string | null, actionJson: string | null, priority: number | null) : Promise<Result<null, AppError>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("update_rule", { id, name, matchType, matchValue, actionType, actionJson, priority }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async deleteRule(id: string) : Promise<Result<null, AppError>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("delete_rule", { id }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async listRules(workspaceId: string) : Promise<Result<InterceptRule[], AppError>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("list_rules", { workspaceId }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async toggleRule(id: string, enabled: boolean) : Promise<Result<null, AppError>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("toggle_rule", { id, enabled }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async startRecording(sessionName: string) : Promise<Result<null, AppError>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("start_recording", { sessionName }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async stopRecording() : Promise<Result<null, AppError>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("stop_recording") };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async listRecordings(workspaceId: string) : Promise<Result<RecordingSession[], AppError>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("list_recordings", { workspaceId }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async getRecording(sessionName: string, workspaceId: string) : Promise<Result<TrafficRecord[], AppError>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("get_recording", { sessionName, workspaceId }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async deleteRecording(sessionName: string, workspaceId: string) : Promise<Result<null, AppError>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("delete_recording", { sessionName, workspaceId }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async replayRecording(sessionName: string, workspaceId: string) : Promise<Result<TrafficRecord[], AppError>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("replay_recording", { sessionName, workspaceId }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async listCommunityAgents(search: string | null, tag: string | null) : Promise<Result<CommunityAgent[], AppError>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("list_community_agents", { search, tag }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async submitToCommunity(agentId: string) : Promise<Result<CommunityAgent, AppError>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("submit_to_community", { agentId }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async toggleFavorite(agentId: string, folder: string | null) : Promise<Result<boolean, AppError>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("toggle_favorite", { agentId, folder }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async listFavorites(folder: string | null) : Promise<Result<Favorite[], AppError>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("list_favorites", { folder }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async updateFavorite(id: string, folder: string | null, notes: string | null) : Promise<Result<null, AppError>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("update_favorite", { id, folder, notes }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async checkAgentHealth(agentId: string) : Promise<Result<HealthCheck, AppError>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("check_agent_health", { agentId }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async checkAllHealth(workspaceId: string) : Promise<Result<HealthCheck[], AppError>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("check_all_health", { workspaceId }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async listHealthChecks(agentId: string, limit: number | null) : Promise<Result<HealthCheck[], AppError>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("list_health_checks", { agentId, limit }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async exportTestSuite(suiteId: string) : Promise<Result<string, AppError>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("export_test_suite", { suiteId }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async importTestSuite(jsonData: string, agentId: string, workspaceId: string) : Promise<Result<string, AppError>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("import_test_suite", { jsonData, agentId, workspaceId }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async listEnvVars(workspaceId: string) : Promise<Result<EnvVariable[], AppError>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("list_env_vars", { workspaceId }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async setEnvVar(workspaceId: string, name: string, value: string, isSecret: boolean | null) : Promise<Result<EnvVariable, AppError>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("set_env_var", { workspaceId, name, value, isSecret }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async deleteEnvVar(id: string) : Promise<Result<null, AppError>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("delete_env_var", { id }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async createChain(name: string, description: string | null, workspaceId: string) : Promise<Result<RequestChain, AppError>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("create_chain", { name, description, workspaceId }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async updateChain(id: string, name: string | null, description: string | null) : Promise<Result<null, AppError>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("update_chain", { id, name, description }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async deleteChain(id: string) : Promise<Result<null, AppError>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("delete_chain", { id }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async listChains(workspaceId: string) : Promise<Result<RequestChain[], AppError>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("list_chains", { workspaceId }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async addChainStep(chainId: string, name: string, agentId: string, skillName: string, requestJson: string, extractJson: string | null, timeoutMs: number | null) : Promise<Result<ChainStep, AppError>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("add_chain_step", { chainId, name, agentId, skillName, requestJson, extractJson, timeoutMs }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async updateChainStep(id: string, name: string | null, requestJson: string | null, extractJson: string | null, timeoutMs: number | null) : Promise<Result<null, AppError>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("update_chain_step", { id, name, requestJson, extractJson, timeoutMs }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async deleteChainStep(id: string) : Promise<Result<null, AppError>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("delete_chain_step", { id }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async listChainSteps(chainId: string) : Promise<Result<ChainStep[], AppError>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("list_chain_steps", { chainId }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async runChain(chainId: string) : Promise<Result<ChainRunResult, AppError>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("run_chain", { chainId }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async exportWorkspace(workspaceId: string) : Promise<Result<string, AppError>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("export_workspace", { workspaceId }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async importWorkspace(jsonData: string) : Promise<Result<string, AppError>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("import_workspace", { jsonData }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async diffResponses(responseA: string, responseB: string) : Promise<Result<DiffResult, AppError>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("diff_responses", { responseA, responseB }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
 }
 }
 
@@ -200,10 +640,29 @@ export type AgentProvider = { organization?: string | null; url?: string | null 
 export type AgentRow = { id: string; url: string; nickname: string | null; card: AgentCard; lastFetchedAt: string; workspaceId: string }
 export type AgentSkill = { id: string; name: string; description?: string | null; tags?: string[] | null; inputModes?: string[] | null; outputModes?: string[] | null; examples?: JsonValue[] | null }
 export type AppError = { kind: "Database"; message: string } | { kind: "Http"; message: string } | { kind: "Io"; message: string } | { kind: "Serialization"; message: string } | { kind: "NotFound"; message: string } | { kind: "Credential"; message: string }
+export type ChainRunResult = { chainId: string; status: string; steps: ChainStepResult[]; variables: Partial<{ [key in string]: string }>; durationMs: number }
+export type ChainStep = { id: string; chainId: string; sortOrder: number; name: string; agentId: string; skillName: string; requestJson: string; extractJson: string; timeoutMs: number }
+export type ChainStepResult = { stepName: string; status: string; responseJson: string | null; extracted: Partial<{ [key in string]: string }>; durationMs: number; error: string | null }
+export type CommunityAgent = { id: string; name: string; description: string; url: string; cardJson: string; tags: string; author: string; stars: number; lastChecked: string; createdAt: string }
+export type DiffChange = { path: string; oldValue: string; newValue: string }
+export type DiffResult = { identical: boolean; added: string[]; removed: string[]; changed: DiffChange[] }
+export type EnvVariable = { id: string; workspaceId: string; name: string; value: string; isSecret: boolean; createdAt: string }
+export type Favorite = { id: string; agentId: string; folder: string; notes: string; createdAt: string }
+export type HealthCheck = { id: string; agentId: string; status: string; latencyMs: number | null; error: string | null; checkedAt: string }
+export type InterceptRule = { id: string; name: string; enabled: boolean; matchType: string; matchValue: string; actionType: string; actionJson: string; priority: number; workspaceId: string; createdAt: string }
 export type JsonValue = null | boolean | number | string | JsonValue[] | Partial<{ [key in string]: JsonValue }>
+export type ProxyStatus = { running: boolean; port: number; requestCount: number }
+export type RecordingSession = { name: string; count: number }
+export type RequestChain = { id: string; name: string; description: string; workspaceId: string; createdAt: string }
+export type StepResult = { id: string; runId: string; stepId: string; status: string; responseJson: string | null; assertionResultsJson: string | null; errorMessage: string | null; durationMs: number }
+export type Suite = { id: string; name: string; description: string; agentId: string | null; workspaceId: string; runMode: string; createdAt: string; updatedAt: string }
+export type SuiteRun = { id: string; suiteId: string; status: string; totalSteps: number; passedSteps: number; failedSteps: number; durationMs: number; startedAt: string; finishedAt: string | null }
+export type SuiteRunDetail = { run: SuiteRun; stepResults: StepResult[] }
 export type TAURI_CHANNEL<TSend> = null
 export type TaskEvent = { id: string | null; status: TaskStatus | null; artifact: JsonValue | null; raw: JsonValue }
 export type TaskStatus = { state: string; message: string | null }
+export type TestStep = { id: string; suiteId: string; sortOrder: number; name: string; agentId: string; skillName: string; requestJson: string; assertionsJson: string; timeoutMs: number }
+export type TrafficRecord = { id: string; sessionName: string; agentId: string | null; skillName: string | null; requestJson: string; responseJson: string | null; statusCode: number | null; durationMs: number | null; timestamp: string; workspaceId: string }
 
 /** tauri-specta globals **/
 

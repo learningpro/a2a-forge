@@ -6,6 +6,7 @@ import { useTestStore } from "./stores/testStore";
 import { useAgentStore } from "./stores/agentStore";
 import { generateCurlCommand } from "./lib/curl";
 import { buildTaskSendPayload, generateTaskId } from "./lib/a2a";
+import { I18nProvider } from "./lib/i18n";
 
 function App() {
   const [dbReady, setDbReady] = useState(false);
@@ -77,7 +78,7 @@ function App() {
     );
   }
 
-  return <AppShell />;
+  return <I18nProvider><AppShell /></I18nProvider>;
 }
 
 export default App;

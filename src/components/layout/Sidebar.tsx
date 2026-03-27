@@ -4,7 +4,6 @@ import { useAgentStore } from "../../stores/agentStore";
 import { useWorkspaceStore } from "../../stores/workspaceStore";
 import { AgentListItem } from "../agent/AgentListItem";
 import { AddAgentDialog } from "../agent/AddAgentDialog";
-import { SettingsModal } from "../settings/SettingsModal";
 import { staggerIn } from "../../lib/animations";
 import { EmptyState } from "../shared/EmptyState";
 
@@ -24,7 +23,6 @@ export function Sidebar() {
   const createWorkspace = useWorkspaceStore((s) => s.createWorkspace);
 
   const [showAddDialog, setShowAddDialog] = useState(false);
-  const [settingsOpen, setSettingsOpen] = useState(false);
   const agentListRef = useRef<HTMLDivElement>(null);
 
   // Animate agent list when agents change
@@ -217,36 +215,6 @@ export function Sidebar() {
                 >
                   +
                 </button>
-                <button
-                  onClick={() => setSettingsOpen(true)}
-                  title="Settings"
-                  style={{
-                    background: "transparent",
-                    border: "none",
-                    cursor: "pointer",
-                    color: "var(--text-muted)",
-                    fontSize: 14,
-                    padding: "4px 6px",
-                    lineHeight: 1,
-                    borderRadius: "var(--radius-md)",
-                    minWidth: 28,
-                    minHeight: 28,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    transition: "color var(--duration-normal), background var(--duration-normal)",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = "var(--bg-tertiary)";
-                    e.currentTarget.style.color = "var(--text-primary)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = "transparent";
-                    e.currentTarget.style.color = "var(--text-muted)";
-                  }}
-                >
-                  {"\u2699"}
-                </button>
               </div>
             </div>
             <select
@@ -306,12 +274,6 @@ export function Sidebar() {
       <AddAgentDialog
         open={showAddDialog}
         onClose={() => setShowAddDialog(false)}
-      />
-
-      {/* Settings Modal */}
-      <SettingsModal
-        isOpen={settingsOpen}
-        onClose={() => setSettingsOpen(false)}
       />
     </aside>
   );

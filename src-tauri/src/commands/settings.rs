@@ -46,3 +46,30 @@ pub async fn save_setting(
         .map_err(|e| AppError::Database(e.to_string()))?;
     Ok(())
 }
+
+#[tauri::command]
+#[specta::specta]
+pub async fn get_data_path(
+    app: tauri::AppHandle,
+) -> Result<String, AppError> {
+    let path = tauri::Manager::path(&app)
+        .app_data_dir()
+        .map_err(|e| AppError::Io(e.to_string()))?;
+    Ok(path.to_string_lossy().to_string())
+}
+
+#[tauri::command]
+#[specta::specta]
+pub async fn set_data_path(
+    path: String,
+    app: tauri::AppHandle,
+) -> Result<(), AppError> {
+    let pool = get_pool(&app).await?;
+    sqlx::query("INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)")
+        .bind("data_path")
+        .bind(&serde_json::to_string(&path).unwrap_or_else(|_| path))
+        .execute(&pool)
+        .await
+        .map_err(|e| AppError::Database(e.to_string()))?;
+    Ok(())
+}

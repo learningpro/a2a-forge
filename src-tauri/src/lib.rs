@@ -14,6 +14,8 @@ pub fn run() {
         .commands(collect_commands![
             commands::settings::get_settings,
             commands::settings::save_setting,
+            commands::settings::get_data_path,
+            commands::settings::set_data_path,
             commands::agents::fetch_agent_card,
             commands::agents::add_agent,
             commands::agents::list_agents,
