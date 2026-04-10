@@ -39,6 +39,7 @@ pub struct ProxyState {
 pub struct ProxyHandle {
     pub shutdown_tx: watch::Sender<bool>,
     pub port: u16,
+    pub state: Arc<ProxyState>,
 }
 
 /// Start the proxy server on the given port. Returns a handle to stop it.
@@ -60,7 +61,7 @@ pub async fn start_server(
         .route("/.well-known/agent.json", get(handle_agent_card))
         .route("/a2a", post(handle_a2a_proxy))
         .route("/proxy/status", get(handle_status))
-        .with_state(state);
+        .with_state(state.clone());
 
     let addr = SocketAddr::from(([127, 0, 0, 1], port));
     let listener = tokio::net::TcpListener::bind(addr)
@@ -82,7 +83,7 @@ pub async fn start_server(
             .ok();
     });
 
-    Ok(ProxyHandle { shutdown_tx, port })
+    Ok(ProxyHandle { shutdown_tx, port, state })
 }
 
 /// GET /.well-known/agent.json — aggregated agent card
@@ -152,17 +153,8 @@ async fn handle_a2a_proxy(
         .and_then(|obj| obj.remove("_proxyHeaders"))
         .and_then(|v| serde_json::from_value(v).ok());
 
-    // Load per-agent default headers
-    let headers_key = format!("card:{}:headers", agent_id);
-    let agent_headers: Option<std::collections::HashMap<String, String>> = sqlx::query_as::<_, (String,)>(
-        "SELECT value FROM settings WHERE key = ?"
-    )
-    .bind(&headers_key)
-    .fetch_optional(&state.pool)
-    .await
-    .ok()
-    .flatten()
-    .and_then(|row| serde_json::from_str(&row.0).ok());
+    // Load per-agent default headers from secure credential storage
+    let agent_headers: Option<std::collections::HashMap<String, String>> = crate::credentials::get_agent_headers(&agent_id).await;
 
     // Merge headers: agent defaults + proxy rule headers
     let mut extra_headers = agent_headers.unwrap_or_default();

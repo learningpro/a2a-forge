@@ -13,6 +13,7 @@ export function SuitePanel() {
   const { t } = useT();
 
   useEffect(() => {
+    useSuiteStore.getState().selectSuite(null);
     useSuiteStore.getState().loadSuites(activeWorkspaceId);
   }, [activeWorkspaceId]);
 

@@ -16,11 +16,17 @@ export function CommunityPanel() {
     useCommunityStore.getState().loadFavorites();
   }, []);
 
+  const { t } = useT();
+
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "100%", overflow: "hidden" }}>
       {/* Sub-tabs */}
       <div style={{ display: "flex", borderBottom: "0.5px solid var(--border-subtle)", flexShrink: 0 }}>
-        {(["directory", "favorites", "health"] as CommunityTab[]).map((tab) => (
+        {(["directory", "favorites", "health"] as CommunityTab[]).map((tab) => {
+          const label = tab === "directory" ? t("community.directory")
+            : tab === "favorites" ? t("community.favorites")
+            : t("community.health");
+          return (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
@@ -29,15 +35,16 @@ export function CommunityPanel() {
               color: activeTab === tab ? "var(--text-primary)" : "var(--text-muted)",
               background: "transparent", border: "none",
               borderBottom: activeTab === tab ? "2px solid var(--text-primary)" : "2px solid transparent",
-              cursor: "pointer", textTransform: "capitalize",
+              cursor: "pointer",
               transition: "color var(--duration-fast), border-color var(--duration-fast)",
             }}
             onMouseEnter={(e) => { if (activeTab !== tab) e.currentTarget.style.color = "var(--text-secondary)"; }}
             onMouseLeave={(e) => { if (activeTab !== tab) e.currentTarget.style.color = "var(--text-muted)"; }}
           >
-            {tab}
+            {label}
           </button>
-        ))}
+          );
+        })}
       </div>
 
       <div style={{ flex: 1, overflow: "auto" }}>
@@ -72,7 +79,7 @@ function DirectoryTab() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           onKeyDown={(e) => { if (e.key === "Enter") handleSearch(); }}
-          placeholder="Search community agents..."
+          placeholder={t("community.searchPlaceholder")}
           style={{
             flex: 1, padding: "4px 8px", fontSize: 11,
             background: "var(--bg-secondary)", border: "0.5px solid var(--border-subtle)",
@@ -83,14 +90,14 @@ function DirectoryTab() {
           padding: "4px 10px", fontSize: 11, background: "transparent",
           border: "0.5px solid var(--border-strong)", borderRadius: "var(--radius-md, 6px)",
           color: "var(--text-primary)", cursor: "pointer",
-        }}>Search</button>
+        }}>{t("community.search")}</button>
       </div>
 
       {/* Submit your agents */}
       {agents.length > 0 && (
         <div style={{ padding: "8px 12px", borderBottom: "0.5px solid var(--border-subtle)" }}>
           <div style={{ fontSize: 11, fontWeight: 500, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 4 }}>
-            Share Your Agents
+            {t("community.shareAgents")}
           </div>
           <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
             {agents.map((a) => (
@@ -126,8 +133,8 @@ function DirectoryTab() {
                 <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 1 }}>{ca.description || ca.url}</div>
                 {tags.length > 0 && (
                   <div style={{ display: "flex", gap: 4, marginTop: 4 }}>
-                    {tags.map((t, i) => (
-                      <span key={i} style={{
+                    {tags.map((t) => (
+                      <span key={t} style={{
                         padding: "1px 6px", fontSize: 11, background: "var(--bg-secondary)",
                         borderRadius: "var(--radius-md, 6px)", color: "var(--text-muted)",
                       }}>{t}</span>
@@ -147,6 +154,7 @@ function DirectoryTab() {
 function FavoritesTab() {
   const favorites = useCommunityStore((s) => s.favorites);
   const agents = useAgentStore((s) => s.agents);
+  const { t } = useT();
 
   const handleToggle = useCallback(async (agentId: string) => {
     await useCommunityStore.getState().toggleFavorite(agentId);
@@ -166,7 +174,7 @@ function FavoritesTab() {
       {agents.length > 0 && (
         <div style={{ padding: "8px 12px", borderBottom: "0.5px solid var(--border-subtle)" }}>
           <div style={{ fontSize: 11, fontWeight: 500, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 4 }}>
-            Quick Favorite
+            {t("community.quickFavorite")}
           </div>
           <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
             {agents.map((a) => {
@@ -188,7 +196,7 @@ function FavoritesTab() {
 
       {favorites.length === 0 && (
         <div style={{ padding: 20, textAlign: "center", color: "var(--text-muted)", fontSize: 11 }}>
-          No favorites yet. Star agents to add them here.
+          {t("community.noFavorites")}
         </div>
       )}
 
@@ -231,6 +239,7 @@ function HealthTab({ workspaceId }: { workspaceId: string }) {
   const agents = useAgentStore((s) => s.agents);
   const latestHealth = useCommunityStore((s) => s.latestHealth);
   const isChecking = useCommunityStore((s) => s.isChecking);
+  const { t } = useT();
 
   const handleCheckAll = useCallback(async () => {
     await useCommunityStore.getState().checkAllHealth(workspaceId);
@@ -247,7 +256,7 @@ function HealthTab({ workspaceId }: { workspaceId: string }) {
         display: "flex", justifyContent: "space-between", alignItems: "center",
       }}>
         <span style={{ fontSize: 11, fontWeight: 500, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.07em" }}>
-          Agent Health
+          {t("community.agentHealth")}
         </span>
         <button onClick={handleCheckAll} disabled={isChecking} style={{
           padding: "3px 10px", fontSize: 11, background: "transparent",
@@ -255,13 +264,13 @@ function HealthTab({ workspaceId }: { workspaceId: string }) {
           color: "var(--text-primary)", cursor: isChecking ? "default" : "pointer",
           fontWeight: 500, opacity: isChecking ? 0.5 : 1,
         }}>
-          {isChecking ? "Checking..." : "Check All"}
+          {isChecking ? t("community.checking") : t("community.checkAll")}
         </button>
       </div>
 
       {agents.length === 0 && (
         <div style={{ padding: 20, textAlign: "center", color: "var(--text-muted)", fontSize: 11 }}>
-          No agents to monitor. Add agents first.
+          {t("community.noAgentsToMonitor")}
         </div>
       )}
 
@@ -284,7 +293,7 @@ function HealthTab({ workspaceId }: { workspaceId: string }) {
                       {hc.status} · {hc.latencyMs}ms
                       {hc.error && <span style={{ color: "var(--dot-error, #ef4444)" }}> · {hc.error}</span>}
                     </>
-                  ) : "Not checked"}
+                  ) : t("community.notChecked")}
                 </div>
               </div>
             </div>
@@ -292,7 +301,7 @@ function HealthTab({ workspaceId }: { workspaceId: string }) {
               padding: "2px 8px", fontSize: 11, background: "transparent",
               border: "0.5px solid var(--border-subtle)", borderRadius: "var(--radius-md, 6px)",
               color: "var(--text-secondary)", cursor: "pointer",
-            }}>Check</button>
+            }}>{t("community.check")}</button>
           </div>
         );
       })}

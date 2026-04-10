@@ -65,17 +65,6 @@ pub struct ChainStepResult {
     pub error: Option<String>,
 }
 
-#[allow(dead_code)]
-#[derive(Debug, Clone, Serialize, Deserialize, Type)]
-#[serde(rename_all = "camelCase")]
-pub struct WorkspaceExport {
-    pub workspace_name: String,
-    pub agents: Vec<serde_json::Value>,
-    pub env_variables: Vec<serde_json::Value>,
-    pub suites: Vec<serde_json::Value>,
-    pub chains: Vec<serde_json::Value>,
-}
-
 #[derive(Debug, Clone, Serialize, Deserialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct DiffResult {
@@ -310,7 +299,10 @@ pub async fn run_chain(
             request_str = request_str.replace(&format!("{{{{{}}}}}", k), v);
         }
 
-        let payload: serde_json::Value = serde_json::from_str(&request_str).unwrap_or_default();
+        let payload: serde_json::Value = serde_json::from_str(&request_str)
+            .map_err(|e| AppError::Serialization(format!(
+                "Invalid JSON in chain step '{}' after variable substitution: {}", step_name, e
+            )))?;
 
         // Look up agent URL
         let agent_url = sqlx::query_as::<_, (String,)>("SELECT url FROM agents WHERE id = ?")
@@ -321,12 +313,8 @@ pub async fn run_chain(
         let step_start = Instant::now();
 
         if let Some(url) = agent_url {
-            // Load agent headers
-            let headers_key = format!("card:{}:headers", agent_id);
-            let extra_headers: Option<HashMap<String, String>> = sqlx::query_as::<_, (String,)>(
-                "SELECT value FROM settings WHERE key = ?"
-            ).bind(&headers_key).fetch_optional(&pool).await.ok().flatten()
-            .and_then(|r| serde_json::from_str(&r.0).ok());
+            // Load agent headers from secure credential storage
+            let extra_headers: Option<HashMap<String, String>> = crate::credentials::get_agent_headers(&agent_id).await;
 
             let timeout_secs = (timeout_ms / 1000).max(1) as u64;
             let result = send_task_rpc(&state.http_client, &url, &payload, None, extra_headers.as_ref(), timeout_secs).await;
@@ -412,23 +400,62 @@ pub async fn export_workspace(workspace_id: String, app: tauri::AppHandle) -> Re
     let agents: Vec<serde_json::Value> = sqlx::query_as::<_, (String, String, Option<String>, String)>(
         "SELECT url, card_json, nickname, id FROM agents WHERE workspace_id = ?"
     ).bind(&workspace_id).fetch_all(&pool).await.map_err(|e| AppError::Database(e.to_string()))?
-    .into_iter().map(|r| serde_json::json!({"url": r.0, "card": r.1, "nickname": r.2})).collect();
+    .into_iter().map(|r| serde_json::json!({"id": r.3, "url": r.0, "card": r.1, "nickname": r.2})).collect();
 
     let env_vars: Vec<serde_json::Value> = sqlx::query_as::<_, (String, String, bool)>(
         "SELECT name, value, is_secret FROM env_variables WHERE workspace_id = ?"
     ).bind(&workspace_id).fetch_all(&pool).await.map_err(|e| AppError::Database(e.to_string()))?
     .into_iter().map(|r| serde_json::json!({"name": r.0, "value": if r.2 { "" } else { &r.1 }, "isSecret": r.2})).collect();
 
-    let chains: Vec<serde_json::Value> = sqlx::query_as::<_, (String, String, String)>(
-        "SELECT id, name, description FROM request_chains WHERE workspace_id = ?"
-    ).bind(&workspace_id).fetch_all(&pool).await.map_err(|e| AppError::Database(e.to_string()))?
-    .into_iter().map(|r| serde_json::json!({"name": r.1, "description": r.2})).collect();
+    let chains: Vec<serde_json::Value> = {
+        let chain_rows = sqlx::query_as::<_, (String, String, String)>(
+            "SELECT id, name, description FROM request_chains WHERE workspace_id = ?"
+        ).bind(&workspace_id).fetch_all(&pool).await.map_err(|e| AppError::Database(e.to_string()))?;
+
+        let mut result = Vec::new();
+        for r in chain_rows {
+            let steps: Vec<serde_json::Value> = sqlx::query_as::<_, (String, String, String, String, String, i32, i32)>(
+                "SELECT name, agent_id, skill_name, request_json, extract_json, timeout_ms, sort_order FROM chain_steps WHERE chain_id = ? ORDER BY sort_order"
+            ).bind(&r.0).fetch_all(&pool).await.map_err(|e| AppError::Database(e.to_string()))?
+            .into_iter().map(|s| serde_json::json!({
+                "name": s.0, "agentId": s.1, "skillName": s.2,
+                "requestJson": s.3, "extractJson": s.4, "timeoutMs": s.5, "sortOrder": s.6
+            })).collect();
+
+            result.push(serde_json::json!({"name": r.1, "description": r.2, "steps": steps}));
+        }
+        result
+    };
+
+    // Export test suites with steps
+    let suites: Vec<serde_json::Value> = {
+        let suite_rows = sqlx::query_as::<_, (String, String, String, Option<String>, String)>(
+            "SELECT id, name, description, agent_id, run_mode FROM test_suites WHERE workspace_id = ?"
+        ).bind(&workspace_id).fetch_all(&pool).await.map_err(|e| AppError::Database(e.to_string()))?;
+
+        let mut result = Vec::new();
+        for s in suite_rows {
+            let steps: Vec<serde_json::Value> = sqlx::query_as::<_, (String, i32, String, String, String, String, i32)>(
+                "SELECT name, sort_order, agent_id, skill_name, request_json, assertions_json, timeout_ms FROM test_steps WHERE suite_id = ? ORDER BY sort_order"
+            ).bind(&s.0).fetch_all(&pool).await.map_err(|e| AppError::Database(e.to_string()))?
+            .into_iter().map(|st| serde_json::json!({
+                "name": st.0, "sortOrder": st.1, "agentId": st.2, "skillName": st.3,
+                "requestJson": st.4, "assertionsJson": st.5, "timeoutMs": st.6
+            })).collect();
+
+            result.push(serde_json::json!({
+                "name": s.1, "description": s.2, "agentId": s.3, "runMode": s.4, "steps": steps
+            }));
+        }
+        result
+    };
 
     let export = serde_json::json!({
         "workspaceName": ws_name,
         "agents": agents,
         "envVariables": env_vars,
         "chains": chains,
+        "suites": suites,
     });
 
     Ok(serde_json::to_string_pretty(&export)?)
@@ -443,8 +470,11 @@ pub async fn import_workspace(json_data: String, app: tauri::AppHandle) -> Resul
     let ws_name = data.get("workspaceName").and_then(|v| v.as_str()).unwrap_or("Imported");
     let ws_id = nanoid::nanoid!();
 
+    // Wrap entire import in a transaction for atomicity
+    let mut tx = pool.begin().await.map_err(|e| AppError::Database(e.to_string()))?;
+
     sqlx::query("INSERT INTO workspaces (id, name, created_at) VALUES (?, ?, unixepoch())")
-        .bind(&ws_id).bind(ws_name).execute(&pool).await.map_err(|e| AppError::Database(e.to_string()))?;
+        .bind(&ws_id).bind(ws_name).execute(&mut *tx).await.map_err(|e| AppError::Database(e.to_string()))?;
 
     // Import env variables
     if let Some(vars) = data.get("envVariables").and_then(|v| v.as_array()) {
@@ -456,15 +486,102 @@ pub async fn import_workspace(json_data: String, app: tauri::AppHandle) -> Resul
                 let id = nanoid::nanoid!();
                 sqlx::query("INSERT INTO env_variables (id, workspace_id, name, value, is_secret) VALUES (?, ?, ?, ?, ?)")
                     .bind(&id).bind(&ws_id).bind(name).bind(value).bind(is_secret)
-                    .execute(&pool).await.map_err(|e| AppError::Database(e.to_string()))?;
+                    .execute(&mut *tx).await.map_err(|e| AppError::Database(e.to_string()))?;
             }
         }
     }
 
+    // Import agents (build old->new ID mapping for chain steps)
+    let mut agent_id_map: HashMap<String, String> = HashMap::new();
+    if let Some(agents) = data.get("agents").and_then(|v| v.as_array()) {
+        for agent in agents {
+            let url = agent.get("url").and_then(|v| v.as_str()).unwrap_or("");
+            let card_json = agent.get("card").and_then(|v| v.as_str()).unwrap_or("{}");
+            let nickname = agent.get("nickname").and_then(|v| v.as_str());
+            let old_id = agent.get("id").and_then(|v| v.as_str()).unwrap_or("");
+            if !url.is_empty() {
+                let new_id = nanoid::nanoid!();
+                if !old_id.is_empty() {
+                    agent_id_map.insert(old_id.to_string(), new_id.clone());
+                }
+                sqlx::query("INSERT INTO agents (id, url, card_json, nickname, workspace_id, last_fetched_at) VALUES (?, ?, ?, ?, ?, unixepoch())")
+                    .bind(&new_id).bind(url).bind(card_json).bind(nickname).bind(&ws_id)
+                    .execute(&mut *tx).await.map_err(|e| AppError::Database(e.to_string()))?;
+            }
+        }
+    }
+
+    // Import chains with steps (remap agent IDs)
+    if let Some(chains) = data.get("chains").and_then(|v| v.as_array()) {
+        for chain in chains {
+            let name = chain.get("name").and_then(|v| v.as_str()).unwrap_or("");
+            let description = chain.get("description").and_then(|v| v.as_str()).unwrap_or("");
+            if !name.is_empty() {
+                let chain_id = nanoid::nanoid!();
+                sqlx::query("INSERT INTO request_chains (id, name, description, workspace_id, created_at) VALUES (?, ?, ?, ?, unixepoch())")
+                    .bind(&chain_id).bind(name).bind(description).bind(&ws_id)
+                    .execute(&mut *tx).await.map_err(|e| AppError::Database(e.to_string()))?;
+
+                if let Some(steps) = chain.get("steps").and_then(|v| v.as_array()) {
+                    for step in steps {
+                        let step_name = step.get("name").and_then(|v| v.as_str()).unwrap_or("");
+                        let old_agent_id = step.get("agentId").and_then(|v| v.as_str()).unwrap_or("");
+                        let mapped_agent_id = agent_id_map.get(old_agent_id).map(|s| s.as_str()).unwrap_or(old_agent_id);
+                        let skill_name = step.get("skillName").and_then(|v| v.as_str()).unwrap_or("");
+                        let request_json = step.get("requestJson").and_then(|v| v.as_str()).unwrap_or("{}");
+                        let extract_json = step.get("extractJson").and_then(|v| v.as_str()).unwrap_or("{}");
+                        let timeout_ms = step.get("timeoutMs").and_then(|v| v.as_i64()).unwrap_or(30000) as i32;
+                        let sort_order = step.get("sortOrder").and_then(|v| v.as_i64()).unwrap_or(0) as i32;
+                        let step_id = nanoid::nanoid!();
+                        sqlx::query("INSERT INTO chain_steps (id, chain_id, name, agent_id, skill_name, request_json, extract_json, timeout_ms, sort_order) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)")
+                            .bind(&step_id).bind(&chain_id).bind(step_name).bind(mapped_agent_id).bind(skill_name)
+                            .bind(request_json).bind(extract_json).bind(timeout_ms).bind(sort_order)
+                            .execute(&mut *tx).await.map_err(|e| AppError::Database(e.to_string()))?;
+                    }
+                }
+            }
+        }
+    }
+
+    // Import test suites with steps (remap agent IDs)
+    if let Some(suites) = data.get("suites").and_then(|v| v.as_array()) {
+        for suite in suites {
+            let name = suite.get("name").and_then(|v| v.as_str()).unwrap_or("");
+            let description = suite.get("description").and_then(|v| v.as_str()).unwrap_or("");
+            let old_agent_id = suite.get("agentId").and_then(|v| v.as_str());
+            let mapped_agent_id = old_agent_id.and_then(|id| agent_id_map.get(id).map(|s| s.as_str()).or(Some(id)));
+            let run_mode = suite.get("runMode").and_then(|v| v.as_str()).unwrap_or("sequential");
+            if !name.is_empty() {
+                let suite_id = nanoid::nanoid!();
+                sqlx::query("INSERT INTO test_suites (id, name, description, agent_id, workspace_id, run_mode) VALUES (?, ?, ?, ?, ?, ?)")
+                    .bind(&suite_id).bind(name).bind(description).bind(mapped_agent_id).bind(&ws_id).bind(run_mode)
+                    .execute(&mut *tx).await.map_err(|e| AppError::Database(e.to_string()))?;
+
+                if let Some(steps) = suite.get("steps").and_then(|v| v.as_array()) {
+                    for step in steps {
+                        let step_name = step.get("name").and_then(|v| v.as_str()).unwrap_or("");
+                        let old_step_agent = step.get("agentId").and_then(|v| v.as_str()).unwrap_or("");
+                        let mapped_step_agent = agent_id_map.get(old_step_agent).map(|s| s.as_str()).unwrap_or(old_step_agent);
+                        let skill_name = step.get("skillName").and_then(|v| v.as_str()).unwrap_or("");
+                        let request_json = step.get("requestJson").and_then(|v| v.as_str()).unwrap_or("{}");
+                        let assertions_json = step.get("assertionsJson").and_then(|v| v.as_str()).unwrap_or("[]");
+                        let timeout_ms = step.get("timeoutMs").and_then(|v| v.as_i64()).unwrap_or(60000) as i32;
+                        let sort_order = step.get("sortOrder").and_then(|v| v.as_i64()).unwrap_or(0) as i32;
+                        let step_id = nanoid::nanoid!();
+                        sqlx::query("INSERT INTO test_steps (id, suite_id, sort_order, name, agent_id, skill_name, request_json, assertions_json, timeout_ms) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)")
+                            .bind(&step_id).bind(&suite_id).bind(sort_order).bind(step_name).bind(mapped_step_agent)
+                            .bind(skill_name).bind(request_json).bind(assertions_json).bind(timeout_ms)
+                            .execute(&mut *tx).await.map_err(|e| AppError::Database(e.to_string()))?;
+                    }
+                }
+            }
+        }
+    }
+
+    tx.commit().await.map_err(|e| AppError::Database(e.to_string()))?;
+
     Ok(ws_id)
 }
-
-// --- Diff ---
 
 #[tauri::command]
 #[specta::specta]

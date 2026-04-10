@@ -55,7 +55,9 @@ pub async fn stream_task(
     let mut es = EventSource::new(req)
         .map_err(|e| AppError::Http(format!("Failed to create EventSource: {e}")))?;
 
-    let task_id_clone = task_id.clone();
+    let task_id_for_spawn = task_id.clone();
+    let task_id_for_insert = task_id.clone();
+    let active_tasks = state.active_tasks.clone();
     let handle = tokio::spawn(async move {
         while let Some(event) = es.next().await {
             match event {
@@ -97,6 +99,8 @@ pub async fn stream_task(
                 }
             }
         }
+        // Clean up: remove this task from active_tasks when stream ends naturally
+        active_tasks.lock().await.remove(&task_id_for_spawn);
     });
 
     let abort_handle = handle.abort_handle();
@@ -104,7 +108,7 @@ pub async fn stream_task(
         .active_tasks
         .lock()
         .await
-        .insert(task_id_clone, abort_handle);
+        .insert(task_id_for_insert, abort_handle);
 
     Ok(task_id)
 }

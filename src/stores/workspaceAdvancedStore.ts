@@ -93,7 +93,7 @@ export const useWorkspaceAdvancedStore = create<WorkspaceAdvancedState>()((set, 
   selectChain: (id) => {
     set({ selectedChainId: id, chainRunResult: null });
     if (id) {
-      workspaceCommands.listChainSteps(id).then((steps) => set({ chainSteps: steps }));
+      workspaceCommands.listChainSteps(id).then((steps) => set({ chainSteps: steps })).catch(() => { /* ignore */ });
     }
   },
 

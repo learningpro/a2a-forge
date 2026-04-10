@@ -99,16 +99,8 @@ pub async fn execute_step(
         .ok_or_else(|| AppError::NotFound(format!("Agent {} not found", step.agent_id)))?;
     let agent_url = agent_row.0;
 
-    // Load per-agent default headers
-    let headers_key = format!("card:{}:headers", step.agent_id);
-    let extra_headers: Option<HashMap<String, String>> = sqlx::query_as::<_, (String,)>(
-        "SELECT value FROM settings WHERE key = ?"
-    )
-    .bind(&headers_key)
-    .fetch_optional(pool)
-    .await
-    .map_err(|e| AppError::Database(e.to_string()))?
-    .and_then(|row| serde_json::from_str(&row.0).ok());
+    // Load per-agent default headers from secure credential storage
+    let extra_headers: Option<HashMap<String, String>> = crate::credentials::get_agent_headers(&step.agent_id).await;
 
     // Parse request payload
     let payload: serde_json::Value = serde_json::from_str(&step.request_json)?;

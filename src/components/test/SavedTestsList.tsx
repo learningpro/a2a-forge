@@ -1,6 +1,7 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { commands } from "../../bindings";
-import { unwrap } from "../../lib/tauri-helpers";
+import { unwrap, type SavedTest } from "../../lib/tauri-helpers";
+import { useT } from "../../lib/i18n";
 
 interface SavedTestsListProps {
   agentId: string;
@@ -15,18 +16,18 @@ export function SavedTestsList({
   onRerun,
   currentPayload,
 }: SavedTestsListProps) {
-  const [tests, setTests] = useState<Array<{ id: string; name: string; agentId: string; skillId: string; payload: unknown; createdAt: number }>>([]);
+  const [tests, setTests] = useState<SavedTest[]>([]);
   const [loading, setLoading] = useState(false);
+  const [naming, setNaming] = useState(false);
+  const [nameInput, setNameInput] = useState("");
+  const nameRef = useRef<HTMLInputElement>(null);
+  const { t } = useT();
 
   const loadTests = useCallback(async () => {
     setLoading(true);
     try {
-      const all = unwrap(await commands.listSavedTests(agentId, skillName)) as unknown as Array<{ id: string; name: string; agentId: string; skillId: string; payload: unknown; createdAt: number }>;
-      // Filter by skillName client-side if needed
-      const filtered = skillName
-        ? all.filter((t) => t.skillId === skillName)
-        : all;
-      setTests(filtered);
+      const all = unwrap(await commands.listSavedTests(agentId, skillName)) as SavedTest[];
+      setTests(all);
     } catch {
       setTests([]);
     } finally {
@@ -40,15 +41,31 @@ export function SavedTestsList({
 
   const handleSave = useCallback(async () => {
     if (!currentPayload) return;
-    const name = window.prompt("Name this test case:");
-    if (!name?.trim()) return;
+    if (!naming) {
+      setNaming(true);
+      setNameInput("");
+      setTimeout(() => nameRef.current?.focus(), 50);
+      return;
+    }
+    if (!nameInput.trim()) return;
     try {
-      unwrap(await commands.saveTest(name.trim(), agentId, skillName, JSON.stringify(currentPayload)));
+      unwrap(await commands.saveTest(nameInput.trim(), agentId, skillName, JSON.stringify(currentPayload)));
+      setNaming(false);
+      setNameInput("");
       await loadTests();
     } catch {
       // ignore save failures
     }
-  }, [agentId, skillName, currentPayload, loadTests]);
+  }, [agentId, skillName, currentPayload, loadTests, naming, nameInput]);
+
+  const handleRerun = useCallback((test: SavedTest) => {
+    try {
+      const parsed = JSON.parse(test.requestJson);
+      onRerun(parsed);
+    } catch {
+      onRerun(null);
+    }
+  }, [onRerun]);
 
   const handleDelete = useCallback(
     async (testId: string) => {
@@ -65,7 +82,7 @@ export function SavedTestsList({
   if (loading) {
     return (
       <div style={{ padding: 8, fontSize: 11, color: "var(--text-muted)" }}>
-        Loading saved tests...
+        {t("test.loading")}
       </div>
     );
   }
@@ -102,7 +119,7 @@ export function SavedTestsList({
             }}
           >
             <span
-              onClick={() => onRerun(test.payload)}
+              onClick={() => handleRerun(test)}
               style={{
                 overflow: "hidden",
                 textOverflow: "ellipsis",
@@ -126,7 +143,7 @@ export function SavedTestsList({
                 flexShrink: 0,
                 transition: "color var(--duration-fast)",
               }}
-              title="Delete saved test"
+              title={t("action.delete")}
               onMouseEnter={(e) => { e.currentTarget.style.color = "var(--dot-error)"; }}
               onMouseLeave={(e) => { e.currentTarget.style.color = "var(--text-muted)"; }}
             >
@@ -137,13 +154,70 @@ export function SavedTestsList({
 
         {tests.length === 0 ? (
           <span style={{ fontSize: 11, color: "var(--text-muted)" }}>
-            No saved tests for this skill
+            {t("test.noSavedTests")}
           </span>
         ) : null}
       </div>
 
+      {/* Inline name input for saving */}
+      {naming && (
+        <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
+          <input
+            ref={nameRef}
+            value={nameInput}
+            onChange={(e) => setNameInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleSave();
+              if (e.key === "Escape") { setNaming(false); setNameInput(""); }
+            }}
+            placeholder={t("test.testNamePlaceholder")}
+            style={{
+              flex: 1,
+              padding: "3px 6px",
+              fontSize: 11,
+              background: "var(--bg-secondary)",
+              border: "0.5px solid var(--border-default)",
+              borderRadius: "var(--radius-md)",
+              color: "var(--text-primary)",
+              fontFamily: "inherit",
+              outline: "none",
+            }}
+          />
+          <button
+            onClick={handleSave}
+            style={{
+              padding: "3px 8px",
+              fontSize: 11,
+              background: "transparent",
+              border: "0.5px solid var(--border-subtle)",
+              borderRadius: "var(--radius-md)",
+              color: "var(--text-secondary)",
+              cursor: "pointer",
+              fontFamily: "inherit",
+            }}
+          >
+            {t("action.save")}
+          </button>
+          <button
+            onClick={() => { setNaming(false); setNameInput(""); }}
+            style={{
+              padding: "3px 8px",
+              fontSize: 11,
+              background: "transparent",
+              border: "0.5px solid var(--border-subtle)",
+              borderRadius: "var(--radius-md)",
+              color: "var(--text-muted)",
+              cursor: "pointer",
+              fontFamily: "inherit",
+            }}
+          >
+            {t("action.cancel")}
+          </button>
+        </div>
+      )}
+
       {/* Save current button */}
-      {currentPayload != null && (
+      {currentPayload != null && !naming && (
         <button
           onClick={handleSave}
           style={{
@@ -158,7 +232,7 @@ export function SavedTestsList({
             fontFamily: "inherit",
           }}
         >
-          Save current
+          {t("test.saveCurrent")}
         </button>
       )}
     </div>

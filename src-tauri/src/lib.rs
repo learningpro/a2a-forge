@@ -23,6 +23,7 @@ pub fn run() {
             commands::agents::refresh_agent,
             commands::agents::import_agents,
             commands::agents::export_agents,
+            commands::agents::rename_agent,
             commands::tasks::send_task,
             commands::tasks::stream_task,
             commands::tasks::cancel_task,
@@ -89,6 +90,9 @@ pub fn run() {
             commands::workspace::export_workspace,
             commands::workspace::import_workspace,
             commands::workspace::diff_responses,
+            commands::credentials::store_agent_headers,
+            commands::credentials::retrieve_agent_headers,
+            commands::credentials::delete_agent_headers,
         ]);
 
     #[cfg(debug_assertions)]

@@ -3,8 +3,14 @@ import { useAgentStore } from "../../stores/agentStore";
 import { fadeBackdrop, slideInRight } from "../../lib/animations";
 
 interface HeaderEntry {
+  id: string;
   key: string;
   value: string;
+}
+
+let hdrIdCounter = 0;
+function newHdrEntry(key = "", value = ""): HeaderEntry {
+  return { id: `hdr-${++hdrIdCounter}`, key, value };
 }
 
 interface AgentHeadersDialogProps {
@@ -30,7 +36,7 @@ export function AgentHeadersDialog({
   const setDefaultHeaders = useAgentStore((s) => s.setDefaultHeaders);
   const loadDefaultHeaders = useAgentStore((s) => s.loadDefaultHeaders);
 
-  const [entries, setEntries] = useState<HeaderEntry[]>([{ key: "", value: "" }]);
+  const [entries, setEntries] = useState<HeaderEntry[]>([newHdrEntry()]);
 
   // Load from store/SQLite on open
   useEffect(() => {
@@ -43,9 +49,9 @@ export function AgentHeadersDialog({
   useEffect(() => {
     const pairs = Object.entries(defaultHeaders);
     if (pairs.length > 0) {
-      setEntries([...pairs.map(([key, value]) => ({ key, value })), { key: "", value: "" }]);
+      setEntries([...pairs.map(([key, value]) => newHdrEntry(key, value)), newHdrEntry()]);
     } else {
-      setEntries([{ key: "", value: "" }]);
+      setEntries([newHdrEntry()]);
     }
   }, [defaultHeaders]);
 
@@ -56,12 +62,12 @@ export function AgentHeadersDialog({
   };
 
   const addRow = () => {
-    setEntries([...entries, { key: "", value: "" }]);
+    setEntries([...entries, newHdrEntry()]);
   };
 
   const removeRow = (idx: number) => {
     const next = entries.filter((_, i) => i !== idx);
-    if (next.length === 0) next.push({ key: "", value: "" });
+    if (next.length === 0) next.push(newHdrEntry());
     setEntries(next);
   };
 
@@ -115,6 +121,9 @@ function AgentHeadersDialogInner({ entries, handleChange, addRow, removeRow, han
     >
       <div
         ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="agent-headers-dialog-title"
         onClick={(e) => e.stopPropagation()}
         style={{
           background: "var(--bg-secondary)",
@@ -129,6 +138,7 @@ function AgentHeadersDialogInner({ entries, handleChange, addRow, removeRow, han
         }}
       >
         <div
+          id="agent-headers-dialog-title"
           style={{
             fontSize: 13,
             fontWeight: 500,
@@ -152,7 +162,7 @@ function AgentHeadersDialogInner({ entries, handleChange, addRow, removeRow, han
         <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
           {entries.map((entry, i) => (
             <div
-              key={i}
+              key={entry.id}
               style={{ display: "flex", gap: 4, alignItems: "center" }}
             >
               <input

@@ -1,5 +1,6 @@
 use sqlx::Row;
 
+use crate::a2a::types::HistoryEntry;
 use crate::db::get_pool;
 use crate::error::AppError;
 
@@ -18,7 +19,7 @@ pub async fn save_history(
     let id = uuid::Uuid::new_v4().to_string();
     let now = std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
-        .unwrap()
+        .unwrap_or_default()
         .as_secs() as i64;
 
     sqlx::query(
@@ -46,7 +47,7 @@ pub async fn list_history(
     search: Option<String>,
     limit: Option<i32>,
     app: tauri::AppHandle,
-) -> Result<serde_json::Value, AppError> {
+) -> Result<Vec<HistoryEntry>, AppError> {
     let pool = get_pool(&app).await?;
     let limit_val = limit.unwrap_or(100) as i64;
 
@@ -78,19 +79,19 @@ pub async fn list_history(
 
     let mut results = Vec::with_capacity(rows.len());
     for row in rows {
-        results.push(serde_json::json!({
-            "id": row.try_get::<String, _>("id").map_err(|e| AppError::Database(e.to_string()))?,
-            "agentId": row.try_get::<String, _>("agent_id").map_err(|e| AppError::Database(e.to_string()))?,
-            "skillName": row.try_get::<String, _>("skill_name").map_err(|e| AppError::Database(e.to_string()))?,
-            "requestJson": row.try_get::<String, _>("request_json").map_err(|e| AppError::Database(e.to_string()))?,
-            "responseJson": row.try_get::<Option<String>, _>("response_json").map_err(|e| AppError::Database(e.to_string()))?,
-            "status": row.try_get::<String, _>("status").map_err(|e| AppError::Database(e.to_string()))?,
-            "durationMs": row.try_get::<Option<i64>, _>("duration_ms").map_err(|e| AppError::Database(e.to_string()))?,
-            "createdAt": row.try_get::<i64, _>("created_at").map_err(|e| AppError::Database(e.to_string()))?,
-        }));
+        results.push(HistoryEntry {
+            id: row.try_get::<String, _>("id").map_err(|e| AppError::Database(e.to_string()))?,
+            agent_id: row.try_get::<String, _>("agent_id").map_err(|e| AppError::Database(e.to_string()))?,
+            skill_name: row.try_get::<String, _>("skill_name").map_err(|e| AppError::Database(e.to_string()))?,
+            request_json: row.try_get::<String, _>("request_json").map_err(|e| AppError::Database(e.to_string()))?,
+            response_json: row.try_get::<Option<String>, _>("response_json").map_err(|e| AppError::Database(e.to_string()))?,
+            status: row.try_get::<String, _>("status").map_err(|e| AppError::Database(e.to_string()))?,
+            duration_ms: row.try_get::<Option<i32>, _>("duration_ms").map_err(|e| AppError::Database(e.to_string()))?,
+            created_at: row.try_get::<i32, _>("created_at").map_err(|e| AppError::Database(e.to_string()))?,
+        });
     }
 
-    Ok(serde_json::Value::Array(results))
+    Ok(results)
 }
 
 #[tauri::command]

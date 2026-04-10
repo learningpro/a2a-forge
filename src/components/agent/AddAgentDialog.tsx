@@ -3,6 +3,7 @@ import { commands, type AgentCard } from "../../bindings";
 import { unwrap } from "../../lib/tauri-helpers";
 import { useAgentStore } from "../../stores/agentStore";
 import { fadeBackdrop, slideInRight } from "../../lib/animations";
+import { useT } from "../../lib/i18n";
 
 type PreviewState =
   | { status: "idle" }
@@ -13,13 +14,15 @@ type PreviewState =
 interface AddAgentDialogProps {
   open: boolean;
   onClose: () => void;
+  workspaceId?: string;
 }
 
-export function AddAgentDialog({ open, onClose }: AddAgentDialogProps) {
+export function AddAgentDialog({ open, onClose, workspaceId = "default" }: AddAgentDialogProps) {
   const [url, setUrl] = useState("");
   const [nickname, setNickname] = useState("");
   const [preview, setPreview] = useState<PreviewState>({ status: "idle" });
   const [isAdding, setIsAdding] = useState(false);
+  const { t } = useT();
 
   // Debounced URL preview (900ms)
   useEffect(() => {
@@ -35,7 +38,7 @@ export function AddAgentDialog({ open, onClose }: AddAgentDialogProps) {
         const card = unwrap(await commands.fetchAgentCard(url.trim()));
         setPreview({ status: "success", card });
       } catch (err: unknown) {
-        let message = "Failed to fetch agent card";
+        let message = t("agent.fetchError");
         if (err && typeof err === "object" && "message" in err) {
           message = String((err as { message: string }).message);
         } else if (typeof err === "string") {
@@ -54,13 +57,13 @@ export function AddAgentDialog({ open, onClose }: AddAgentDialogProps) {
     try {
       await useAgentStore
         .getState()
-        .addAgent(url.trim(), nickname.trim() || null, "default");
+        .addAgent(url.trim(), nickname.trim() || null, workspaceId);
       setUrl("");
       setNickname("");
       setPreview({ status: "idle" });
       onClose();
     } catch (err: unknown) {
-      let message = "Failed to add agent";
+      let message = t("agent.addError");
       if (err && typeof err === "object" && "message" in err) {
         message = String((err as { message: string }).message);
       }
@@ -95,6 +98,7 @@ function AddAgentDialogInner({ url, setUrl, nickname, setNickname, preview, addD
   preview: PreviewState; addDisabled: boolean;
   handleAdd: () => void; handleCancel: () => void;
 }) {
+  const { t } = useT();
   const backdropRef = useRef<HTMLDivElement>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
 
@@ -122,6 +126,9 @@ function AddAgentDialogInner({ url, setUrl, nickname, setNickname, preview, addD
     >
       <div
         ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="add-agent-dialog-title"
         style={{
           background: "var(--bg-secondary)",
           borderRadius: "var(--radius-lg)",
@@ -132,8 +139,8 @@ function AddAgentDialogInner({ url, setUrl, nickname, setNickname, preview, addD
           boxShadow: "0 4px 32px rgba(0,0,0,0.06)",
         }}
       >
-        {/* Title */}
         <div
+          id="add-agent-dialog-title"
           style={{
             fontSize: 13,
             fontWeight: 500,
@@ -141,7 +148,7 @@ function AddAgentDialogInner({ url, setUrl, nickname, setNickname, preview, addD
             marginBottom: 4,
           }}
         >
-          Add agent card
+          {t("agent.addTitle")}
         </div>
 
         {/* Subtitle */}
@@ -153,17 +160,7 @@ function AddAgentDialogInner({ url, setUrl, nickname, setNickname, preview, addD
             lineHeight: 1.5,
           }}
         >
-          Enter the base URL of the agent. The workbench will fetch the
-          well-known card from{" "}
-          <code
-            style={{
-              fontFamily: "var(--font-mono, 'JetBrains Mono', monospace)",
-              fontSize: 11,
-            }}
-          >
-            /.well-known/agent.json
-          </code>
-          .
+          {t("agent.addSubtitle")}
         </div>
 
         {/* Base URL label */}
@@ -177,7 +174,7 @@ function AddAgentDialogInner({ url, setUrl, nickname, setNickname, preview, addD
             marginBottom: 4,
           }}
         >
-          Base URL
+          {t("agent.baseUrl")}
         </div>
 
         {/* URL input */}
@@ -212,7 +209,7 @@ function AddAgentDialogInner({ url, setUrl, nickname, setNickname, preview, addD
             marginBottom: 4,
           }}
         >
-          Nickname (optional)
+          {t("agent.nickname")}
         </div>
 
         {/* Nickname input */}
@@ -247,7 +244,7 @@ function AddAgentDialogInner({ url, setUrl, nickname, setNickname, preview, addD
             marginBottom: 4,
           }}
         >
-          Preview
+          {t("agent.preview")}
         </div>
 
         {/* Preview box */}
@@ -262,7 +259,7 @@ function AddAgentDialogInner({ url, setUrl, nickname, setNickname, preview, addD
         >
           {preview.status === "idle" && (
             <div style={{ fontSize: 11, color: "var(--text-muted)" }}>
-              Enter a URL to preview the agent card
+              {t("agent.previewHint")}
             </div>
           )}
 
@@ -287,7 +284,7 @@ function AddAgentDialogInner({ url, setUrl, nickname, setNickname, preview, addD
                   flexShrink: 0,
                 }}
               />
-              Fetching agent.json...
+              {t("agent.fetching")}
             </div>
           )}
 
@@ -381,7 +378,7 @@ function AddAgentDialogInner({ url, setUrl, nickname, setNickname, preview, addD
               fontFamily: "inherit",
             }}
           >
-            Cancel
+            {t("action.cancel")}
           </button>
           <button
             onClick={handleAdd}
@@ -400,7 +397,7 @@ function AddAgentDialogInner({ url, setUrl, nickname, setNickname, preview, addD
               pointerEvents: addDisabled ? "none" : "auto",
             }}
           >
-            Add agent
+            {t("agent.addButton")}
           </button>
         </div>
       </div>

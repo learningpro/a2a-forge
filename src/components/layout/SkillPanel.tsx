@@ -69,13 +69,20 @@ function SkillItem({
   skill,
   isSelected,
   onSelect,
-  taskStatus,
+  agentId,
 }: {
   skill: AgentSkill;
   isSelected: boolean;
   onSelect: () => void;
-  taskStatus?: "running" | "completed" | "failed" | null;
+  agentId: string;
 }) {
+  // Subscribe only to this skill's execution status
+  const execKey = agentId ? `${agentId}:${skill.id}` : "";
+  const status = useTestStore((s) => s.executions[execKey]?.status);
+  const taskStatus = status === "running" ? "running"
+    : status === "completed" ? "completed"
+    : status === "failed" ? "failed"
+    : null;
   return (
     <div
       onClick={onSelect}
@@ -172,8 +179,6 @@ export function SkillPanel({ width }: SkillPanelProps) {
   const selectedAgentId = useAgentStore((s) => s.selectedAgentId);
   const selectedSkillId = useAgentStore((s) => s.selectedSkillId);
   const setSelectedSkillId = useAgentStore((s) => s.setSelectedSkillId);
-
-  const executions = useTestStore((s) => s.executions);
 
   const selectedAgent = useMemo(
     () => agents.find((a) => a.id === selectedAgentId),
@@ -370,19 +375,13 @@ export function SkillPanel({ width }: SkillPanelProps) {
           />
         ) : (
           filteredSkills.map((skill) => {
-              const execKey = selectedAgentId ? `${selectedAgentId}:${skill.id}` : "";
-              const exec = execKey ? executions[execKey] : undefined;
-              const taskStatus = exec?.status === "running" ? "running"
-                : exec?.status === "completed" ? "completed"
-                : exec?.status === "failed" ? "failed"
-                : null;
               return (
                 <SkillItem
                   key={skill.id}
                   skill={skill}
                   isSelected={skill.id === selectedSkillId}
                   onSelect={() => setSelectedSkillId(skill.id)}
-                  taskStatus={taskStatus}
+                  agentId={selectedAgentId ?? ""}
                 />
               );
             })

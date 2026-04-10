@@ -39,7 +39,7 @@ pub async fn build_aggregated_card(
     Ok(serde_json::json!({
         "name": "A2A-Forge Local Registry",
         "description": "Aggregated agent registry proxy",
-        "url": "http://localhost:9339",
+        "url": format!("http://localhost:{}", super::DEFAULT_PROXY_PORT),
         "version": "0.3.0",
         "protocolVersion": "0.2",
         "capabilities": {

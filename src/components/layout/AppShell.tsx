@@ -1,5 +1,6 @@
 import { useCallback, useState } from "react";
 import { useUiStore } from "../../stores/uiStore";
+import { useT } from "../../lib/i18n";
 import { Sidebar } from "./Sidebar";
 import { SkillPanel } from "./SkillPanel";
 import { ResizeHandle } from "./ResizeHandle";
@@ -13,6 +14,7 @@ export function AppShell() {
   const setSidebarWidth = useUiStore((s) => s.setSidebarWidth);
   const sidebarCollapsed = useUiStore((s) => s.sidebarCollapsed);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const { t } = useT();
 
   const handleSkillPanelResize = useCallback(
     (deltaX: number) => {
@@ -43,7 +45,7 @@ export function AppShell() {
       {/* Settings gear — top right */}
       <button
         onClick={() => setSettingsOpen(true)}
-        title="Settings"
+        title={t("settings.title")}
         style={{
           position: "absolute",
           top: 10,

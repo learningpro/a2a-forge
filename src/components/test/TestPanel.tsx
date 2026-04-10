@@ -1,6 +1,7 @@
-import { useState, useCallback, useEffect, useMemo } from "react";
+import { useState, useCallback, useEffect, useMemo, useRef } from "react";
 import { useAgentStore } from "../../stores/agentStore";
 import { useTestStore } from "../../stores/testStore";
+import { useUiStore } from "../../stores/uiStore";
 import { useStreamingTask } from "../../hooks/useStreamingTask";
 import {
   buildTaskSendPayload,
@@ -18,6 +19,9 @@ import { SavedTestsList } from "./SavedTestsList";
 
 import { EmptyState } from "../shared/EmptyState";
 import { useT } from "../../lib/i18n";
+import { DEFAULT_TIMEOUT_MS } from "../../lib/constants";
+
+const EMPTY_HEADERS: Record<string, string> = {};
 
 export function TestPanel() {
   const agents = useAgentStore((s) => s.agents);
@@ -29,18 +33,34 @@ export function TestPanel() {
   const selectedSkillId = useAgentStore((s) => s.selectedSkillId);
   const defaultHeaders = useAgentStore((s) => s.defaultHeaders);
   const agentDefaultHeaders = useMemo(
-    () => (selectedAgentId ? defaultHeaders[selectedAgentId] : undefined) ?? {},
+    () => (selectedAgentId ? defaultHeaders[selectedAgentId] : undefined) ?? EMPTY_HEADERS,
     [defaultHeaders, selectedAgentId],
   );
 
-  const executions = useTestStore((s) => s.executions);
   const inputText = useTestStore((s) => s.inputText);
   const customHeaders = useTestStore((s) => s.customHeaders);
   const { run: runStreaming } = useStreamingTask();
 
   const [curlCopied, setCurlCopied] = useState(false);
   const [historyRefreshKey, setHistoryRefreshKey] = useState(0);
+  const [timeout, setTimeoutVal] = useState(DEFAULT_TIMEOUT_MS);
   const { t } = useT();
+  const curlTimerRef = useRef<ReturnType<typeof setTimeout>>();
+  const rerunTimerRef = useRef<ReturnType<typeof setTimeout>>();
+
+  // Load timeout setting
+  useEffect(() => {
+    commands.getSettings().then((res) => {
+      const settings = unwrap(res) as Record<string, unknown>;
+      if (settings["timeout_seconds"] != null) setTimeoutVal(Number(settings["timeout_seconds"]) * 1000);
+    }).catch(() => {});
+  }, []);
+  useEffect(() => {
+    return () => {
+      if (curlTimerRef.current) clearTimeout(curlTimerRef.current);
+      if (rerunTimerRef.current) clearTimeout(rerunTimerRef.current);
+    };
+  }, []);
 
   // Find selected skill
   const skill: AgentSkill | null =
@@ -51,10 +71,11 @@ export function TestPanel() {
   const agentId = selectedAgent?.id ?? "";
   const skillId = skill?.id ?? "";
 
-  const exec = useMemo(
-    () => useTestStore.getState().getExecution(agentId, skillId),
-    [agentId, skillId, executions],
-  );
+  // Subscribe only to the specific execution, not the entire map
+  const execKey = `${agentId}:${skillId}`;
+  const exec = useTestStore((s) => s.executions[execKey]) ?? {
+    taskId: null, status: "idle" as const, chunks: [], result: null, latencyMs: null, startedAt: null,
+  };
 
   const isRunning = exec.status === "running";
 
@@ -62,7 +83,8 @@ export function TestPanel() {
     if (!selectedAgent || !skill) return;
 
     const taskId = generateTaskId();
-    const payload = buildTaskSendPayload(skill.id, inputText, taskId);
+    const { contextData, droppedFile } = useTestStore.getState();
+    const payload = buildTaskSendPayload(skill.id, inputText, taskId, contextData, droppedFile);
     const merged = { ...agentDefaultHeaders, ...customHeaders };
     const authHeader = merged["Authorization"]
       ? `Authorization: ${merged["Authorization"]}`
@@ -78,8 +100,8 @@ export function TestPanel() {
 
     navigator.clipboard.writeText(curl).then(() => {
       setCurlCopied(true);
-      setTimeout(() => setCurlCopied(false), 1500);
-    });
+      curlTimerRef.current = setTimeout(() => setCurlCopied(false), 1500);
+    }).catch(() => { /* clipboard permission denied */ });
   }, [selectedAgent, skill, inputText, agentDefaultHeaders, customHeaders]);
 
   const handleRun = useCallback(async () => {
@@ -94,10 +116,10 @@ export function TestPanel() {
     const { Authorization: _, ...rest } = merged;
     const extraHeaders =
       Object.keys(rest).length > 0 ? rest : undefined;
-    const { startTask, finishTask } = useTestStore.getState();
+    const { startTask, finishTask, contextData, droppedFile } = useTestStore.getState();
 
     if (hasStreaming) {
-      const payload = buildTaskSubscribePayload(skill.id, inputText, taskId);
+      const payload = buildTaskSubscribePayload(skill.id, inputText, taskId, contextData, droppedFile);
       try {
         await runStreaming(
           selectedAgent.url,
@@ -116,7 +138,7 @@ export function TestPanel() {
         );
       }
     } else {
-      const payload = buildTaskSendPayload(skill.id, inputText, taskId);
+      const payload = buildTaskSendPayload(skill.id, inputText, taskId, contextData, droppedFile);
       startTask(selectedAgent.id, skill.id, taskId);
       try {
         const result = unwrap(await commands.sendTask(
@@ -124,7 +146,7 @@ export function TestPanel() {
           payload as unknown as JsonValue,
           authHeader ?? null,
           extraHeaders ?? null,
-          null,
+          Math.round(timeout / 1000) || null,
         ));
         finishTask(selectedAgent.id, skill.id, result, "completed");
       } catch (err) {
@@ -138,12 +160,16 @@ export function TestPanel() {
     }
 
     // Save history fire-and-forget
+    const { contextData: ctx, droppedFile: file } = useTestStore.getState();
     const finalExec = useTestStore.getState().getExecution(selectedAgent.id, skill.id);
+    const requestSnapshot: Record<string, unknown> = { skill: skill.id, text: inputText };
+    if (ctx && ctx.trim() !== "{\n  \n}") requestSnapshot.context = ctx;
+    if (file) requestSnapshot.file = file;
     commands
       .saveHistory(
         selectedAgent.id,
-        taskId,
-        JSON.stringify({ skill: skill.id, text: inputText }),
+        skill.id,
+        JSON.stringify(requestSnapshot),
         finalExec.result != null ? JSON.stringify(finalExec.result) : null,
         finalExec.status,
         finalExec.latencyMs,
@@ -166,22 +192,24 @@ export function TestPanel() {
   ]);
 
 
-  // Listen for global keyboard shortcut event
+  // Run test when requested via store (keyboard shortcut)
+  const runTestRequested = useUiStore((s) => s.runTestRequested);
   useEffect(() => {
-    const handler = () => {
+    if (runTestRequested > 0) {
       handleRun();
-    };
-    document.addEventListener("a2a:run-test", handler);
-    return () => document.removeEventListener("a2a:run-test", handler);
-  }, [handleRun]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [runTestRequested]);
 
   const handleHistorySelect = useCallback((entry: HistoryEntry) => {
     if (!selectedAgent || !skill) return;
     // Load the request into the input form
     try {
       const req = JSON.parse(entry.requestJson);
-      if (req && typeof req === "object" && "text" in req) {
-        useTestStore.getState().setInputText(String(req.text));
+      if (req && typeof req === "object") {
+        if ("text" in req) useTestStore.getState().setInputText(String(req.text));
+        if ("context" in req) useTestStore.getState().setContextData(String(req.context));
+        if ("file" in req) useTestStore.getState().setDroppedFile(req.file as { name: string; data: string } | null);
       }
     } catch { /* ignore parse error */ }
     // Show the response in the viewer
@@ -208,7 +236,7 @@ export function TestPanel() {
         useTestStore.getState().setInputTab("message");
       }
       // Auto-run after a tick so state is updated
-      setTimeout(() => {
+      rerunTimerRef.current = setTimeout(() => {
         handleRun();
       }, 50);
     },
@@ -216,10 +244,15 @@ export function TestPanel() {
   );
 
   // Build the current payload for the saved tests "save current" button
-  const currentPayload =
-    selectedAgent && skill && inputText
-      ? { skill: skill.id, text: inputText }
-      : undefined;
+  const contextData = useTestStore((s) => s.contextData);
+  const droppedFile = useTestStore((s) => s.droppedFile);
+  const currentPayload = useMemo(() => {
+    if (!selectedAgent || !skill || !inputText) return undefined;
+    const p: Record<string, unknown> = { skill: skill.id, text: inputText };
+    if (contextData && contextData.trim() !== "{\n  \n}") p.context = contextData;
+    if (droppedFile) p.file = droppedFile;
+    return p;
+  }, [selectedAgent, skill, inputText, contextData, droppedFile]);
 
   // No skill selected -- empty state
   if (!skill || !selectedAgent) {
@@ -316,7 +349,7 @@ export function TestPanel() {
         <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
           <button
             onClick={handleCopyCurl}
-            title="Copy as curl (Cmd+Shift+C)"
+            title={t("test.copyCurl")}
             style={{
               padding: "4px 8px",
               fontSize: 11,
@@ -328,7 +361,7 @@ export function TestPanel() {
               fontFamily: "var(--font-mono, 'JetBrains Mono', monospace)",
             }}
           >
-            {curlCopied ? "Copied!" : "curl"}
+            {curlCopied ? t("test.copied") : t("test.curl")}
           </button>
           <button
             onClick={handleRun}
@@ -358,7 +391,7 @@ export function TestPanel() {
                 flexShrink: 0,
               }}
             />
-            {isRunning ? "Running\u2026" : "Run"}
+            {isRunning ? t("test.running") : t("action.run")}
           </button>
         </div>
       </div>
@@ -398,7 +431,7 @@ export function TestPanel() {
                 marginBottom: 6,
               }}
             >
-              Saved Tests
+              {t("test.savedTests")}
             </div>
             <SavedTestsList
               agentId={selectedAgent.id}
@@ -441,7 +474,7 @@ export function TestPanel() {
                 padding: "8px 12px 0",
               }}
             >
-              History
+              {t("test.history")}
             </div>
             <HistoryList
               key={historyRefreshKey}

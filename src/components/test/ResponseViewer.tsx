@@ -1,5 +1,6 @@
-import { useMemo } from "react";
+import { } from "react";
 import { useTestStore, type TaskChunk } from "../../stores/testStore";
+import { useT } from "../../lib/i18n";
 import { TaskStatus } from "./TaskStatus";
 import { JsonTree } from "./JsonTree";
 import ReactMarkdown from "react-markdown";
@@ -15,6 +16,7 @@ type A2APart = {
     name?: string;
     mimeType?: string;
     bytes?: string; // base64
+    uri?: string;   // URL
   };
 };
 
@@ -40,11 +42,9 @@ interface ResponseViewerProps {
 }
 
 export function ResponseViewer({ agentId, skillId }: ResponseViewerProps) {
-  const executions = useTestStore((s) => s.executions);
-  const exec = useMemo(
-    () => executions[`${agentId}:${skillId}`] ?? { taskId: null, status: "idle" as const, chunks: [] as TaskChunk[], result: null, latencyMs: null, startedAt: null },
-    [executions, agentId, skillId],
-  );
+  // Subscribe only to the specific execution, not the entire map
+  const execKey = `${agentId}:${skillId}`;
+  const exec = useTestStore((s) => s.executions[execKey]) ?? { taskId: null, status: "idle" as const, chunks: [] as TaskChunk[], result: null, latencyMs: null, startedAt: null };
   const { result, status, latencyMs, chunks, taskId } = exec;
   const responseTab = useTestStore((s) => s.responseTab);
   const setResponseTab = useTestStore((s) => s.setResponseTab);
@@ -132,6 +132,7 @@ export function ResponseViewer({ agentId, skillId }: ResponseViewerProps) {
 }
 
 function EmptyState() {
+  const { t } = useT();
   return (
     <div
       style={{
@@ -146,7 +147,7 @@ function EmptyState() {
         lineHeight: 1.6,
       }}
     >
-      Run a test to see results here
+      {t("suite.runResults")}
     </div>
   );
 }
@@ -158,7 +159,7 @@ function RenderedView({ result }: { result: unknown }) {
     return (
       <>
         {message.parts.map((part, i) => (
-          <PartBubble key={i} part={part} index={i} role={message.role} />
+          <PartBubble key={`part-${i}-${part.type ?? "text"}`} part={part} index={i} role={message.role} />
         ))}
       </>
     );
@@ -172,7 +173,7 @@ function RenderedView({ result }: { result: unknown }) {
       {media.length > 0 && (
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           {media.map((m, i) => (
-            <MediaPreview key={i} item={m} />
+            <MediaPreview key={`media-${i}-${m.url ?? m.type ?? "item"}`} item={m} />
           ))}
         </div>
       )}
@@ -229,21 +230,83 @@ function PartBubble({
             {part.text}
           </ReactMarkdown>
         )}
-        {partType === "file" && part.file && <FileDownload file={part.file} />}
+        {partType === "file" && part.file && <FilePreview file={part.file} mimeType={part.mimeType} />}
         {partType === "data" && part.data != null && <JsonTree value={part.data} />}
       </div>
     </div>
   );
 }
 
-function FileDownload({ file }: { file: { name?: string; mimeType?: string; bytes?: string } }) {
+function FilePreview({ file, mimeType }: { file: { name?: string; mimeType?: string; bytes?: string; uri?: string }; mimeType?: string }) {
+  const mime = file.mimeType || mimeType || "";
+  const isImage = mime.startsWith("image/");
+  const src = file.uri || (file.bytes ? `data:${mime};base64,${file.bytes}` : null);
+
+  // If we have a URL/data URI and it's an image, show inline preview
+  if (src && isImage) {
+    return (
+      <div>
+        <img
+          src={src}
+          alt={file.name ?? "image"}
+          style={{ maxWidth: "100%", maxHeight: 400, display: "block", borderRadius: "var(--radius-sm)" }}
+          loading="lazy"
+        />
+        {file.uri && (
+          <a
+            href={file.uri}
+            target="_blank"
+            rel="noreferrer"
+            style={{
+              fontSize: 11,
+              color: "var(--text-info)",
+              fontFamily: "var(--font-mono)",
+              wordBreak: "break-all",
+              display: "block",
+              marginTop: 4,
+            }}
+          >
+            {file.uri}
+          </a>
+        )}
+      </div>
+    );
+  }
+
+  // If we have a URI, show a link
+  if (file.uri) {
+    return (
+      <a
+        href={file.uri}
+        target="_blank"
+        rel="noreferrer"
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 6,
+          padding: "4px 10px",
+          fontSize: 11,
+          background: "var(--bg-info)",
+          color: "var(--text-info)",
+          border: "0.5px solid var(--border-info)",
+          borderRadius: "var(--radius-md)",
+          fontFamily: "var(--font-mono)",
+          textDecoration: "none",
+        }}
+      >
+        {file.name ?? "file"} \u2197
+      </a>
+    );
+  }
+
+  // Fallback: base64 download button
   const handleDownload = () => {
     if (!file.bytes) return;
     try {
       const binary = atob(file.bytes);
       const bytes = new Uint8Array(binary.length);
       for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-      const blob = new Blob([bytes], { type: file.mimeType ?? "application/octet-stream" });
+      const blob = new Blob([bytes], { type: mime || "application/octet-stream" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
@@ -425,7 +488,7 @@ function StreamingView({ chunks }: { chunks: { raw: unknown; status?: { state: s
     <>
       {chunks.map((chunk, i) => (
         <div
-          key={i}
+          key={`chunk-${i}-${chunk.status?.state ?? "unknown"}`}
           style={{
             padding: "6px 10px",
             background: "var(--bg-secondary)",

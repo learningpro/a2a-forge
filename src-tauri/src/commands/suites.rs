@@ -362,6 +362,11 @@ pub async fn export_report(
             Ok(serde_json::to_string_pretty(&report)?)
         }
         "html" => {
+            // HTML entity escaping to prevent XSS
+            fn esc(s: &str) -> String {
+                s.replace('&', "&amp;").replace('<', "&lt;").replace('>', "&gt;").replace('"', "&quot;").replace('\'', "&#x27;")
+            }
+
             let mut html = String::from(r#"<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -389,15 +394,15 @@ h1 { margin: 0; }
 "#);
             html.push_str(&format!(
                 r#"<div class="card"><h1>{}</h1><p class="meta">Run: {} | Duration: {}ms | {}</p></div>"#,
-                suite_name, detail.run.id, detail.run.duration_ms,
-                detail.run.started_at
+                esc(&suite_name), esc(&detail.run.id), detail.run.duration_ms,
+                esc(&detail.run.started_at)
             ));
 
             let status_class = if detail.run.status == "passed" { "passed" } else { "failed" };
             html.push_str(&format!(
                 r#"<div class="card"><div class="summary"><div class="stat"><div class="num">{}</div>Total</div><div class="stat"><div class="num passed">{}</div>Passed</div><div class="stat"><div class="num failed">{}</div>Failed</div><div class="stat"><div class="num {}">{}</div>Status</div></div></div>"#,
                 detail.run.total_steps, detail.run.passed_steps, detail.run.failed_steps,
-                status_class, detail.run.status.to_uppercase()
+                status_class, esc(&detail.run.status.to_uppercase())
             ));
 
             html.push_str(r#"<div class="card"><h2>Steps</h2>"#);
@@ -407,7 +412,7 @@ h1 { margin: 0; }
                 let icon = if sr.status == "passed" { "&#x2705;" } else { "&#x274C;" };
                 html.push_str(&format!(
                     r#"<div class="step {class}">{icon} <strong>{step_name}</strong> — {duration}ms"#,
-                    class = class, icon = icon, step_name = step_name, duration = sr.duration_ms
+                    class = class, icon = icon, step_name = esc(step_name), duration = sr.duration_ms
                 ));
 
                 if let Some(ref ar_json) = sr.assertion_results_json {
@@ -419,14 +424,14 @@ h1 { margin: 0; }
                             let ai = if ap { "&#x2705;" } else { "&#x274C;" };
                             html.push_str(&format!(
                                 r#"<div class="assertion {ac}">{ai} {msg}</div>"#,
-                                ac = ac, ai = ai, msg = msg
+                                ac = ac, ai = ai, msg = esc(msg)
                             ));
                         }
                     }
                 }
 
                 if let Some(ref err) = sr.error_message {
-                    html.push_str(&format!(r#"<div class="assertion fail">Error: {}</div>"#, err));
+                    html.push_str(&format!(r#"<div class="assertion fail">Error: {}</div>"#, esc(err)));
                 }
 
                 html.push_str("</div>");

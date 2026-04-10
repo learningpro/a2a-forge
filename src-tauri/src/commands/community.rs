@@ -108,8 +108,11 @@ pub async fn submit_to_community(
     .map_err(|e| AppError::Database(e.to_string()))?
     .ok_or_else(|| AppError::NotFound(format!("Agent {agent_id} not found")))?;
 
-    let card: serde_json::Value = serde_json::from_str(&agent.2).unwrap_or_default();
-    let name = card.get("name").and_then(|v| v.as_str()).unwrap_or("Unknown").to_string();
+    let card: serde_json::Value = serde_json::from_str(&agent.2)
+        .map_err(|e| AppError::Serialization(format!("Invalid agent card JSON: {e}")))?;
+    let name = card.get("name").and_then(|v| v.as_str())
+        .ok_or_else(|| AppError::Serialization("Agent card missing 'name' field".into()))?
+        .to_string();
     let description = card.get("description").and_then(|v| v.as_str()).unwrap_or("").to_string();
     let skills = card.get("skills").and_then(|v| v.as_array()).map(|a| a.len()).unwrap_or(0);
 

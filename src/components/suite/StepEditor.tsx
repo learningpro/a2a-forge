@@ -1,6 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { useSuiteStore } from "../../stores/suiteStore";
 import { useAgentStore } from "../../stores/agentStore";
+import { useT } from "../../lib/i18n";
 import type { Assertion, AssertionType } from "../../lib/suite-commands";
 import { fadeBackdrop, slideInRight } from "../../lib/animations";
 
@@ -9,17 +10,18 @@ interface AssertionEditorProps {
   onChange: (assertions: Assertion[]) => void;
 }
 
-const ASSERTION_TYPES: { value: AssertionType; label: string; needsPath: boolean; needsExpected: boolean }[] = [
-  { value: "status_equals", label: "Status equals", needsPath: false, needsExpected: true },
-  { value: "json_path_equals", label: "JSONPath equals", needsPath: true, needsExpected: true },
-  { value: "json_path_exists", label: "JSONPath exists", needsPath: true, needsExpected: false },
-  { value: "json_path_contains", label: "JSONPath contains", needsPath: true, needsExpected: true },
-  { value: "json_path_matches", label: "JSONPath matches regex", needsPath: true, needsExpected: true },
-  { value: "response_time_lt", label: "Response time <", needsPath: false, needsExpected: true },
-  { value: "contains_media", label: "Contains media URL", needsPath: false, needsExpected: false },
+const ASSERTION_TYPES: { value: AssertionType; labelKey: string; needsPath: boolean; needsExpected: boolean }[] = [
+  { value: "status_equals", labelKey: "suite.assertionStatusEquals", needsPath: false, needsExpected: true },
+  { value: "json_path_equals", labelKey: "suite.assertionJsonPathEquals", needsPath: true, needsExpected: true },
+  { value: "json_path_exists", labelKey: "suite.assertionJsonPathExists", needsPath: true, needsExpected: false },
+  { value: "json_path_contains", labelKey: "suite.assertionJsonPathContains", needsPath: true, needsExpected: true },
+  { value: "json_path_matches", labelKey: "suite.assertionJsonPathMatches", needsPath: true, needsExpected: true },
+  { value: "response_time_lt", labelKey: "suite.assertionResponseTimeLt", needsPath: false, needsExpected: true },
+  { value: "contains_media", labelKey: "suite.assertionContainsMedia", needsPath: false, needsExpected: false },
 ];
 
 export function AssertionEditor({ assertions, onChange }: AssertionEditorProps) {
+  const { t } = useT();
   const handleAdd = useCallback(() => {
     const id = crypto.randomUUID().slice(0, 8);
     onChange([...assertions, { id, type: "status_equals", expected: "completed" }]);
@@ -37,7 +39,7 @@ export function AssertionEditor({ assertions, onChange }: AssertionEditorProps) 
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
         <span style={{ fontSize: 11, fontWeight: 500, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.07em" }}>
-          Assertions
+          {t("suite.assertions")}
         </span>
         <button
           onClick={handleAdd}
@@ -47,12 +49,12 @@ export function AssertionEditor({ assertions, onChange }: AssertionEditorProps) 
             color: "var(--text-secondary)", cursor: "pointer",
           }}
         >
-          + Add
+          {t("suite.addStep")}
         </button>
       </div>
       {assertions.length === 0 && (
         <div style={{ fontSize: 11, color: "var(--text-muted)", padding: "4px 0" }}>
-          No assertions. Add one to validate responses.
+          {t("suite.noAssertions")}
         </div>
       )}
       {assertions.map((a) => {
@@ -68,8 +70,8 @@ export function AssertionEditor({ assertions, onChange }: AssertionEditorProps) 
                 borderRadius: "var(--radius-md, 6px)", color: "var(--text-primary)",
               }}
             >
-              {ASSERTION_TYPES.map((t) => (
-                <option key={t.value} value={t.value}>{t.label}</option>
+              {ASSERTION_TYPES.map((at) => (
+                <option key={at.value} value={at.value}>{t(at.labelKey)}</option>
               ))}
             </select>
             {typeDef.needsPath && (
@@ -89,7 +91,7 @@ export function AssertionEditor({ assertions, onChange }: AssertionEditorProps) 
               <input
                 value={a.expected ?? ""}
                 onChange={(e) => handleUpdate(a.id, { expected: e.target.value })}
-                placeholder={a.type === "response_time_lt" ? "30000" : "expected value"}
+                placeholder={a.type === "response_time_lt" ? "30000" : t("suite.expectedValue")}
                 style={{
                   flex: 1, padding: "3px 6px", fontSize: 11,
                   background: "var(--bg-secondary)", border: "0.5px solid var(--border-subtle)",
@@ -122,6 +124,7 @@ interface StepEditorProps {
 
 export function StepEditor({ suiteId, editingStep, onClose }: StepEditorProps) {
   const agents = useAgentStore((s) => s.agents);
+  const { t } = useT();
   const backdropRef = useRef<HTMLDivElement>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
 
@@ -179,6 +182,9 @@ export function StepEditor({ suiteId, editingStep, onClose }: StepEditorProps) {
     >
       <div
         ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="step-editor-dialog-title"
         onClick={(e) => e.stopPropagation()}
         style={{
           background: "var(--bg-primary)", borderRadius: "var(--radius-lg, 12px)",
@@ -188,19 +194,19 @@ export function StepEditor({ suiteId, editingStep, onClose }: StepEditorProps) {
           visibility: "hidden",
         }}
       >
-        <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text-primary)", marginBottom: 16 }}>
-          {editingStep ? "Edit Step" : "Add Step"}
+        <div id="step-editor-dialog-title" style={{ fontSize: 13, fontWeight: 600, color: "var(--text-primary)", marginBottom: 16 }}>
+          {editingStep ? t("suite.editStep") : t("suite.addStepTitle")}
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           <div>
-            <label style={labelStyle}>Name</label>
-            <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Step name" style={inputStyle} autoFocus />
+            <label style={labelStyle}>{t("suite.stepName")}</label>
+            <input value={name} onChange={(e) => setName(e.target.value)} placeholder={t("suite.stepNamePlaceholder")} style={inputStyle} autoFocus />
           </div>
 
           <div style={{ display: "flex", gap: 8 }}>
             <div style={{ flex: 1 }}>
-              <label style={labelStyle}>Agent</label>
+              <label style={labelStyle}>{t("suite.agent")}</label>
               <select value={agentId} onChange={(e) => { setAgentId(e.target.value); setSkillName(""); }} style={inputStyle}>
                 {agents.map((a) => (
                   <option key={a.id} value={a.id}>{a.nickname || a.card.name}</option>
@@ -208,9 +214,9 @@ export function StepEditor({ suiteId, editingStep, onClose }: StepEditorProps) {
               </select>
             </div>
             <div style={{ flex: 1 }}>
-              <label style={labelStyle}>Skill</label>
+              <label style={labelStyle}>{t("suite.skill")}</label>
               <select value={skillName} onChange={(e) => setSkillName(e.target.value)} style={inputStyle}>
-                <option value="">Select skill...</option>
+                <option value="">{t("suite.selectSkill")}</option>
                 {skills.map((s) => (
                   <option key={s.id} value={s.id}>{s.name}</option>
                 ))}
@@ -219,12 +225,12 @@ export function StepEditor({ suiteId, editingStep, onClose }: StepEditorProps) {
           </div>
 
           <div>
-            <label style={labelStyle}>Timeout (ms)</label>
+            <label style={labelStyle}>{t("suite.timeout")}</label>
             <input type="number" value={timeoutMs} onChange={(e) => setTimeoutMs(Number(e.target.value))} style={inputStyle} />
           </div>
 
           <div>
-            <label style={labelStyle}>Request JSON</label>
+            <label style={labelStyle}>{t("suite.requestJson")}</label>
             <textarea
               value={requestJson}
               onChange={(e) => setRequestJson(e.target.value)}
@@ -249,7 +255,7 @@ export function StepEditor({ suiteId, editingStep, onClose }: StepEditorProps) {
               color: "var(--text-secondary)", cursor: "pointer",
             }}
           >
-            Cancel
+            {t("action.cancel")}
           </button>
           <button
             onClick={handleSave}
@@ -262,7 +268,7 @@ export function StepEditor({ suiteId, editingStep, onClose }: StepEditorProps) {
               opacity: !name.trim() || !agentId || !skillName ? 0.5 : 1,
             }}
           >
-            {editingStep ? "Update" : "Add"}
+            {editingStep ? t("suite.update") : t("action.add")}
           </button>
         </div>
       </div>

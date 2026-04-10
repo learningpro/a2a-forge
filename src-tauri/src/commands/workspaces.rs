@@ -1,5 +1,6 @@
 use sqlx::Row;
 
+use crate::a2a::types::WorkspaceRow;
 use crate::db::get_pool;
 use crate::error::AppError;
 
@@ -7,7 +8,7 @@ use crate::error::AppError;
 #[specta::specta]
 pub async fn list_workspaces(
     app: tauri::AppHandle,
-) -> Result<serde_json::Value, AppError> {
+) -> Result<Vec<WorkspaceRow>, AppError> {
     let pool = get_pool(&app).await?;
     let rows = sqlx::query("SELECT id, name, created_at FROM workspaces ORDER BY created_at")
         .fetch_all(&pool)
@@ -16,14 +17,14 @@ pub async fn list_workspaces(
 
     let mut results = Vec::with_capacity(rows.len());
     for row in rows {
-        results.push(serde_json::json!({
-            "id": row.try_get::<String, _>("id").map_err(|e| AppError::Database(e.to_string()))?,
-            "name": row.try_get::<String, _>("name").map_err(|e| AppError::Database(e.to_string()))?,
-            "createdAt": row.try_get::<i64, _>("created_at").map_err(|e| AppError::Database(e.to_string()))?,
-        }));
+        results.push(WorkspaceRow {
+            id: row.try_get::<String, _>("id").map_err(|e| AppError::Database(e.to_string()))?,
+            name: row.try_get::<String, _>("name").map_err(|e| AppError::Database(e.to_string()))?,
+            created_at: row.try_get::<i32, _>("created_at").map_err(|e| AppError::Database(e.to_string()))?,
+        });
     }
 
-    Ok(serde_json::Value::Array(results))
+    Ok(results)
 }
 
 #[tauri::command]
@@ -31,13 +32,13 @@ pub async fn list_workspaces(
 pub async fn create_workspace(
     name: String,
     app: tauri::AppHandle,
-) -> Result<serde_json::Value, AppError> {
+) -> Result<WorkspaceRow, AppError> {
     let pool = get_pool(&app).await?;
     let id = uuid::Uuid::new_v4().to_string();
     let now = std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
-        .unwrap()
-        .as_secs() as i64;
+        .unwrap_or_default()
+        .as_secs() as i32;
 
     sqlx::query("INSERT INTO workspaces (id, name, created_at) VALUES (?, ?, ?)")
         .bind(&id)
@@ -47,11 +48,11 @@ pub async fn create_workspace(
         .await
         .map_err(|e| AppError::Database(e.to_string()))?;
 
-    Ok(serde_json::json!({
-        "id": id,
-        "name": name,
-        "createdAt": now,
-    }))
+    Ok(WorkspaceRow {
+        id,
+        name,
+        created_at: now,
+    })
 }
 
 #[tauri::command]

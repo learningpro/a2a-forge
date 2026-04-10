@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { invoke } from "@tauri-apps/api/core";
 import { commands } from "../../bindings";
 import { unwrap } from "../../lib/tauri-helpers";
 import { useUiStore, type ThemeOverride, type Locale } from "../../stores/uiStore";
@@ -16,10 +15,7 @@ interface SettingsPanelProps {
 export function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
   const [theme, setTheme] = useState<ThemeOverride>("system");
   const [timeout, setTimeout_] = useState(30000);
-  const [proxyUrl, setProxyUrl] = useState("");
-  const [telemetry, setTelemetry] = useState(false);
   const [dataPath, setDataPath] = useState("");
-  const [pathChanged, setPathChanged] = useState(false);
 
   const setThemeOverride = useUiStore((s) => s.setThemeOverride);
   const locale = useUiStore((s) => s.locale);
@@ -29,12 +25,10 @@ export function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
     if (!isOpen) return;
     commands.getSettings().then((res) => {
       const settings = unwrap(res) as Record<string, unknown>;
-      if (settings["timeout_seconds"] != null) setTimeout_(Number(settings["timeout_seconds"]));
-      if (settings["proxy_url"] != null) setProxyUrl(String(settings["proxy_url"]));
+      if (settings["timeout_seconds"] != null) setTimeout_(Number(settings["timeout_seconds"]) * 1000);
       if (settings["theme"] != null) setTheme(String(settings["theme"]) as ThemeOverride);
-      if (settings["telemetry_enabled"] != null) setTelemetry(settings["telemetry_enabled"] === true || settings["telemetry_enabled"] === "true");
     }).catch(() => {});
-    invoke<string>("get_data_path").then((p) => setDataPath(p)).catch(() => {});
+    commands.getDataPath().then((res) => setDataPath(unwrap(res))).catch(() => {});
   }, [isOpen]);
 
   const saveSetting = useCallback(async (key: string, value: unknown) => {
@@ -44,40 +38,18 @@ export function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
   const handleThemeChange = useCallback((val: ThemeOverride) => {
     setTheme(val);
     setThemeOverride(val);
-    saveSetting("theme", val);
-  }, [saveSetting, setThemeOverride]);
+    // Theme is persisted via Zustand persist (uiStore), not SQLite
+  }, [setThemeOverride]);
 
   const handleLocaleChange = useCallback((val: Locale) => {
     setLocale(val);
-    saveSetting("locale", val);
-  }, [saveSetting, setLocale]);
+    // Locale is persisted via Zustand persist (uiStore), not SQLite
+  }, [setLocale]);
 
   const handleTimeoutChange = useCallback((val: number) => {
     setTimeout_(val);
-    saveSetting("timeout_seconds", val);
+    saveSetting("timeout_seconds", Math.round(val / 1000));
   }, [saveSetting]);
-
-  const handleProxyChange = useCallback((val: string) => {
-    setProxyUrl(val);
-    saveSetting("proxy_url", val || null);
-  }, [saveSetting]);
-
-  const handleTelemetryChange = useCallback((val: boolean) => {
-    setTelemetry(val);
-    saveSetting("telemetry_enabled", val);
-  }, [saveSetting]);
-
-  const handleChangePath = useCallback(async () => {
-    try {
-      const { open } = await import("@tauri-apps/plugin-dialog");
-      const selected = await open({ directory: true, multiple: false, title: "Select data folder" });
-      if (selected && typeof selected === "string") {
-        await invoke("set_data_path", { path: selected });
-        setDataPath(selected);
-        setPathChanged(true);
-      }
-    } catch {}
-  }, []);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -94,25 +66,20 @@ export function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
       theme={theme} handleThemeChange={handleThemeChange}
       locale={locale} handleLocaleChange={handleLocaleChange}
       timeout={timeout} handleTimeoutChange={handleTimeoutChange}
-      proxyUrl={proxyUrl} handleProxyChange={handleProxyChange}
-      telemetry={telemetry} handleTelemetryChange={handleTelemetryChange}
-      dataPath={dataPath} handleChangePath={handleChangePath} pathChanged={pathChanged}
+      dataPath={dataPath}
     />
   );
 }
 
 function SettingsPanelInner({
   onClose, theme, handleThemeChange, locale, handleLocaleChange,
-  timeout, handleTimeoutChange, proxyUrl, handleProxyChange,
-  telemetry, handleTelemetryChange, dataPath, handleChangePath, pathChanged,
+  timeout, handleTimeoutChange, dataPath,
 }: {
   onClose: () => void;
   theme: ThemeOverride; handleThemeChange: (v: ThemeOverride) => void;
   locale: Locale; handleLocaleChange: (v: Locale) => void;
   timeout: number; handleTimeoutChange: (v: number) => void;
-  proxyUrl: string; handleProxyChange: (v: string) => void;
-  telemetry: boolean; handleTelemetryChange: (v: boolean) => void;
-  dataPath: string; handleChangePath: () => void; pathChanged: boolean;
+  dataPath: string;
 }) {
   const [activeTab, setActiveTab] = useState<SettingsTab>("appearance");
   const { t } = useT();
@@ -155,6 +122,9 @@ function SettingsPanelInner({
     >
       <div
         ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="settings-dialog-title"
         style={{
           background: "var(--bg-secondary)", borderRadius: "var(--radius-lg)",
           width: 560, maxWidth: "90vw", maxHeight: "80vh",
@@ -167,7 +137,7 @@ function SettingsPanelInner({
           width: 160, padding: "20px 0", borderRight: "0.5px solid var(--border-subtle)",
           display: "flex", flexDirection: "column", gap: 2, flexShrink: 0,
         }}>
-          <div style={{ fontSize: 14, fontWeight: 600, padding: "0 16px 12px", color: "var(--text-primary)" }}>
+          <div id="settings-dialog-title" style={{ fontSize: 14, fontWeight: 600, padding: "0 16px 12px", color: "var(--text-primary)" }}>
             {t("settings.title")}
           </div>
           {tabs.map((tab) => (
@@ -217,14 +187,6 @@ function SettingsPanelInner({
                 <div style={labelStyle}>{t("settings.timeout")}</div>
                 <input type="number" value={timeout} onChange={(e) => handleTimeoutChange(Number(e.target.value))} min={1000} max={300000} step={1000} style={inputStyle} />
               </div>
-              <div>
-                <div style={labelStyle}>{t("settings.proxyUrl")}</div>
-                <input type="text" value={proxyUrl} onChange={(e) => handleProxyChange(e.target.value)} placeholder="http://proxy:8080" style={inputStyle} />
-              </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <input type="checkbox" checked={telemetry} onChange={(e) => handleTelemetryChange(e.target.checked)} id="settings-telemetry" style={{ cursor: "pointer" }} />
-                <label htmlFor="settings-telemetry" style={{ fontSize: 12, color: "var(--text-primary)", cursor: "pointer" }}>{t("settings.telemetry")}</label>
-              </div>
             </div>
           )}
 
@@ -266,26 +228,6 @@ function SettingsPanelInner({
                   {dataPath || "—"}
                 </div>
               </div>
-              <button
-                onClick={handleChangePath}
-                style={{
-                  alignSelf: "flex-start", padding: "6px 16px", fontSize: 12,
-                  background: "var(--bg-primary)", border: "0.5px solid var(--border-default)",
-                  borderRadius: "var(--radius-md)", color: "var(--text-primary)",
-                  cursor: "pointer", fontFamily: "inherit", fontWeight: 500,
-                }}
-              >
-                {t("settings.changePath")}
-              </button>
-              {pathChanged && (
-                <div style={{
-                  padding: "8px 12px", fontSize: 12, borderRadius: "var(--radius-md)",
-                  background: "var(--bg-warning, #FEF3C7)", color: "var(--text-warning, #D97706)",
-                  border: "0.5px solid rgba(217,119,6,0.2)",
-                }}>
-                  {t("settings.restartRequired")}
-                </div>
-              )}
             </div>
           )}
 

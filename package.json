@@ -8,7 +8,10 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "tauri": "tauri",
-    "test": "vitest run"
+    "test": "vitest run",
+    "dev:web": "WEB_MODE=1 vite",
+    "build:web": "WEB_MODE=1 tsc && WEB_MODE=1 vite build",
+    "mock-agent": "node mock-agent/index.js"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",

@@ -21,6 +21,32 @@ describe("a2a", () => {
       expect(result.params.input).toEqual({ prompt: "hello" });
       expect(result.id).toBe(1);
     });
+
+    it("includes context data when provided as valid JSON", () => {
+      const result = buildTaskSendPayload("skill-1", "hello", "task-1", '{"key": "val"}');
+      expect(result.params.input).toEqual({ prompt: "hello", context: { key: "val" } });
+    });
+
+    it("ignores invalid context JSON", () => {
+      const result = buildTaskSendPayload("skill-1", "hello", "task-1", "not json");
+      expect(result.params.input).toEqual({ prompt: "hello" });
+    });
+
+    it("includes file data when provided", () => {
+      const file = { name: "test.png", data: "base64data" };
+      const result = buildTaskSendPayload("skill-1", "hello", "task-1", undefined, file);
+      expect(result.params.input).toEqual({ prompt: "hello", file: { name: "test.png", data: "base64data" } });
+    });
+
+    it("includes both context and file when provided", () => {
+      const file = { name: "img.jpg", data: "abc123" };
+      const result = buildTaskSendPayload("skill-1", "hello", "task-1", '{"mode": "fast"}', file);
+      expect(result.params.input).toEqual({
+        prompt: "hello",
+        context: { mode: "fast" },
+        file: { name: "img.jpg", data: "abc123" },
+      });
+    });
   });
 
   describe("buildTaskSubscribePayload", () => {

@@ -60,7 +60,7 @@ pub async fn add_agent(
         serde_json::to_string(&card).map_err(|e| AppError::Serialization(e.to_string()))?;
     let now = SystemTime::now()
         .duration_since(UNIX_EPOCH)
-        .unwrap()
+        .unwrap_or_default()
         .as_secs() as i64;
 
     let pool = get_pool(&app).await?;
@@ -169,7 +169,7 @@ pub async fn refresh_agent(
         serde_json::to_string(&card).map_err(|e| AppError::Serialization(e.to_string()))?;
     let now = SystemTime::now()
         .duration_since(UNIX_EPOCH)
-        .unwrap()
+        .unwrap_or_default()
         .as_secs() as i64;
 
     sqlx::query("UPDATE agents SET card_json = ?, last_fetched_at = ? WHERE id = ?")
@@ -188,6 +188,23 @@ pub async fn refresh_agent(
         last_fetched_at: now.to_string(),
         workspace_id,
     })
+}
+
+#[tauri::command]
+#[specta::specta]
+pub async fn rename_agent(
+    agent_id: String,
+    nickname: String,
+    app: tauri::AppHandle,
+) -> Result<(), AppError> {
+    let pool = get_pool(&app).await?;
+    sqlx::query("UPDATE agents SET nickname = ? WHERE id = ?")
+        .bind(&nickname)
+        .bind(&agent_id)
+        .execute(&pool)
+        .await
+        .map_err(|e| AppError::Database(e.to_string()))?;
+    Ok(())
 }
 
 #[tauri::command]
@@ -275,7 +292,7 @@ async fn add_agent_inner(
         serde_json::to_string(&card).map_err(|e| AppError::Serialization(e.to_string()))?;
     let now = SystemTime::now()
         .duration_since(UNIX_EPOCH)
-        .unwrap()
+        .unwrap_or_default()
         .as_secs() as i64;
 
     let pool = get_pool(app).await?;

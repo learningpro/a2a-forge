@@ -29,7 +29,16 @@ export function buildTaskSendPayload(
   skillId: string,
   text: string,
   taskId: string,
+  contextData?: string,
+  fileData?: { name: string; data: string } | null,
 ): TaskSendPayload {
+  const input: Record<string, unknown> = { prompt: text };
+  if (contextData) {
+    try { input.context = JSON.parse(contextData); } catch { console.warn("Invalid context JSON, skipping context data"); }
+  }
+  if (fileData) {
+    input.file = { name: fileData.name, data: fileData.data };
+  }
   return {
     jsonrpc: "2.0",
     method: "tasks/send",
@@ -40,7 +49,7 @@ export function buildTaskSendPayload(
         role: "user",
         parts: [{ type: "text", text }],
       },
-      input: { prompt: text },
+      input,
     },
     id: 1,
   };
@@ -50,7 +59,16 @@ export function buildTaskSubscribePayload(
   skillId: string,
   text: string,
   taskId: string,
+  contextData?: string,
+  fileData?: { name: string; data: string } | null,
 ): TaskSendPayload {
+  const input: Record<string, unknown> = { prompt: text };
+  if (contextData) {
+    try { input.context = JSON.parse(contextData); } catch { console.warn("Invalid context JSON, skipping context data"); }
+  }
+  if (fileData) {
+    input.file = { name: fileData.name, data: fileData.data };
+  }
   return {
     jsonrpc: "2.0",
     method: "tasks/sendSubscribe",
@@ -61,7 +79,7 @@ export function buildTaskSubscribePayload(
         role: "user",
         parts: [{ type: "text", text }],
       },
-      input: { prompt: text },
+      input,
     },
     id: 1,
   };

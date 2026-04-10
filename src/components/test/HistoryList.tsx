@@ -1,13 +1,15 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { commands } from "../../bindings";
 import { unwrap, type HistoryEntry } from "../../lib/tauri-helpers";
+import { useT } from "../../lib/i18n";
 
 interface HistoryListProps {
   agentId: string | null;
   onSelectHistory?: (entry: HistoryEntry) => void;
 }
 
-function formatTime(epochMs: number): string {
+function formatTime(epochSecs: number): string {
+  const epochMs = epochSecs * 1000;
   const diff = Date.now() - epochMs;
   if (diff < 60_000) return "just now";
   if (diff < 3_600_000) return `${Math.floor(diff / 60_000)}m ago`;
@@ -27,11 +29,12 @@ export function HistoryList({ agentId, onSelectHistory }: HistoryListProps) {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const { t } = useT();
 
   const loadHistory = useCallback(async (searchQuery?: string) => {
     setLoading(true);
     try {
-      const all = unwrap(await commands.listHistory(agentId, null, null)) as unknown as HistoryEntry[];
+      const all = unwrap(await commands.listHistory(agentId, null, null)) as HistoryEntry[];
       let filtered: HistoryEntry[] = all;
       if (searchQuery) {
         const q = searchQuery.toLowerCase();
@@ -50,6 +53,9 @@ export function HistoryList({ agentId, onSelectHistory }: HistoryListProps) {
 
   useEffect(() => {
     loadHistory();
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
   }, [loadHistory]);
 
   const handleSearchChange = useCallback(
@@ -65,7 +71,7 @@ export function HistoryList({ agentId, onSelectHistory }: HistoryListProps) {
 
   const handleClear = useCallback(async () => {
     const label = agentId ? "this agent" : "all agents";
-    if (!window.confirm(`Clear history for ${label}?`)) return;
+    if (!window.confirm(`${t("history.clearConfirm")} ${label}?`)) return;
     try {
       unwrap(await commands.clearHistory(agentId ?? null));
       setEntries([]);
@@ -82,7 +88,7 @@ export function HistoryList({ agentId, onSelectHistory }: HistoryListProps) {
           type="text"
           value={search}
           onChange={(e) => handleSearchChange(e.target.value)}
-          placeholder="Search history..."
+          placeholder={t("history.searchPlaceholder")}
           style={{
             width: "100%",
             padding: "5px 8px",
@@ -101,13 +107,13 @@ export function HistoryList({ agentId, onSelectHistory }: HistoryListProps) {
       <div style={{ flex: 1, overflowY: "auto", padding: "0 8px" }}>
         {loading && (
           <div style={{ padding: 12, color: "var(--text-muted)", fontSize: 11, textAlign: "center" }}>
-            Loading...
+            {t("history.loading")}
           </div>
         )}
 
         {!loading && entries.length === 0 && (
           <div style={{ padding: 24, color: "var(--text-muted)", fontSize: 11, textAlign: "center" }}>
-            No test history yet
+            {t("history.empty")}
           </div>
         )}
 
@@ -186,7 +192,7 @@ export function HistoryList({ agentId, onSelectHistory }: HistoryListProps) {
               fontFamily: "inherit",
             }}
           >
-            {agentId ? "Clear history" : "Clear all history"}
+            {agentId ? t("history.clearHistory") : t("history.clearAll")}
           </button>
         </div>
       )}

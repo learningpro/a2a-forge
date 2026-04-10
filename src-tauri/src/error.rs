@@ -21,7 +21,6 @@ pub enum AppError {
     NotFound(String),
 
     #[error("Credential error: {0}")]
-    #[allow(dead_code)]
     Credential(String),
 }
 

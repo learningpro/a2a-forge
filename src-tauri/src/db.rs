@@ -291,5 +291,24 @@ pub fn migrations() -> Vec<Migration> {
             "#,
             kind: MigrationKind::Up,
         },
+        Migration {
+            version: 10,
+            description: "remove_agents_url_unique",
+            sql: r#"
+                CREATE TABLE agents_new (
+                    id              TEXT PRIMARY KEY,
+                    url             TEXT NOT NULL,
+                    nickname        TEXT,
+                    card_json       TEXT NOT NULL,
+                    last_fetched_at INTEGER NOT NULL,
+                    workspace_id    TEXT NOT NULL REFERENCES workspaces(id)
+                );
+                INSERT INTO agents_new SELECT * FROM agents;
+                DROP TABLE agents;
+                ALTER TABLE agents_new RENAME TO agents;
+                CREATE INDEX idx_agents_workspace ON agents(workspace_id);
+            "#,
+            kind: MigrationKind::Up,
+        },
     ]
 }

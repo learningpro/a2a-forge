@@ -12,6 +12,7 @@ export function Sidebar() {
   const sidebarCollapsed = useUiStore((s) => s.sidebarCollapsed);
   const setSidebarCollapsed = useUiStore((s) => s.setSidebarCollapsed);
   const sidebarWidth = useUiStore((s) => s.sidebarWidth);
+  const addAgentRequested = useUiStore((s) => s.addAgentRequested);
   const { t } = useT();
 
   const agents = useAgentStore((s) => s.agents);
@@ -25,6 +26,8 @@ export function Sidebar() {
   const createWorkspace = useWorkspaceStore((s) => s.createWorkspace);
 
   const [showAddDialog, setShowAddDialog] = useState(false);
+  const [showNewWorkspace, setShowNewWorkspace] = useState(false);
+  const [newWorkspaceName, setNewWorkspaceName] = useState("");
   const agentListRef = useRef<HTMLDivElement>(null);
 
   // Animate agent list when agents change
@@ -35,16 +38,14 @@ export function Sidebar() {
     }
   }, [agents]);
 
-  // Listen for global keyboard shortcut event
+  // Open add-agent dialog when requested via store
   useEffect(() => {
-    const handler = () => setShowAddDialog(true);
-    document.addEventListener("a2a:add-agent", handler);
-    return () => document.removeEventListener("a2a:add-agent", handler);
-  }, []);
+    if (addAgentRequested > 0) setShowAddDialog(true);
+  }, [addAgentRequested]);
 
   // Load workspaces and agents on mount
   useEffect(() => {
-    loadWorkspaces();
+    loadWorkspaces().catch(() => { /* ignore init failure */ });
   }, [loadWorkspaces]);
 
   useEffect(() => {
@@ -53,13 +54,18 @@ export function Sidebar() {
 
   const handleWorkspaceChange = (id: string) => {
     setActiveWorkspace(id);
-    useAgentStore.getState().loadAgents(id);
+    // loadAgents is triggered by useEffect on activeWorkspaceId
   };
 
   const handleAddWorkspace = () => {
-    const name = window.prompt("New workspace name:");
-    if (!name?.trim()) return;
-    createWorkspace(name.trim());
+    setShowNewWorkspace(true);
+  };
+
+  const handleCreateWorkspace = () => {
+    if (!newWorkspaceName.trim()) return;
+    createWorkspace(newWorkspaceName.trim()).catch(() => { /* ignore */ });
+    setNewWorkspaceName("");
+    setShowNewWorkspace(false);
   };
 
 
@@ -235,7 +241,7 @@ export function Sidebar() {
                 fontFamily: "inherit",
               }}
             >
-              <option value="default">Default</option>
+              <option value="default">{t("sidebar.default")}</option>
               {workspaces
                 .filter((w) => w.id !== "default")
                 .map((w) => (
@@ -244,6 +250,36 @@ export function Sidebar() {
                   </option>
                 ))}
             </select>
+            {showNewWorkspace && (
+              <div style={{ display: "flex", gap: 4 }}>
+                <input
+                  autoFocus
+                  value={newWorkspaceName}
+                  onChange={(e) => setNewWorkspaceName(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") handleCreateWorkspace();
+                    if (e.key === "Escape") { setShowNewWorkspace(false); setNewWorkspaceName(""); }
+                  }}
+                  placeholder={t("sidebar.createWorkspace")}
+                  style={{
+                    flex: 1, padding: "4px 8px", fontSize: 11,
+                    background: "var(--bg-primary)", border: "0.5px solid var(--border-default)",
+                    borderRadius: "var(--radius-md)", color: "var(--text-primary)",
+                    outline: "none", fontFamily: "inherit",
+                  }}
+                />
+                <button
+                  onClick={handleCreateWorkspace}
+                  style={{
+                    padding: "4px 8px", fontSize: 11, background: "var(--text-primary)",
+                    border: "none", borderRadius: "var(--radius-md)", color: "var(--bg-primary)",
+                    cursor: "pointer", fontFamily: "inherit",
+                  }}
+                >
+                  {t("action.add")}
+                </button>
+              </div>
+            )}
           </>
         )}
         {/* Collapse toggle */}
@@ -277,6 +313,7 @@ export function Sidebar() {
       <AddAgentDialog
         open={showAddDialog}
         onClose={() => setShowAddDialog(false)}
+        workspaceId={activeWorkspaceId}
       />
     </aside>
   );

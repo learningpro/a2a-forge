@@ -94,6 +94,14 @@ async exportAgents(workspaceId: string) : Promise<Result<string, AppError>> {
     else return { status: "error", error: e  as any };
 }
 },
+async renameAgent(agentId: string, nickname: string) : Promise<Result<null, AppError>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("rename_agent", { agentId, nickname }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
 async sendTask(agentUrl: string, payload: JsonValue, authHeader: string | null, extraHeaders: Partial<{ [key in string]: string }> | null, timeoutSecs: number | null) : Promise<Result<JsonValue, AppError>> {
     try {
     return { status: "ok", data: await TAURI_INVOKE("send_task", { agentUrl, payload, authHeader, extraHeaders, timeoutSecs }) };
@@ -617,6 +625,30 @@ async importWorkspace(jsonData: string) : Promise<Result<string, AppError>> {
 async diffResponses(responseA: string, responseB: string) : Promise<Result<DiffResult, AppError>> {
     try {
     return { status: "ok", data: await TAURI_INVOKE("diff_responses", { responseA, responseB }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async storeAgentHeaders(agentId: string, headersJson: string) : Promise<Result<null, AppError>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("store_agent_headers", { agentId, headersJson }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async retrieveAgentHeaders(agentId: string) : Promise<Result<string | null, AppError>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("retrieve_agent_headers", { agentId }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async deleteAgentHeaders(agentId: string) : Promise<Result<null, AppError>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("delete_agent_headers", { agentId }) };
 } catch (e) {
     if(e instanceof Error) throw e;
     else return { status: "error", error: e  as any };

@@ -1,13 +1,9 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { commands } from "../bindings";
-import { unwrap } from "../lib/tauri-helpers";
+import { unwrap, type WorkspaceRow } from "../lib/tauri-helpers";
 
-export interface Workspace {
-  id: string;
-  name: string;
-  createdAt: number;
-}
+export type Workspace = WorkspaceRow;
 
 interface WorkspaceState {
   workspaces: Workspace[];
@@ -26,19 +22,19 @@ export const useWorkspaceStore = create<WorkspaceState>()(
       activeWorkspaceId: "default",
 
       loadWorkspaces: async () => {
-        const workspaces = unwrap(await commands.listWorkspaces()) as unknown as Workspace[];
+        const workspaces = unwrap(await commands.listWorkspaces()) as Workspace[];
         set({ workspaces });
       },
 
       createWorkspace: async (name: string) => {
         unwrap(await commands.createWorkspace(name));
-        const workspaces = unwrap(await commands.listWorkspaces()) as unknown as Workspace[];
+        const workspaces = unwrap(await commands.listWorkspaces()) as Workspace[];
         set({ workspaces });
       },
 
       deleteWorkspace: async (id: string) => {
         unwrap(await commands.deleteWorkspace(id));
-        const workspaces = unwrap(await commands.listWorkspaces()) as unknown as Workspace[];
+        const workspaces = unwrap(await commands.listWorkspaces()) as Workspace[];
         set((state) => ({
           workspaces,
           activeWorkspaceId:

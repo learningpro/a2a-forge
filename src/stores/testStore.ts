@@ -36,6 +36,8 @@ interface TestState {
   inputTab: "message" | "context" | "headers";
   responseTab: "rendered" | "raw";
   customHeaders: Record<string, string>;
+  contextData: string;
+  droppedFile: { name: string; data: string } | null;
 
   /** Get execution state for a skill (returns idle defaults if none) */
   getExecution: (agentId: string, skillId: string) => SkillExecution;
@@ -48,6 +50,8 @@ interface TestState {
   setInputTab: (tab: "message" | "context" | "headers") => void;
   setResponseTab: (tab: "rendered" | "raw") => void;
   setCustomHeaders: (headers: Record<string, string>) => void;
+  setContextData: (data: string) => void;
+  setDroppedFile: (file: { name: string; data: string } | null) => void;
 }
 
 function key(agentId: string, skillId: string) {
@@ -60,25 +64,32 @@ export const useTestStore = create<TestState>()((set, get) => ({
   inputTab: "message" as const,
   responseTab: "rendered" as const,
   customHeaders: {} as Record<string, string>,
+  contextData: "{\n  \n}",
+  droppedFile: null,
 
   getExecution: (agentId: string, skillId: string): SkillExecution => {
     return get().executions[key(agentId, skillId)] ?? emptyExecution;
   },
 
   startTask: (agentId: string, skillId: string, taskId: string) =>
-    set((state) => ({
-      executions: {
-        ...state.executions,
-        [key(agentId, skillId)]: {
-          taskId,
-          status: "running" as TaskStatus,
-          startedAt: Date.now(),
-          chunks: [],
-          result: null,
-          latencyMs: null,
+    set((state) => {
+      const k = key(agentId, skillId);
+      // Preserve any chunks that arrived before startTask (SSE race condition)
+      const existingChunks = state.executions[k]?.chunks ?? [];
+      return {
+        executions: {
+          ...state.executions,
+          [k]: {
+            taskId,
+            status: "running" as TaskStatus,
+            startedAt: Date.now(),
+            chunks: existingChunks,
+            result: null,
+            latencyMs: null,
+          },
         },
-      },
-    })),
+      };
+    }),
 
   appendChunk: (agentId: string, skillId: string, chunk: TaskChunk) =>
     set((state) => {
@@ -117,4 +128,6 @@ export const useTestStore = create<TestState>()((set, get) => ({
   setInputTab: (tab) => set({ inputTab: tab }),
   setResponseTab: (tab) => set({ responseTab: tab }),
   setCustomHeaders: (headers) => set({ customHeaders: headers }),
+  setContextData: (data) => set({ contextData: data }),
+  setDroppedFile: (file) => set({ droppedFile: file }),
 }));

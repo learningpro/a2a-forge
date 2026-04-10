@@ -2,6 +2,7 @@ import { useState, useCallback } from "react";
 import { useSuiteStore } from "../../stores/suiteStore";
 import { useAgentStore } from "../../stores/agentStore";
 import { StepEditor } from "./StepEditor";
+import { useT } from "../../lib/i18n";
 import type { TestStep } from "../../lib/suite-commands";
 
 interface SuiteEditorProps {
@@ -14,6 +15,7 @@ export function SuiteEditor({ suiteId }: SuiteEditorProps) {
   const steps = useSuiteStore((s) => s.steps);
   const isRunning = useSuiteStore((s) => s.isRunning);
   const agents = useAgentStore((s) => s.agents);
+  const { t } = useT();
 
   const [showStepEditor, setShowStepEditor] = useState(false);
   const [editingStep, setEditingStep] = useState<TestStep | null>(null);
@@ -63,7 +65,7 @@ export function SuiteEditor({ suiteId }: SuiteEditorProps) {
   if (!suite) {
     return (
       <div style={{ padding: 20, color: "var(--text-muted)", fontSize: 11, textAlign: "center" }}>
-        Select a suite to edit
+        {t("suite.selectToEdit")}
       </div>
     );
   }
@@ -98,7 +100,7 @@ export function SuiteEditor({ suiteId }: SuiteEditorProps) {
             <div
               onClick={handleStartRename}
               style={{ fontSize: 13, fontWeight: 600, color: "var(--text-primary)", cursor: "pointer" }}
-              title="Click to rename"
+              title={t("suite.clickToRename")}
             >
               {suite.name}
             </div>
@@ -113,11 +115,11 @@ export function SuiteEditor({ suiteId }: SuiteEditorProps) {
                 borderRadius: "var(--radius-md, 6px)", color: "var(--text-secondary)",
               }}
             >
-              <option value="sequential">Sequential</option>
-              <option value="parallel">Parallel</option>
+              <option value="sequential">{t("suite.sequential")}</option>
+              <option value="parallel">{t("suite.parallel")}</option>
             </select>
             <span style={{ fontSize: 11, color: "var(--text-muted)" }}>
-              {steps.length} step{steps.length !== 1 ? "s" : ""}
+              {steps.length} {t("suite.step")}{steps.length !== 1 ? "s" : ""}
             </span>
           </div>
         </div>
@@ -137,7 +139,7 @@ export function SuiteEditor({ suiteId }: SuiteEditorProps) {
             width: 6, height: 6, borderRadius: "50%",
             background: isRunning ? "var(--dot-warning)" : "var(--dot-online)", flexShrink: 0,
           }} />
-          {isRunning ? "Running\u2026" : "Run Suite"}
+          {isRunning ? t("suite.runningSuite") : t("suite.runSuite")}
         </button>
       </div>
 
@@ -148,7 +150,7 @@ export function SuiteEditor({ suiteId }: SuiteEditorProps) {
           display: "flex", justifyContent: "space-between", alignItems: "center",
         }}>
           <span style={{ fontSize: 11, fontWeight: 500, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.07em" }}>
-            Steps
+            {t("suite.steps")}
           </span>
           <button
             onClick={() => { setEditingStep(null); setShowStepEditor(true); }}
@@ -158,13 +160,13 @@ export function SuiteEditor({ suiteId }: SuiteEditorProps) {
               color: "var(--text-secondary)", cursor: "pointer",
             }}
           >
-            + Add
+            {t("suite.addStep")}
           </button>
         </div>
 
         {steps.length === 0 && (
           <div style={{ padding: "20px 14px", textAlign: "center", color: "var(--text-muted)", fontSize: 11 }}>
-            No steps yet. Add a step to define what to test.
+            {t("suite.noSteps")}
           </div>
         )}
 
@@ -187,8 +189,8 @@ export function SuiteEditor({ suiteId }: SuiteEditorProps) {
                   {index + 1}. {step.name}
                 </div>
                 <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2 }}>
-                  {agent?.nickname || agent?.card.name || "Unknown"} · {step.skillName}
-                  {assertionCount > 0 && ` · ${assertionCount} assertion${assertionCount > 1 ? "s" : ""}`}
+                  {agent?.nickname || agent?.card.name || t("suite.unknown")} · {step.skillName}
+                  {assertionCount > 0 && ` · ${assertionCount} ${t("suite.assertion")}${assertionCount > 1 ? "s" : ""}`}
                 </div>
               </div>
               <div style={{ display: "flex", gap: 2, flexShrink: 0 }}>
@@ -202,7 +204,7 @@ export function SuiteEditor({ suiteId }: SuiteEditorProps) {
                 </button>
                 <button onClick={() => handleEditStep(step)}
                   style={{ padding: "2px 6px", fontSize: 11, background: "transparent", border: "0.5px solid var(--border-subtle)", borderRadius: "var(--radius-md, 6px)", color: "var(--text-secondary)", cursor: "pointer" }}>
-                  Edit
+                  {t("suite.edit")}
                 </button>
                 <button onClick={() => handleDeleteStep(step.id)}
                   style={{ padding: "2px 4px", fontSize: 11, background: "transparent", border: "none", color: "var(--text-muted)", cursor: "pointer" }}>

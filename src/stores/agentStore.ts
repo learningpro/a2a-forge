@@ -1,7 +1,6 @@
 import { create } from "zustand";
 import { commands, type AgentRow } from "../bindings";
 import { unwrap } from "../lib/tauri-helpers";
-import Database from "@tauri-apps/plugin-sql";
 
 interface AgentState {
   agents: AgentRow[];
@@ -79,11 +78,7 @@ export const useAgentStore = create<AgentState>()((set, get) => ({
   },
 
   renameAgent: async (agentId: string, nickname: string) => {
-    const db = await Database.load("sqlite:workbench.db");
-    await db.execute("UPDATE agents SET nickname = ? WHERE id = ?", [
-      nickname,
-      agentId,
-    ]);
+    unwrap(await commands.renameAgent(agentId, nickname));
     set((state) => ({
       agents: state.agents.map((a) =>
         a.id === agentId ? { ...a, nickname } : a
@@ -110,12 +105,13 @@ export const useAgentStore = create<AgentState>()((set, get) => ({
     set((state) => ({
       defaultHeaders: { ...state.defaultHeaders, [agentId]: headers },
     }));
-    // Persist to SQLite
+    // Persist via secure credential storage (keyring with AES fallback)
     try {
-      await commands.saveSetting(
-        `card:${agentId}:headers`,
-        JSON.stringify(headers),
-      );
+      if (Object.keys(headers).length > 0) {
+        await commands.storeAgentHeaders(agentId, JSON.stringify(headers));
+      } else {
+        await commands.deleteAgentHeaders(agentId);
+      }
     } catch {
       /* best-effort persistence */
     }
@@ -123,17 +119,29 @@ export const useAgentStore = create<AgentState>()((set, get) => ({
 
   loadDefaultHeaders: async (agentId: string) => {
     try {
-      const settings = unwrap(await commands.getSettings());
-      const raw = (settings as Record<string, unknown>)[`card:${agentId}:headers`];
+      const raw = unwrap(await commands.retrieveAgentHeaders(agentId));
       if (raw) {
-        // raw may already be parsed as object by Rust serde_json, or may be a string
-        const headers = (typeof raw === "string" ? JSON.parse(raw) : raw) as Record<string, string>;
+        const headers = JSON.parse(raw) as Record<string, string>;
         set((state) => ({
           defaultHeaders: { ...state.defaultHeaders, [agentId]: headers },
         }));
       }
     } catch {
-      /* ignore */
+      // Fallback: try legacy settings storage for migration
+      try {
+        const settings = unwrap(await commands.getSettings());
+        const legacyRaw = (settings as Record<string, unknown>)[`card:${agentId}:headers`];
+        if (legacyRaw) {
+          const headers = (typeof legacyRaw === "string" ? JSON.parse(legacyRaw) : legacyRaw) as Record<string, string>;
+          set((state) => ({
+            defaultHeaders: { ...state.defaultHeaders, [agentId]: headers },
+          }));
+          // Migrate to secure storage
+          await commands.storeAgentHeaders(agentId, JSON.stringify(headers)).catch(() => {});
+        }
+      } catch {
+        /* ignore */
+      }
     }
   },
 }));

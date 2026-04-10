@@ -8,12 +8,15 @@ import { useT } from "../../lib/i18n";
 type WsTab = "env" | "chains" | "diff" | "export";
 
 export function WorkspacePanel() {
+  const { t } = useT();
   const activeWorkspaceId = useWorkspaceStore((s) => s.activeWorkspaceId);
   const [activeTab, setActiveTab] = useState<WsTab>("env");
 
   useEffect(() => {
-    useWorkspaceAdvancedStore.getState().loadEnvVars(activeWorkspaceId);
-    useWorkspaceAdvancedStore.getState().loadChains(activeWorkspaceId);
+    const store = useWorkspaceAdvancedStore.getState();
+    store.selectChain(null);
+    store.loadEnvVars(activeWorkspaceId);
+    store.loadChains(activeWorkspaceId);
   }, [activeWorkspaceId]);
 
   return (
@@ -31,7 +34,7 @@ export function WorkspacePanel() {
           onMouseEnter={(e) => { if (activeTab !== tab) e.currentTarget.style.color = "var(--text-secondary)"; }}
           onMouseLeave={(e) => { if (activeTab !== tab) e.currentTarget.style.color = "var(--text-muted)"; }}
           >
-            {tab === "env" ? "Variables" : tab === "chains" ? "Chains" : tab === "diff" ? "Diff" : "Export"}
+            {tab === "env" ? t("workspace.variables") : tab === "chains" ? t("workspace.chains") : tab === "diff" ? t("workspace.diff") : t("workspace.export")}
           </button>
         ))}
       </div>
@@ -69,16 +72,16 @@ function EnvVarsTab({ workspaceId }: { workspaceId: string }) {
     <div>
       <div style={{ padding: "8px 12px", borderBottom: "0.5px solid var(--border-subtle)" }}>
         <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
-          <input value={name} onChange={(e) => setName(e.target.value)} placeholder="VAR_NAME" style={{ ...inputStyle, flex: 1, fontFamily: "var(--font-mono, monospace)" }} />
-          <input value={value} onChange={(e) => setValue(e.target.value)} placeholder="value" type={isSecret ? "password" : "text"} style={{ ...inputStyle, flex: 2 }} />
+          <input value={name} onChange={(e) => setName(e.target.value)} placeholder={t("workspace.varName")} style={{ ...inputStyle, flex: 1, fontFamily: "var(--font-mono, monospace)" }} />
+          <input value={value} onChange={(e) => setValue(e.target.value)} placeholder={t("workspace.varValue")} type={isSecret ? "password" : "text"} style={{ ...inputStyle, flex: 2 }} />
           <label style={{ fontSize: 11, color: "var(--text-muted)", display: "flex", alignItems: "center", gap: 2, cursor: "pointer" }}>
-            <input type="checkbox" checked={isSecret} onChange={(e) => setIsSecret(e.target.checked)} /> Secret
+            <input type="checkbox" checked={isSecret} onChange={(e) => setIsSecret(e.target.checked)} /> {t("workspace.secret")}
           </label>
           <button onClick={handleAdd} style={{
             padding: "3px 10px", fontSize: 11, background: "transparent",
             border: "0.5px solid var(--border-strong)", borderRadius: "var(--radius-md, 6px)",
             color: "var(--text-primary)", cursor: "pointer", fontWeight: 500,
-          }}>Add</button>
+          }}>{t("action.add")}</button>
         </div>
       </div>
       {envVars.length === 0 && (
@@ -96,7 +99,7 @@ function EnvVarsTab({ workspaceId }: { workspaceId: string }) {
           <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
             <span style={{ fontSize: 11, fontFamily: "var(--font-mono, monospace)", color: "var(--text-primary)", fontWeight: 500 }}>{v.name}</span>
             <span style={{ fontSize: 11, color: "var(--text-muted)" }}>{v.isSecret ? "********" : v.value}</span>
-            {v.isSecret && <span style={{ fontSize: 11, padding: "1px 4px", background: "var(--bg-secondary)", borderRadius: 4, color: "var(--text-muted)" }}>secret</span>}
+            {v.isSecret && <span style={{ fontSize: 11, padding: "1px 4px", background: "var(--bg-secondary)", borderRadius: 4, color: "var(--text-muted)" }}>{t("workspace.secret")}</span>}
           </div>
           <button onClick={() => useWorkspaceAdvancedStore.getState().deleteEnvVar(v.id)} style={{
             padding: "2px 4px", fontSize: 11, background: "transparent", border: "none", color: "var(--text-muted)", cursor: "pointer",
@@ -109,6 +112,7 @@ function EnvVarsTab({ workspaceId }: { workspaceId: string }) {
 
 // --- Chains ---
 function ChainsTab({ workspaceId }: { workspaceId: string }) {
+  const { t } = useT();
   const chains = useWorkspaceAdvancedStore((s) => s.chains);
   const selectedChainId = useWorkspaceAdvancedStore((s) => s.selectedChainId);
   const chainSteps = useWorkspaceAdvancedStore((s) => s.chainSteps);
@@ -151,7 +155,7 @@ function ChainsTab({ workspaceId }: { workspaceId: string }) {
       <div style={{ width: 180, borderRight: "0.5px solid var(--border-subtle)", display: "flex", flexDirection: "column" }}>
         <div style={{ padding: "6px 8px", borderBottom: "0.5px solid var(--border-subtle)", display: "flex", gap: 4 }}>
           <input value={newName} onChange={(e) => setNewName(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") handleCreateChain(); }}
-            placeholder="New chain..." style={{ ...inputStyle, flex: 1 }} />
+            placeholder={t("workspace.newChain")} style={{ ...inputStyle, flex: 1 }} />
           <button onClick={handleCreateChain} style={{ padding: "2px 6px", fontSize: 11, background: "transparent", border: "0.5px solid var(--border-subtle)", borderRadius: "var(--radius-md, 6px)", color: "var(--text-secondary)", cursor: "pointer" }}>+</button>
         </div>
         <div style={{ flex: 1, overflow: "auto" }}>
@@ -174,41 +178,41 @@ function ChainsTab({ workspaceId }: { workspaceId: string }) {
       <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "auto" }}>
         {!selectedChainId ? (
           <div style={{ padding: 20, textAlign: "center", color: "var(--text-muted)", fontSize: 11 }}>
-            Select or create a chain. Chains pipe the output of one skill into the next using {"{{variable}}"} substitution.
+            {t("workspace.chainHint")}
           </div>
         ) : (
           <>
             <div style={{ padding: "8px 12px", borderBottom: "0.5px solid var(--border-subtle)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <span style={{ fontSize: 11, fontWeight: 500, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.07em" }}>Steps</span>
+              <span style={{ fontSize: 11, fontWeight: 500, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.07em" }}>{t("workspace.steps")}</span>
               <div style={{ display: "flex", gap: 4 }}>
-                <button onClick={() => setShowAddStep(!showAddStep)} style={{ padding: "2px 8px", fontSize: 11, background: "transparent", border: "0.5px solid var(--border-subtle)", borderRadius: "var(--radius-md, 6px)", color: "var(--text-secondary)", cursor: "pointer" }}>+ Step</button>
+                <button onClick={() => setShowAddStep(!showAddStep)} style={{ padding: "2px 8px", fontSize: 11, background: "transparent", border: "0.5px solid var(--border-subtle)", borderRadius: "var(--radius-md, 6px)", color: "var(--text-secondary)", cursor: "pointer" }}>{t("workspace.addStep")}</button>
                 <button onClick={() => useWorkspaceAdvancedStore.getState().runChain(selectedChainId)} disabled={isRunningChain || chainSteps.length === 0}
                   style={{ padding: "2px 8px", fontSize: 11, fontWeight: 500, background: "transparent", border: "0.5px solid var(--border-strong)", borderRadius: "var(--radius-md, 6px)", color: "var(--text-primary)", cursor: isRunningChain ? "default" : "pointer", opacity: isRunningChain || chainSteps.length === 0 ? 0.5 : 1 }}>
-                  {isRunningChain ? "Running..." : "Run"}
+                  {isRunningChain ? t("test.running") : t("action.run")}
                 </button>
               </div>
             </div>
 
             {showAddStep && (
               <div style={{ padding: "8px 12px", borderBottom: "0.5px solid var(--border-subtle)", display: "flex", flexDirection: "column", gap: 4 }}>
-                <input value={stepName} onChange={(e) => setStepName(e.target.value)} placeholder="Step name" style={inputStyle} />
+                <input value={stepName} onChange={(e) => setStepName(e.target.value)} placeholder={t("workspace.stepName")} style={inputStyle} />
                 <div style={{ display: "flex", gap: 4 }}>
                   <select value={stepAgentId} onChange={(e) => { setStepAgentId(e.target.value); setStepSkill(""); }} style={{ ...inputStyle, flex: 1 }}>
-                    <option value="">Agent...</option>
+                    <option value="">{t("workspace.agentPlaceholder")}</option>
                     {agents.map((a) => <option key={a.id} value={a.id}>{a.nickname || a.card.name}</option>)}
                   </select>
                   <select value={stepSkill} onChange={(e) => setStepSkill(e.target.value)} style={{ ...inputStyle, flex: 1 }}>
-                    <option value="">Skill...</option>
+                    <option value="">{t("workspace.skillPlaceholder")}</option>
                     {skills.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
                   </select>
                 </div>
-                <textarea value={stepRequest} onChange={(e) => setStepRequest(e.target.value)} rows={3} placeholder="Request JSON (use {{var}} for substitution)"
+                <textarea value={stepRequest} onChange={(e) => setStepRequest(e.target.value)} rows={3} placeholder={t("workspace.requestJson")}
                   style={{ ...inputStyle, fontFamily: "var(--font-mono, monospace)", resize: "vertical" }} />
-                <textarea value={stepExtract} onChange={(e) => setStepExtract(e.target.value)} rows={2} placeholder='Extract: {"varName": "$.result.url"}'
+                <textarea value={stepExtract} onChange={(e) => setStepExtract(e.target.value)} rows={2} placeholder={t("workspace.extractJson")}
                   style={{ ...inputStyle, fontFamily: "var(--font-mono, monospace)", resize: "vertical" }} />
                 <div style={{ display: "flex", gap: 4, justifyContent: "flex-end" }}>
-                  <button onClick={() => setShowAddStep(false)} style={{ padding: "3px 8px", fontSize: 11, background: "transparent", border: "0.5px solid var(--border-subtle)", borderRadius: "var(--radius-md, 6px)", color: "var(--text-secondary)", cursor: "pointer" }}>Cancel</button>
-                  <button onClick={handleAddStep} style={{ padding: "3px 8px", fontSize: 11, fontWeight: 500, background: "transparent", border: "0.5px solid var(--border-strong)", borderRadius: "var(--radius-md, 6px)", color: "var(--text-primary)", cursor: "pointer" }}>Add</button>
+                  <button onClick={() => setShowAddStep(false)} style={{ padding: "3px 8px", fontSize: 11, background: "transparent", border: "0.5px solid var(--border-subtle)", borderRadius: "var(--radius-md, 6px)", color: "var(--text-secondary)", cursor: "pointer" }}>{t("action.cancel")}</button>
+                  <button onClick={handleAddStep} style={{ padding: "3px 8px", fontSize: 11, fontWeight: 500, background: "transparent", border: "0.5px solid var(--border-strong)", borderRadius: "var(--radius-md, 6px)", color: "var(--text-primary)", cursor: "pointer" }}>{t("action.add")}</button>
                 </div>
               </div>
             )}
@@ -229,7 +233,7 @@ function ChainsTab({ workspaceId }: { workspaceId: string }) {
                     {runStep?.error && <div style={{ fontSize: 11, color: "var(--dot-error, #ef4444)" }}>{runStep.error}</div>}
                     {runStep && Object.keys(runStep.extracted).length > 0 && (
                       <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2 }}>
-                        Extracted: {Object.entries(runStep.extracted).map(([k, v]) => `${k}=${v.slice(0, 30)}`).join(", ")}
+                        {t("workspace.extracted")} {Object.entries(runStep.extracted).map(([k, v]) => `${k}=${v.slice(0, 30)}`).join(", ")}
                       </div>
                     )}
                   </div>
@@ -256,6 +260,7 @@ function ChainsTab({ workspaceId }: { workspaceId: string }) {
 
 // --- Diff ---
 function DiffTab() {
+  const { t } = useT();
   const diffResult = useWorkspaceAdvancedStore((s) => s.diffResult);
   const [responseA, setResponseA] = useState("");
   const [responseB, setResponseB] = useState("");
@@ -275,24 +280,24 @@ function DiffTab() {
     <div style={{ padding: 12, display: "flex", flexDirection: "column", gap: 8 }}>
       <div style={{ display: "flex", gap: 8 }}>
         <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 11, fontWeight: 500, color: "var(--text-muted)", marginBottom: 4 }}>Response A</div>
-          <textarea value={responseA} onChange={(e) => setResponseA(e.target.value)} rows={6} style={textareaStyle} placeholder="Paste JSON response..." />
+          <div style={{ fontSize: 11, fontWeight: 500, color: "var(--text-muted)", marginBottom: 4 }}>{t("workspace.responseA")}</div>
+          <textarea value={responseA} onChange={(e) => setResponseA(e.target.value)} rows={6} style={textareaStyle} placeholder={t("workspace.pasteJson")} />
         </div>
         <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 11, fontWeight: 500, color: "var(--text-muted)", marginBottom: 4 }}>Response B</div>
-          <textarea value={responseB} onChange={(e) => setResponseB(e.target.value)} rows={6} style={textareaStyle} placeholder="Paste JSON response..." />
+          <div style={{ fontSize: 11, fontWeight: 500, color: "var(--text-muted)", marginBottom: 4 }}>{t("workspace.responseB")}</div>
+          <textarea value={responseB} onChange={(e) => setResponseB(e.target.value)} rows={6} style={textareaStyle} placeholder={t("workspace.pasteJson")} />
         </div>
       </div>
       <button onClick={handleDiff} style={{
         padding: "5px 14px", fontSize: 11, fontWeight: 500, background: "var(--bg-primary)",
         border: "0.5px solid var(--border-strong)", borderRadius: "var(--radius-md, 6px)",
         color: "var(--text-primary)", cursor: "pointer", alignSelf: "flex-start",
-      }}>Compare</button>
+      }}>{ t("workspace.compare") }</button>
 
       {diffResult && (
         <div style={{ marginTop: 8 }}>
           <div style={{ fontSize: 11, fontWeight: 600, color: diffResult.identical ? "var(--dot-online, #22c55e)" : "var(--text-primary)", marginBottom: 8 }}>
-            {diffResult.identical ? "Identical" : `${diffResult.changed.length} changed, ${diffResult.added.length} added, ${diffResult.removed.length} removed`}
+            {diffResult.identical ? t("workspace.identical") : `${diffResult.changed.length} changed, ${diffResult.added.length} added, ${diffResult.removed.length} removed`}
           </div>
           {diffResult.changed.map((c, i) => (
             <div key={i} style={{ padding: "4px 0", fontSize: 11, borderBottom: "0.5px solid var(--border-subtle)" }}>
@@ -315,6 +320,7 @@ function DiffTab() {
 
 // --- Export/Import ---
 function ExportTab({ workspaceId }: { workspaceId: string }) {
+  const { t } = useT();
   const [exportData, setExportData] = useState("");
   const [importData, setImportData] = useState("");
   const [importResult, setImportResult] = useState("");
@@ -328,19 +334,22 @@ function ExportTab({ workspaceId }: { workspaceId: string }) {
   const handleImport = useCallback(async () => {
     if (!importData.trim()) return;
     const wsId = await useWorkspaceAdvancedStore.getState().importWorkspace(importData);
-    setImportResult(`Imported as workspace: ${wsId}`);
+    setImportResult(`${t("workspace.imported")} ${wsId}`);
     setImportData("");
-  }, [importData]);
+    // Refresh workspace list and switch to the new workspace
+    await useWorkspaceStore.getState().loadWorkspaces();
+    useWorkspaceStore.getState().setActiveWorkspace(wsId);
+  }, [importData, t]);
 
   return (
     <div style={{ padding: 12, display: "flex", flexDirection: "column", gap: 12 }}>
       <div>
-        <div style={{ fontSize: 11, fontWeight: 500, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 6 }}>Export</div>
+        <div style={{ fontSize: 11, fontWeight: 500, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 6 }}>{t("workspace.export")}</div>
         <button onClick={handleExport} style={{
           padding: "5px 14px", fontSize: 11, fontWeight: 500, background: "var(--bg-primary)",
           border: "0.5px solid var(--border-strong)", borderRadius: "var(--radius-md, 6px)",
           color: "var(--text-primary)", cursor: "pointer",
-        }}>Export Workspace to Clipboard</button>
+        }}>{ t("workspace.exportClipboard") }</button>
         {exportData && (
           <pre style={{ marginTop: 8, padding: 8, fontSize: 11, background: "var(--bg-secondary)", borderRadius: "var(--radius-md, 6px)", maxHeight: 200, overflow: "auto", color: "var(--text-secondary)", fontFamily: "var(--font-mono, monospace)" }}>
             {exportData}
@@ -348,14 +357,14 @@ function ExportTab({ workspaceId }: { workspaceId: string }) {
         )}
       </div>
       <div>
-        <div style={{ fontSize: 11, fontWeight: 500, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 6 }}>Import</div>
-        <textarea value={importData} onChange={(e) => setImportData(e.target.value)} rows={4} placeholder="Paste workspace JSON..."
+        <div style={{ fontSize: 11, fontWeight: 500, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 6 }}>{t("workspace.import")}</div>
+        <textarea value={importData} onChange={(e) => setImportData(e.target.value)} rows={4} placeholder={t("workspace.pasteImport")}
           style={{ width: "100%", padding: "6px 8px", fontSize: 11, background: "var(--bg-secondary)", border: "0.5px solid var(--border-subtle)", borderRadius: "var(--radius-md, 6px)", color: "var(--text-primary)", fontFamily: "var(--font-mono, monospace)", resize: "vertical", outline: "none" }} />
         <button onClick={handleImport} disabled={!importData.trim()} style={{
           marginTop: 4, padding: "5px 14px", fontSize: 11, fontWeight: 500, background: "var(--bg-primary)",
           border: "0.5px solid var(--border-strong)", borderRadius: "var(--radius-md, 6px)",
           color: "var(--text-primary)", cursor: importData.trim() ? "pointer" : "default", opacity: importData.trim() ? 1 : 0.5,
-        }}>Import Workspace</button>
+        }}>{ t("workspace.import") }</button>
         {importResult && <div style={{ marginTop: 4, fontSize: 11, color: "var(--dot-online, #22c55e)" }}>{importResult}</div>}
       </div>
     </div>

@@ -1,6 +1,7 @@
 import React, { Suspense, useState, useRef, useCallback } from "react";
 import type { AgentSkill, AgentCard } from "../../bindings";
 import { useTestStore } from "../../stores/testStore";
+import { useT } from "../../lib/i18n";
 
 const MonacoWrapper = React.lazy(() => import("./MonacoWrapper").then((m) => ({ default: m.MonacoWrapper })));
 
@@ -10,8 +11,14 @@ interface InputFormProps {
 }
 
 interface HeaderEntry {
+  id: string;
   key: string;
   value: string;
+}
+
+let headerIdCounter = 0;
+function newHeaderEntry(key = "", value = ""): HeaderEntry {
+  return { id: `h-${++headerIdCounter}`, key, value };
 }
 
 export function InputForm({
@@ -23,14 +30,17 @@ export function InputForm({
   const inputTab = useTestStore((s) => s.inputTab);
   const setInputTab = useTestStore((s) => s.setInputTab);
   const setCustomHeaders = useTestStore((s) => s.setCustomHeaders);
+  const contextData = useTestStore((s) => s.contextData);
+  const setContextData = useTestStore((s) => s.setContextData);
+  const droppedFile = useTestStore((s) => s.droppedFile);
+  const setDroppedFile = useTestStore((s) => s.setDroppedFile);
 
-  const [contextData, setContextData] = useState("{\n  \n}");
   const [headerEntries, setHeaderEntries] = useState<HeaderEntry[]>([
-    { key: "", value: "" },
+    newHeaderEntry(),
   ]);
-  const [droppedFile, setDroppedFile] = useState<{ name: string; data: string } | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { t } = useT();
 
   const hasFileMode = skill.inputModes?.some((m) => m.includes("file")) ?? false;
 
@@ -54,13 +64,13 @@ export function InputForm({
   };
 
   const addHeader = () => {
-    const next = [...headerEntries, { key: "", value: "" }];
+    const next = [...headerEntries, newHeaderEntry()];
     setHeaderEntries(next);
   };
 
   const removeHeader = (idx: number) => {
     const next = headerEntries.filter((_, i) => i !== idx);
-    if (next.length === 0) next.push({ key: "", value: "" });
+    if (next.length === 0) next.push(newHeaderEntry());
     setHeaderEntries(next);
     syncHeaders(next);
   };
@@ -89,9 +99,9 @@ export function InputForm({
   };
 
   const tabs: Array<{ id: "message" | "context" | "headers"; label: string }> = [
-    { id: "message", label: "message" },
-    { id: "context", label: "context data" },
-    { id: "headers", label: "headers" },
+    { id: "message", label: t("input.message") },
+    { id: "context", label: t("input.contextData") },
+    { id: "headers", label: t("input.headers") },
   ];
 
   return (
@@ -135,7 +145,7 @@ export function InputForm({
           <textarea
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
-            placeholder="Enter test message..."
+            placeholder={t("input.placeholder")}
             style={{
               width: "100%",
               height: "100%",
@@ -167,7 +177,7 @@ export function InputForm({
                   color: "var(--text-muted)",
                 }}
               >
-                Loading editor...
+                {t("input.loadingEditor")}
               </div>
             }
           >
@@ -178,11 +188,11 @@ export function InputForm({
         {inputTab === "headers" && (
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
             {headerEntries.map((entry, i) => (
-              <div key={i} style={{ display: "flex", gap: 4, alignItems: "center" }}>
+              <div key={entry.id} style={{ display: "flex", gap: 4, alignItems: "center" }}>
                 <input
                   value={entry.key}
                   onChange={(e) => handleHeaderChange(i, "key", e.target.value)}
-                  placeholder="Header name"
+                  placeholder={t("input.headerName")}
                   style={{
                     flex: 1,
                     padding: "4px 8px",
@@ -197,7 +207,7 @@ export function InputForm({
                 <input
                   value={entry.value}
                   onChange={(e) => handleHeaderChange(i, "value", e.target.value)}
-                  placeholder="Value"
+                  placeholder={t("input.headerValue")}
                   style={{
                     flex: 2,
                     padding: "4px 8px",
@@ -238,7 +248,7 @@ export function InputForm({
                 cursor: "pointer",
               }}
             >
-              + Add header
+              {t("input.addHeader")}
             </button>
           </div>
         )}
@@ -264,7 +274,7 @@ export function InputForm({
             transition: "color var(--duration-fast), background var(--duration-fast), border-color var(--duration-fast)",
           }}
         >
-          {droppedFile ? droppedFile.name : "Drop a file here or click to select"}
+          {droppedFile ? droppedFile.name : t("input.dropFile")}
           <input
             ref={fileInputRef}
             type="file"
@@ -278,7 +288,7 @@ export function InputForm({
       {skill.examples && skill.examples.length > 0 && (
         <>
           <div style={{ padding: "0 14px 4px", fontSize: 11, color: "var(--text-muted)" }}>
-            Examples
+            {t("input.examples")}
           </div>
           <div
             style={{

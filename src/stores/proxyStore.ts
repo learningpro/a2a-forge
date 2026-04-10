@@ -7,6 +7,8 @@ import {
   type TrafficRecord,
 } from "../lib/proxy-commands";
 
+import { DEFAULT_PROXY_PORT } from "../lib/constants";
+
 interface ProxyState {
   status: ProxyStatus;
   rules: InterceptRule[];
@@ -40,7 +42,7 @@ export const useProxyStore = create<ProxyState>()((set, _get) => ({
   isRecording: false,
   error: null,
 
-  startProxy: async (port = 9339, workspaceId = "default") => {
+  startProxy: async (port = DEFAULT_PROXY_PORT, workspaceId = "default") => {
     try {
       const status = await proxyCommands.startProxy(port, workspaceId);
       set({ status, error: null });

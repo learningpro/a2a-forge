@@ -32,13 +32,23 @@ export function TestPanel() {
         <TabButton label={t("tab.workspace")} active={activeTab === "workspace"} onClick={() => setActiveTab("workspace")} />
       </div>
 
-      {/* Tab content */}
+      {/* Tab content — panels stay mounted to preserve local state */}
       <div ref={contentRef} style={{ flex: 1, overflow: "hidden", display: "flex", flexDirection: "column" }}>
-        {activeTab === "test" && <ManualTestPanel />}
-        {activeTab === "suites" && <SuitePanel />}
-        {activeTab === "proxy" && <ProxyPanel />}
-        {activeTab === "community" && <CommunityPanel />}
-        {activeTab === "workspace" && <WorkspacePanel />}
+        <div style={{ flex: 1, display: activeTab === "test" ? "flex" : "none", flexDirection: "column", overflow: "hidden" }}>
+          <ManualTestPanel />
+        </div>
+        <div style={{ flex: 1, display: activeTab === "suites" ? "flex" : "none", flexDirection: "column", overflow: "hidden" }}>
+          <SuitePanel />
+        </div>
+        <div style={{ flex: 1, display: activeTab === "proxy" ? "flex" : "none", flexDirection: "column", overflow: "hidden" }}>
+          <ProxyPanel />
+        </div>
+        <div style={{ flex: 1, display: activeTab === "community" ? "flex" : "none", flexDirection: "column", overflow: "hidden" }}>
+          <CommunityPanel />
+        </div>
+        <div style={{ flex: 1, display: activeTab === "workspace" ? "flex" : "none", flexDirection: "column", overflow: "hidden" }}>
+          <WorkspacePanel />
+        </div>
       </div>
     </div>
   );

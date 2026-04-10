@@ -1,5 +1,7 @@
 import { useState, useCallback } from "react";
 import { useSuiteStore } from "../../stores/suiteStore";
+import { useCommunityStore } from "../../stores/communityStore";
+import { useAgentStore } from "../../stores/agentStore";
 import type { Suite } from "../../lib/suite-commands";
 import { EmptyState } from "../shared/EmptyState";
 import { useT } from "../../lib/i18n";
@@ -35,10 +37,41 @@ export function SuiteList({ workspaceId, agentId }: SuiteListProps) {
     await useSuiteStore.getState().deleteSuite(id);
   }, []);
 
+  const handleExport = useCallback(async () => {
+    if (!selectedSuiteId) return;
+    try {
+      const json = await useCommunityStore.getState().exportSuite(selectedSuiteId);
+      const blob = new Blob([json], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `suite-${selectedSuiteId}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch { /* ignore */ }
+  }, [selectedSuiteId]);
+
+  const handleImport = useCallback(async () => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = ".json";
+    input.onchange = async () => {
+      const file = input.files?.[0];
+      if (!file) return;
+      const text = await file.text();
+      const aid = agentId ?? useAgentStore.getState().selectedAgentId ?? "";
+      try {
+        await useCommunityStore.getState().importSuite(text, aid, workspaceId);
+        await useSuiteStore.getState().loadSuites(workspaceId);
+      } catch { /* ignore */ }
+    };
+    input.click();
+  }, [agentId, workspaceId]);
+
   if (isLoading) {
     return (
       <div style={{ padding: 16, color: "var(--text-muted)", fontSize: 11 }}>
-        Loading suites...
+        {t("suite.loading")}
       </div>
     );
   }
@@ -66,20 +99,54 @@ export function SuiteList({ workspaceId, agentId }: SuiteListProps) {
         >
           Test Suites
         </span>
-        <button
-          onClick={() => setShowCreate(true)}
-          style={{
-            padding: "2px 8px",
-            fontSize: 11,
-            background: "transparent",
-            border: "0.5px solid var(--border-subtle)",
-            borderRadius: "var(--radius-md, 6px)",
-            color: "var(--text-secondary)",
-            cursor: "pointer",
-          }}
-        >
-          + New
-        </button>
+        <div style={{ display: "flex", gap: 4 }}>
+          <button
+            onClick={handleImport}
+            title={t("suite.import")}
+            style={{
+              padding: "2px 6px",
+              fontSize: 11,
+              background: "transparent",
+              border: "0.5px solid var(--border-subtle)",
+              borderRadius: "var(--radius-md, 6px)",
+              color: "var(--text-secondary)",
+              cursor: "pointer",
+            }}
+          >
+            ↓
+          </button>
+          {selectedSuiteId && (
+            <button
+              onClick={handleExport}
+              title={t("suite.export")}
+              style={{
+                padding: "2px 6px",
+                fontSize: 11,
+                background: "transparent",
+                border: "0.5px solid var(--border-subtle)",
+                borderRadius: "var(--radius-md, 6px)",
+                color: "var(--text-secondary)",
+                cursor: "pointer",
+              }}
+            >
+              ↑
+            </button>
+          )}
+          <button
+            onClick={() => setShowCreate(true)}
+            style={{
+              padding: "2px 8px",
+              fontSize: 11,
+              background: "transparent",
+              border: "0.5px solid var(--border-subtle)",
+              borderRadius: "var(--radius-md, 6px)",
+              color: "var(--text-secondary)",
+              cursor: "pointer",
+            }}
+          >
+            + New
+          </button>
+        </div>
       </div>
 
       {/* Create form */}
@@ -93,7 +160,7 @@ export function SuiteList({ workspaceId, agentId }: SuiteListProps) {
               if (e.key === "Enter") handleCreate();
               if (e.key === "Escape") setShowCreate(false);
             }}
-            placeholder="Suite name..."
+            placeholder={t("suite.namePlaceholder")}
             style={{
               width: "100%",
               padding: "4px 8px",
@@ -143,6 +210,7 @@ function SuiteListItem({
   onSelect: (s: Suite) => void;
   onDelete: (e: React.MouseEvent, id: string) => void;
 }) {
+  const { t } = useT();
   return (
     <div
       onClick={() => onSelect(suite)}
@@ -185,7 +253,7 @@ function SuiteListItem({
           opacity: 0.6,
           flexShrink: 0,
         }}
-        title="Delete suite"
+        title={t("suite.deleteSuite")}
       >
         ×
       </button>

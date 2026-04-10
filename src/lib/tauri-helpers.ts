@@ -14,7 +14,7 @@ export function unwrap<T>(result: Result<T, any>): T {
   throw new Error(msg);
 }
 
-/** History entry type returned by list_history */
+/** History entry — mirrors Rust HistoryEntry in a2a/types.rs */
 export type HistoryEntry = {
   id: string;
   agentId: string;
@@ -23,5 +23,22 @@ export type HistoryEntry = {
   responseJson: string | null;
   status: string;
   durationMs: number | null;
+  createdAt: number;
+};
+
+/** Saved test — mirrors Rust SavedTest in a2a/types.rs */
+export type SavedTest = {
+  id: string;
+  name: string;
+  agentId: string;
+  skillName: string;
+  requestJson: string;
+  createdAt: number;
+};
+
+/** Workspace row — mirrors Rust WorkspaceRow in a2a/types.rs */
+export type WorkspaceRow = {
+  id: string;
+  name: string;
   createdAt: number;
 };

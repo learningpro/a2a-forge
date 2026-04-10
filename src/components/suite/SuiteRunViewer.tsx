@@ -1,5 +1,6 @@
 import { useMemo, useCallback } from "react";
 import { useSuiteStore } from "../../stores/suiteStore";
+import { useT } from "../../lib/i18n";
 import type { AssertionResult } from "../../lib/suite-commands";
 
 export function SuiteRunViewer() {
@@ -7,6 +8,7 @@ export function SuiteRunViewer() {
   const steps = useSuiteStore((s) => s.steps);
   const isRunning = useSuiteStore((s) => s.isRunning);
   const runHistory = useSuiteStore((s) => s.runHistory);
+  const { t } = useT();
 
   const handleExport = useCallback(async (format: string) => {
     if (!currentRunDetail) return;
@@ -16,6 +18,8 @@ export function SuiteRunViewer() {
         const blob = new Blob([content], { type: "text/html" });
         const url = URL.createObjectURL(blob);
         window.open(url, "_blank");
+        // Revoke after a short delay to allow the new tab to load
+        setTimeout(() => URL.revokeObjectURL(url), 5000);
       } else {
         await navigator.clipboard.writeText(content);
       }
@@ -43,7 +47,7 @@ export function SuiteRunViewer() {
   if (isRunning) {
     return (
       <div style={{ padding: 20, textAlign: "center", color: "var(--text-muted)", fontSize: 11 }}>
-        <div style={{ marginBottom: 8 }}>Running suite...</div>
+        <div style={{ marginBottom: 8 }}>{t("suite.runningSuiteStatus")}</div>
         <div style={{
           width: 20, height: 20, border: "2px solid var(--border-subtle)",
           borderTopColor: "var(--text-primary)", borderRadius: "50%",
@@ -58,7 +62,7 @@ export function SuiteRunViewer() {
       <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
         <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
           <div style={{ textAlign: "center", color: "var(--text-muted)", fontSize: 11, lineHeight: 1.6 }}>
-            Run a suite to see results here
+            {t("suite.runResults")}
           </div>
         </div>
         {/* Run history */}
@@ -68,7 +72,7 @@ export function SuiteRunViewer() {
               fontSize: 11, fontWeight: 500, color: "var(--text-muted)",
               textTransform: "uppercase", letterSpacing: "0.07em", padding: "8px 12px 4px",
             }}>
-              Run History
+              {t("suite.runHistory")}
             </div>
             {runHistory.map((run) => (
               <div
@@ -82,7 +86,7 @@ export function SuiteRunViewer() {
               >
                 <span>
                   <StatusIcon status={run.status} />
-                  {" "}{run.passedSteps}/{run.totalSteps} passed
+                  {" "}{run.passedSteps}/{run.totalSteps} {t("suite.passed")}
                 </span>
                 <span style={{ color: "var(--text-muted)" }}>
                   {run.durationMs}ms · {run.startedAt.slice(0, 16)}
@@ -108,7 +112,7 @@ export function SuiteRunViewer() {
         <div>
           <div style={{ fontSize: 12, fontWeight: 600, color: "var(--text-primary)" }}>
             <StatusIcon status={run.status} />
-            {" "}{run.status.toUpperCase()} — {run.passedSteps}/{run.totalSteps} passed
+            {" "}{run.status.toUpperCase()} — {run.passedSteps}/{run.totalSteps} {t("suite.passed")}
           </div>
           <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2 }}>
             {run.durationMs}ms · {run.startedAt.slice(0, 16)}
@@ -124,7 +128,7 @@ export function SuiteRunViewer() {
           <button onClick={handleRerun} style={{
             ...exportBtnStyle, borderColor: "var(--border-strong)", fontWeight: 500,
           }}>
-            Re-run
+            {t("suite.rerun")}
           </button>
         </div>
       </div>
@@ -158,7 +162,7 @@ export function SuiteRunViewer() {
                   {ar.passed ? "\u2705" : "\u274C"} {ar.message}
                   {!ar.passed && ar.actual && (
                     <span style={{ color: "var(--text-muted)", marginLeft: 4 }}>
-                      (got: {ar.actual})
+                      ({t("suite.got")} {ar.actual})
                     </span>
                   )}
                 </div>
@@ -170,7 +174,7 @@ export function SuiteRunViewer() {
                   padding: "2px 0 2px 16px", fontSize: 11,
                   color: "var(--dot-error, #ef4444)",
                 }}>
-                  Error: {sr.errorMessage}
+                  {t("suite.error")} {sr.errorMessage}
                 </div>
               )}
             </div>
@@ -185,7 +189,7 @@ export function SuiteRunViewer() {
             fontSize: 11, fontWeight: 500, color: "var(--text-muted)",
             textTransform: "uppercase", letterSpacing: "0.07em", padding: "8px 12px 4px",
           }}>
-            Previous Runs
+            {t("suite.previousRuns")}
           </div>
           {runHistory.filter((r) => r.id !== run.id).map((r) => (
             <div

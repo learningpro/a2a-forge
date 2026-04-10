@@ -25,25 +25,22 @@ pub async fn start_proxy(
     app: tauri::AppHandle,
     state: tauri::State<'_, AppState>,
 ) -> Result<ProxyStatus, AppError> {
-    let p = port.unwrap_or(9339);
+    let p = port.unwrap_or(crate::proxy::DEFAULT_PROXY_PORT);
 
-    // Check if already running
-    {
-        let guard = state.proxy_handle.lock().await;
-        if guard.is_some() {
-            return Err(AppError::Io("Proxy is already running".into()));
-        }
+    // Hold lock for entire operation to prevent concurrent start race
+    let mut guard = state.proxy_handle.lock().await;
+    if guard.is_some() {
+        return Err(AppError::Io("Proxy is already running".into()));
     }
 
     let pool = get_pool(&app).await?;
     let handle = server::start_server(pool, state.http_client.clone(), workspace_id, p).await?;
 
-    {
-        let mut guard = state.proxy_handle.lock().await;
-        *guard = Some(handle);
-    }
+    let initial_count = *handle.state.request_count.lock().await;
 
-    Ok(ProxyStatus { running: true, port: p, request_count: 0 })
+    *guard = Some(handle);
+
+    Ok(ProxyStatus { running: true, port: p, request_count: initial_count })
 }
 
 #[tauri::command]
@@ -65,7 +62,10 @@ pub async fn get_proxy_status(
 ) -> Result<ProxyStatus, AppError> {
     let guard = state.proxy_handle.lock().await;
     match &*guard {
-        Some(handle) => Ok(ProxyStatus { running: true, port: handle.port, request_count: 0 }),
+        Some(handle) => {
+            let count = *handle.state.request_count.lock().await;
+            Ok(ProxyStatus { running: true, port: handle.port, request_count: count })
+        }
         None => Ok(ProxyStatus { running: false, port: 0, request_count: 0 }),
     }
 }
@@ -159,10 +159,15 @@ pub async fn start_recording(
     session_name: String,
     state: tauri::State<'_, AppState>,
 ) -> Result<(), AppError> {
-    // Set recording session on the proxy server state
-    // We store it in AppState for now
-    let mut guard = state.recording_session.lock().await;
-    *guard = Some(session_name);
+    let guard = state.proxy_handle.lock().await;
+    if let Some(handle) = &*guard {
+        let mut session = handle.state.recording_session.lock().await;
+        *session = Some(session_name);
+    } else {
+        // Fallback: store in AppState if proxy not running
+        let mut session = state.recording_session.lock().await;
+        *session = Some(session_name);
+    }
     Ok(())
 }
 
@@ -171,8 +176,14 @@ pub async fn start_recording(
 pub async fn stop_recording(
     state: tauri::State<'_, AppState>,
 ) -> Result<(), AppError> {
-    let mut guard = state.recording_session.lock().await;
-    *guard = None;
+    let guard = state.proxy_handle.lock().await;
+    if let Some(handle) = &*guard {
+        let mut session = handle.state.recording_session.lock().await;
+        *session = None;
+    } else {
+        let mut session = state.recording_session.lock().await;
+        *session = None;
+    }
     Ok(())
 }
 
@@ -222,7 +233,8 @@ pub async fn replay_recording(
 
     let mut results = Vec::new();
     for record in &records {
-        let payload: serde_json::Value = serde_json::from_str(&record.request_json).unwrap_or_default();
+        let payload: serde_json::Value = serde_json::from_str(&record.request_json)
+            .map_err(|e| AppError::Serialization(format!("Invalid request JSON in recording: {e}")))?;
 
         // Resolve agent URL from the original agent_id
         let agent_url = if let Some(ref aid) = record.agent_id {
@@ -237,28 +249,42 @@ pub async fn replay_recording(
         };
 
         if let Some(url) = agent_url {
+            // Load agent default headers from secure credential storage
+            let agent_headers = if let Some(ref aid) = record.agent_id {
+                crate::credentials::get_agent_headers(aid).await
+            } else {
+                None
+            };
+
             let start = std::time::Instant::now();
             let full_url = format!("{}/a2a", url.trim_end_matches('/'));
-            let resp = state.http_client
+            let mut req = state.http_client
                 .post(&full_url)
-                .header("Content-Type", "application/json")
-                .json(&payload)
-                .send()
-                .await;
+                .header("Content-Type", "application/json");
+
+            // Apply agent default headers (auth, etc.)
+            if let Some(headers) = &agent_headers {
+                for (k, v) in headers {
+                    req = req.header(k.as_str(), v.as_str());
+                }
+            }
+
+            let resp = req.json(&payload).send().await;
 
             let duration_ms = start.elapsed().as_millis() as i32;
 
             match resp {
                 Ok(r) => {
                     let status = r.status().as_u16() as i32;
-                    let body: serde_json::Value = r.json().await.unwrap_or_default();
+                    let body_text = r.text().await.unwrap_or_default();
+                    let response_json = if body_text.is_empty() { None } else { Some(body_text) };
                     results.push(TrafficRecord {
                         id: nanoid::nanoid!(),
                         session_name: format!("replay:{}", session_name),
                         agent_id: record.agent_id.clone(),
                         skill_name: record.skill_name.clone(),
                         request_json: record.request_json.clone(),
-                        response_json: Some(serde_json::to_string(&body).unwrap_or_default()),
+                        response_json,
                         status_code: Some(status),
                         duration_ms: Some(duration_ms),
                         timestamp: String::new(),
