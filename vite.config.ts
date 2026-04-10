@@ -9,7 +9,6 @@ export default defineConfig({
     port: process.env.WEB_MODE ? 5173 : 1421,
     strictPort: true,
     host: process.env.WEB_MODE ? "0.0.0.0" : (process.env.TAURI_DEV_HOST || false),
-    allowedHosts: process.env.WEB_MODE ? [".cnb.run"] : undefined,
   },
   envPrefix: ["VITE_", "TAURI_PLATFORM", "TAURI_ARCH", "TAURI_FAMILY",
               "TAURI_PLATFORM_VERSION", "TAURI_PLATFORM_TYPE", "TAURI_DEBUG"],
