@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A2A-Forge — The Desktop Workbench for A2A Protocol Agents</title>
+<meta name="description" content="Test, debug, and inspect A2A protocol agents with a native desktop app. Postman for A2A — built with Tauri, React, and Rust.">
+<meta property="og:title" content="A2A-Forge — Postman for A2A Protocol">
+<meta property="og:description" content="Native desktop workbench for testing Agent-to-Agent protocol agents.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔨</text></svg>">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.1/dist/fonts/geist-sans/style.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.1/dist/fonts/geist-mono/style.min.css">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --primary:#2563EB;--primary-light:#DBEAFE;--primary-dark:#1D4ED8;
+  --bg-primary:#FFFFFF;--bg-secondary:#F5F4F0;--bg-tertiary:#EEEDE9;
+  --text-primary:#1A1A18;--text-secondary:#5A5A56;--text-muted:#9A9992;
+  --border-subtle:rgba(0,0,0,0.06);--border-default:rgba(0,0,0,0.12);
+  --glow:rgba(37,99,235,0.12);--glow-strong:rgba(37,99,235,0.25);
+  --card-shadow:0 1px 3px rgba(0,0,0,0.04),0 4px 12px rgba(0,0,0,0.03);
+  --card-shadow-hover:0 4px 16px rgba(0,0,0,0.08),0 1px 4px rgba(0,0,0,0.04);
+  --radius-sm:4px;--radius-md:8px;--radius-lg:12px;--radius-xl:16px;
+}
+@media(prefers-color-scheme:dark){:root{
+  --primary:#3B82F6;--primary-light:#1E3A5F;--primary-dark:#60A5FA;
+  --bg-primary:#1C1C1A;--bg-secondary:#222220;--bg-tertiary:#161614;
+  --text-primary:#E8E6DE;--text-secondary:#9C9A92;--text-muted:#66645E;
+  --border-subtle:rgba(255,255,255,0.06);--border-default:rgba(255,255,255,0.10);
+  --glow:rgba(59,130,246,0.15);--glow-strong:rgba(59,130,246,0.30);
+  --card-shadow:0 1px 3px rgba(0,0,0,0.2),0 4px 12px rgba(0,0,0,0.15);
+  --card-shadow-hover:0 4px 16px rgba(0,0,0,0.3),0 1px 4px rgba(0,0,0,0.2);
+}}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Geist Sans',system-ui,-apple-system,sans-serif;
+  background:var(--bg-tertiary);color:var(--text-primary);
+  line-height:1.6;-webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+a{color:var(--primary);text-decoration:none;transition:color 0.15s}
+a:hover{color:var(--primary-dark)}
+code{font-family:'Geist Mono',monospace;font-size:0.88em;background:var(--bg-secondary);padding:2px 7px;border-radius:var(--radius-sm)}
+.container{max-width:1120px;margin:0 auto;padding:0 28px}
+
+/* Animations */
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+@keyframes glow-pulse{0%,100%{opacity:0.5}50%{opacity:1}}
+.animate-up{animation:fadeUp 0.7s cubic-bezier(0.16,1,0.3,1) both}
+.animate-fade{animation:fadeIn 0.6s ease both}
+.delay-1{animation-delay:0.1s}.delay-2{animation-delay:0.2s}.delay-3{animation-delay:0.3s}
+.delay-4{animation-delay:0.4s}.delay-5{animation-delay:0.5s}
+
+/* Nav */
+nav{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg-primary) 85%,transparent);backdrop-filter:blur(16px) saturate(1.5);border-bottom:1px solid var(--border-subtle)}
+nav .container{display:flex;align-items:center;justify-content:space-between;height:56px}
+.nav-brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:15px;letter-spacing:-0.02em}
+.nav-brand-icon{width:28px;height:28px;background:linear-gradient(135deg,var(--primary),#7C3AED);border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;font-size:14px;box-shadow:0 2px 8px var(--glow)}
+.nav-links{display:flex;align-items:center;gap:8px}
+.nav-links a{color:var(--text-secondary);font-size:13px;font-weight:500;padding:6px 12px;border-radius:var(--radius-md);transition:all 0.15s}
+.nav-links a:hover{color:var(--text-primary);background:var(--bg-secondary)}
+.nav-gh{display:inline-flex;align-items:center;gap:6px;background:var(--bg-secondary);border:1px solid var(--border-default);padding:6px 14px!important;border-radius:var(--radius-md)!important;font-size:12px!important;font-weight:600!important}
+.nav-gh:hover{border-color:var(--primary)!important;color:var(--primary)!important;background:var(--primary-light)!important}
+
+/* Hero */
+.hero{position:relative;text-align:center;padding:100px 0 64px;overflow:hidden}
+.hero-glow{position:absolute;top:-120px;left:50%;transform:translateX(-50%);width:800px;height:500px;background:radial-gradient(ellipse,var(--glow) 0%,transparent 70%);pointer-events:none;animation:glow-pulse 4s ease-in-out infinite}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 16px;border-radius:999px;background:var(--bg-primary);border:1px solid var(--border-default);font-size:12px;font-weight:500;color:var(--text-secondary);margin-bottom:24px;box-shadow:var(--card-shadow)}
+.hero-badge-dot{width:6px;height:6px;border-radius:50%;background:#059669;animation:glow-pulse 2s ease-in-out infinite}
+.hero h1{font-size:52px;font-weight:800;letter-spacing:-0.035em;line-height:1.1;margin-bottom:20px;position:relative}
+.hero h1 span{background:linear-gradient(135deg,var(--primary) 0%,#7C3AED 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero p{font-size:18px;color:var(--text-secondary);max-width:520px;margin:0 auto 36px;line-height:1.7;font-weight:400}
+.hero-buttons{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;border-radius:var(--radius-md);font-size:14px;font-weight:600;border:1px solid transparent;cursor:pointer;transition:all 0.2s;font-family:inherit;position:relative;overflow:hidden}
+.btn:active{transform:scale(0.97)}
+.btn-primary{background:linear-gradient(135deg,var(--primary),#4F46E5);color:#fff;border:none;box-shadow:0 2px 12px var(--glow-strong),0 1px 3px rgba(0,0,0,0.1)}
+.btn-primary:hover{box-shadow:0 4px 20px var(--glow-strong),0 2px 6px rgba(0,0,0,0.15);transform:translateY(-1px);color:#fff}
+.btn-secondary{background:var(--bg-primary);color:var(--text-primary);border:1px solid var(--border-default);box-shadow:var(--card-shadow)}
+.btn-secondary:hover{border-color:var(--primary);color:var(--primary);box-shadow:var(--card-shadow-hover)}
+.hero-stats{display:flex;justify-content:center;gap:40px;margin-top:48px;padding-top:32px;border-top:1px solid var(--border-subtle)}
+.hero-stat{text-align:center}
+.hero-stat-value{font-size:28px;font-weight:800;letter-spacing:-0.03em;font-family:'Geist Mono',monospace}
+.hero-stat-label{font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-muted);margin-top:2px}
+
+/* Screenshot showcase */
+.showcase{padding:0 0 80px;text-align:center;position:relative}
+.showcase-toggle{display:inline-flex;gap:0;margin-bottom:32px;border:1px solid var(--border-default);border-radius:999px;overflow:hidden;background:var(--bg-primary);box-shadow:var(--card-shadow);padding:3px}
+.showcase-toggle button{padding:8px 24px;font-size:12px;font-weight:600;font-family:inherit;background:transparent;color:var(--text-muted);border:none;cursor:pointer;transition:all 0.2s;border-radius:999px;letter-spacing:0.02em}
+.showcase-toggle button.active{background:var(--primary);color:#fff;box-shadow:0 2px 8px var(--glow)}
+.showcase-toggle button:hover:not(.active){color:var(--text-primary)}
+.showcase-window{max-width:960px;margin:0 auto;border-radius:var(--radius-xl);overflow:hidden;border:1px solid var(--border-default);box-shadow:0 16px 64px rgba(0,0,0,0.1),0 4px 16px rgba(0,0,0,0.05),0 0 0 1px var(--border-subtle);position:relative}
+.showcase-titlebar{height:40px;background:var(--bg-secondary);border-bottom:1px solid var(--border-subtle);display:flex;align-items:center;padding:0 16px;gap:8px}
+.showcase-dot{width:10px;height:10px;border-radius:50%;border:1px solid var(--border-default)}
+.showcase-dot.red{background:#FF5F57;border-color:#E0443E}.showcase-dot.yellow{background:#FEBC2E;border-color:#DEA123}.showcase-dot.green{background:#28C840;border-color:#1AAB29}
+.showcase-titlebar-text{flex:1;text-align:center;font-size:11px;color:var(--text-muted);font-weight:500;letter-spacing:0.02em}
+.showcase-body img{width:100%;display:block}
+.showcase-body img.hidden{display:none}
+.showcase-glow{position:absolute;bottom:-60px;left:50%;transform:translateX(-50%);width:600px;height:200px;background:radial-gradient(ellipse,var(--glow) 0%,transparent 70%);pointer-events:none}
+
+/* Section common */
+.section{padding:80px 0}
+.section-header{margin-bottom:48px}
+.section-label{font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--primary);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.section-label::before{content:'';width:16px;height:2px;background:var(--primary);border-radius:1px}
+.section-title{font-size:32px;font-weight:800;letter-spacing:-0.03em;line-height:1.2;margin-bottom:12px}
+.section-desc{font-size:15px;color:var(--text-secondary);max-width:480px;line-height:1.7}
+
+/* Features */
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.feature-card{background:var(--bg-primary);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:24px;transition:all 0.25s;box-shadow:var(--card-shadow);position:relative;overflow:hidden}
+.feature-card:hover{border-color:var(--border-default);box-shadow:var(--card-shadow-hover);transform:translateY(-2px)}
+.feature-card::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--primary),#7C3AED);opacity:0;transition:opacity 0.25s}
+.feature-card:hover::after{opacity:1}
+.feature-icon{width:36px;height:36px;border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:14px;background:var(--bg-secondary)}
+.feature-card h3{font-size:14px;font-weight:700;margin-bottom:6px;letter-spacing:-0.01em}
+.feature-card p{font-size:12.5px;color:var(--text-secondary);line-height:1.65}
+
+/* Tech Stack */
+.stack-grid{display:flex;flex-wrap:wrap;gap:12px}
+.stack-chip{display:inline-flex;align-items:center;gap:10px;background:var(--bg-primary);border:1px solid var(--border-subtle);border-radius:var(--radius-md);padding:12px 20px;font-size:13px;font-weight:600;box-shadow:var(--card-shadow);transition:all 0.2s;letter-spacing:-0.01em}
+.stack-chip:hover{border-color:var(--border-default);box-shadow:var(--card-shadow-hover);transform:translateY(-1px)}
+.stack-chip svg{width:20px;height:20px;flex-shrink:0}
+
+/* Quick Start */
+.quickstart-card{background:var(--bg-primary);border:1px solid var(--border-subtle);border-radius:var(--radius-xl);padding:40px;box-shadow:var(--card-shadow);position:relative;overflow:hidden}
+.quickstart-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--primary),#7C3AED,var(--primary));background-size:200% 100%;animation:shimmer 3s linear infinite}
+.quickstart-card pre{font-family:'Geist Mono',monospace;font-size:13px;background:var(--bg-tertiary);border:1px solid var(--border-subtle);border-radius:var(--radius-md);padding:20px 24px;overflow-x:auto;line-height:1.8;margin-top:20px}
+.quickstart-card .comment{color:var(--text-muted)}
+.quickstart-card .cmd{color:var(--primary);font-weight:500}
+
+/* CTA */
+.cta{text-align:center;padding:80px 0}
+.cta-card{background:linear-gradient(135deg,var(--bg-primary),var(--bg-secondary));border:1px solid var(--border-subtle);border-radius:var(--radius-xl);padding:64px 40px;position:relative;overflow:hidden;box-shadow:var(--card-shadow)}
+.cta-card::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at top,var(--glow) 0%,transparent 60%);pointer-events:none}
+.cta h2{font-size:28px;font-weight:800;letter-spacing:-0.03em;margin-bottom:12px;position:relative}
+.cta p{font-size:15px;color:var(--text-secondary);margin-bottom:32px;position:relative}
+.cta .hero-buttons{position:relative}
+
+/* Footer */
+footer{border-top:1px solid var(--border-subtle);padding:40px 0}
+footer .container{display:flex;justify-content:space-between;align-items:center}
+.footer-left{font-size:12px;color:var(--text-muted)}
+.footer-left a{color:var(--text-secondary)}
+.footer-links{display:flex;gap:20px;font-size:12px}
+.footer-links a{color:var(--text-muted);transition:color 0.15s}
+.footer-links a:hover{color:var(--text-primary)}
+
+/* Responsive */
+@media(max-width:768px){
+  .hero{padding:64px 0 48px}
+  .hero h1{font-size:32px}
+  .hero p{font-size:16px}
+  .hero-stats{gap:24px}
+  .hero-stat-value{font-size:22px}
+  .section{padding:56px 0}
+  .section-title{font-size:24px}
+  .features-grid{grid-template-columns:1fr}
+  .nav-links .hide-m{display:none}
+  footer .container{flex-direction:column;gap:16px;text-align:center}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="container">
+    <div class="nav-brand">
+      <div class="nav-brand-icon">🔨</div>
+      A2A-Forge
+    </div>
+    <div class="nav-links">
+      <a href="#features" class="hide-m">Features</a>
+      <a href="#stack" class="hide-m">Stack</a>
+      <a href="#quickstart" class="hide-m">Quick Start</a>
+      <a href="https://github.com/learningpro/a2a-forge" class="nav-gh">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+        GitHub
+      </a>
+    </div>
+  </div>
+</nav>
+
+<main>
+
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="container">
+    <div class="hero-badge animate-up">
+      <span class="hero-badge-dot"></span>
+      Open Source &middot; MIT License
+    </div>
+    <h1 class="animate-up delay-1">Postman for <span>A2A</span> Protocol</h1>
+    <p class="animate-up delay-2">A native desktop workbench for discovering, inspecting, and testing Agent-to-Agent protocol agents. No code required.</p>
+    <div class="hero-buttons animate-up delay-3">
+      <a href="https://github.com/learningpro/a2a-forge/releases" class="btn btn-primary">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M2.75 14A1.75 1.75 0 011 12.25v-2.5a.75.75 0 011.5 0v2.5c0 .138.112.25.25.25h10.5a.25.25 0 00.25-.25v-2.5a.75.75 0 011.5 0v2.5A1.75 1.75 0 0113.25 14zM7.25 7.689V2a.75.75 0 011.5 0v5.689l1.97-1.969a.749.749 0 111.06 1.06l-3.25 3.25a.749.749 0 01-1.06 0L4.22 6.78a.749.749 0 111.06-1.06z"/></svg>
+        Download
+      </a>
+      <a href="https://github.com/learningpro/a2a-forge" class="btn btn-secondary">View Source</a>
+    </div>
+    <div class="hero-stats animate-up delay-4">
+      <div class="hero-stat"><div class="hero-stat-value">77</div><div class="hero-stat-label">Commands</div></div>
+      <div class="hero-stat"><div class="hero-stat-value">17</div><div class="hero-stat-label">Tables</div></div>
+      <div class="hero-stat"><div class="hero-stat-value">10</div><div class="hero-stat-label">Modules</div></div>
+      <div class="hero-stat"><div class="hero-stat-value">5</div><div class="hero-stat-label">Tabs</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="showcase animate-fade delay-5">
+  <div class="container">
+    <div class="showcase-toggle">
+      <button class="active" onclick="toggleSS('light')">Light Mode</button>
+      <button onclick="toggleSS('dark')">Dark Mode</button>
+    </div>
+    <div class="showcase-window">
+      <div class="showcase-titlebar">
+        <span class="showcase-dot red"></span>
+        <span class="showcase-dot yellow"></span>
+        <span class="showcase-dot green"></span>
+        <span class="showcase-titlebar-text">A2A-Forge</span>
+        <span style="width:54px"></span>
+      </div>
+      <div class="showcase-body">
+        <img id="ss-light" src="screenshots/light-mode.png" alt="A2A-Forge Light Mode">
+        <img id="ss-dark" src="screenshots/dark-mode.png" alt="A2A-Forge Dark Mode" class="hidden">
+      </div>
+    </div>
+    <div class="showcase-glow"></div>
+  </div>
+</section>
+
+<section class="section" id="features">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">Features</div>
+      <div class="section-title">Everything you need to test A2A agents</div>
+      <div class="section-desc">From discovery to debugging — a complete toolkit for the A2A protocol workflow.</div>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card"><div class="feature-icon">🔍</div><h3>Agent Discovery</h3><p>Fetch and inspect <code>.well-known/agent.json</code> agent cards. Browse skills, capabilities, and metadata instantly.</p></div>
+      <div class="feature-card"><div class="feature-icon">⚡</div><h3>Skill Testing</h3><p>Invoke any skill with adaptive input — text, JSON, or file upload. Auto-polls async tasks until completion.</p></div>
+      <div class="feature-card"><div class="feature-icon">📡</div><h3>Live Streaming</h3><p>SSE-based streaming with real-time status updates. Watch agent responses arrive token by token.</p></div>
+      <div class="feature-card"><div class="feature-icon">🖼️</div><h3>Smart Preview</h3><p>Auto-detect and render images, video, and audio inline. Deep-scans JSON results for media URLs.</p></div>
+      <div class="feature-card"><div class="feature-icon">🧪</div><h3>Test Suites</h3><p>Group test cases into automated sequences with 7 assertion types. Export results as HTML or JSON.</p></div>
+      <div class="feature-card"><div class="feature-icon">🔐</div><h3>Secure Auth</h3><p>Per-agent default headers with OS keychain credential storage. Credentials never leave your machine.</p></div>
+      <div class="feature-card"><div class="feature-icon">🌐</div><h3>Local Registry Proxy</h3><p>Embedded proxy for agent discovery, request interception, latency simulation, and traffic replay.</p></div>
+      <div class="feature-card"><div class="feature-icon">🔗</div><h3>Request Chaining</h3><p>Pipe output of one skill into another with JSONPath extraction. Build multi-step agent workflows.</p></div>
+      <div class="feature-card"><div class="feature-icon">👥</div><h3>Community Hub</h3><p>Discover popular A2A agents, share test collections, and monitor agent health with periodic checks.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="stack" style="padding-top:0">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">Tech Stack</div>
+      <div class="section-title">Modern, native, fast</div>
+      <div class="section-desc">Lightweight desktop app — no Electron, no browser overhead.</div>
+    </div>
+    <div class="stack-grid">
+      <div class="stack-chip"><svg viewBox="0 0 128 128"><path fill="#FFC131" d="M64 2L2 36v56l62 34 62-34V36z"/><path fill="#fff" d="M64 18L14 44v40l50 26 50-26V44z"/></svg>Tauri 2.x</div>
+      <div class="stack-chip"><svg viewBox="0 0 128 128"><path fill="#DEA584" d="M64 2.3S30 44 30 74a34 34 0 0068 0C98 44 64 2.3 64 2.3z"/><path fill="#000" d="M64 126a34 34 0 01-34-34c0-30 34-71.7 34-71.7S98 62 98 92a34 34 0 01-34 34z"/></svg>Rust</div>
+      <div class="stack-chip"><svg viewBox="0 0 128 128"><circle cx="64" cy="64" r="12" fill="#61DAFB"/><ellipse cx="64" cy="64" rx="60" ry="24" fill="none" stroke="#61DAFB" stroke-width="5"/><ellipse cx="64" cy="64" rx="60" ry="24" fill="none" stroke="#61DAFB" stroke-width="5" transform="rotate(60 64 64)"/><ellipse cx="64" cy="64" rx="60" ry="24" fill="none" stroke="#61DAFB" stroke-width="5" transform="rotate(120 64 64)"/></svg>React 18</div>
+      <div class="stack-chip"><svg viewBox="0 0 128 128"><path fill="#3178C6" d="M2 2h124v124H2z"/><path fill="#fff" d="M57 94V57H44v-9h36v9H67v37zm25-37v37h10V79h12v-9H92V66h14v-9z"/></svg>TypeScript</div>
+      <div class="stack-chip"><svg viewBox="0 0 128 128"><path fill="#38BDF8" d="M64 2C40 2 25 14 22 38c8.4-12 18.2-16.5 29.4-13.5 6.4 1.7 11 6.4 16 11.8C76 45.3 86 56 108 56c24 0 39-12 42-36-8.4 12-18.2 16.5-29.4 13.5-6.4-1.7-11-6.4-16-11.8C96 12.7 86 2 64 2zM22 56C-2 56-17 68-20 92c8.4-12 18.2-16.5 29.4-13.5 6.4 1.7 11 6.4 16 11.8C34 99.3 44 110 66 110c24 0 39-12 42-36-8.4 12-18.2 16.5-29.4 13.5-6.4-1.7-11-6.4-16-11.8C54 66.7 44 56 22 56z"/></svg>Tailwind CSS</div>
+      <div class="stack-chip"><svg viewBox="0 0 128 128"><path fill="#003B57" d="M64 2L2 36v56l62 34 62-34V36z"/><text x="64" y="78" text-anchor="middle" fill="#fff" font-size="36" font-weight="700">SQL</text></svg>SQLite</div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="quickstart">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">Quick Start</div>
+      <div class="section-title">Up and running in 60 seconds</div>
+    </div>
+    <div class="quickstart-card">
+      <pre><span class="comment"># Clone and run</span>
+<span class="cmd">git clone</span> https://github.com/learningpro/a2a-forge.git
+<span class="cmd">cd</span> a2a-forge
+<span class="cmd">npm install</span>
+<span class="cmd">npm run</span> tauri dev
+
+<span class="comment"># Build for production</span>
+<span class="cmd">npm run</span> tauri build</pre>
+      <p style="margin-top:20px;font-size:12px;color:var(--text-muted)">
+        Requires <a href="https://rustup.rs/">Rust</a> (stable) and <a href="https://nodejs.org/">Node.js</a> v18+.
+        See <a href="https://v2.tauri.app/start/prerequisites/">Tauri prerequisites</a> for platform-specific deps.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="cta">
+  <div class="container">
+    <div class="cta-card">
+      <h2>Ready to test your A2A agents?</h2>
+      <p>A2A-Forge is free, open source, and ready to use.</p>
+      <div class="hero-buttons">
+        <a href="https://github.com/learningpro/a2a-forge" class="btn btn-primary">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+          Get Started on GitHub
+        </a>
+        <a href="https://github.com/learningpro/a2a-forge/releases" class="btn btn-secondary">Download Latest</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="container">
+    <div class="footer-left">MIT &copy; 2026 <a href="https://github.com/learningpro">Orange Dong</a></div>
+    <div class="footer-links">
+      <a href="https://v2.tauri.app/">Tauri</a>
+      <a href="https://google.github.io/A2A/">A2A Protocol</a>
+      <a href="https://github.com/learningpro/a2a-forge">GitHub</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+function toggleSS(mode){
+  const l=document.getElementById('ss-light'),d=document.getElementById('ss-dark');
+  const btns=document.querySelectorAll('.showcase-toggle button');
+  if(mode==='dark'){l.classList.add('hidden');d.classList.remove('hidden');btns[0].classList.remove('active');btns[1].classList.add('active')}
+  else{d.classList.add('hidden');l.classList.remove('hidden');btns[1].classList.remove('active');btns[0].classList.add('active')}
+}
+// Intersection Observer for scroll animations
+const obs=new IntersectionObserver((entries)=>{entries.forEach(e=>{if(e.isIntersecting){e.target.style.animation='fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) both';obs.unobserve(e.target)}})},{threshold:0.1});
+document.querySelectorAll('.feature-card,.stack-chip,.quickstart-card,.cta-card').forEach(el=>obs.observe(el));
+</script>
+</body>
+</html>

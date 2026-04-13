@@ -94,7 +94,13 @@ function toAgentRow(s: StoredAgent) {
 const PROXY_PORT = 9700;
 
 function getProxyBaseUrl(): string {
+  // In cnb.run, the proxy runs on the same host but different port
+  // Locally, it's just localhost:9700
   const loc = window.location;
+  if (loc.hostname.includes(".cnb.run")) {
+    // cnb.run pattern: <id>-<port>.cnb.run → replace port segment
+    return loc.origin.replace(/-\d+\.cnb\.run/, `-${PROXY_PORT}.cnb.run`);
+  }
   return `${loc.protocol}//localhost:${PROXY_PORT}`;
 }
 
@@ -103,7 +109,10 @@ function isLocalUrl(url: string): boolean {
     const u = new URL(url);
     const host = u.hostname;
     if (host === "localhost" || host === "127.0.0.1" || host === "0.0.0.0") return true;
+    // Same origin as current page
     if (u.origin === window.location.origin) return true;
+    // cnb.run sibling service (same prefix, different port)
+    if (host.includes(".cnb.run") && window.location.hostname.includes(".cnb.run")) return true;
     return false;
   } catch {
     return false;
